@@ -42,7 +42,10 @@ export const PlayersPage: React.FC = () => {
   useEffect(() => {
     if (id) {
       apiClient.get(`/player/statistic/${id}`)
-        .then(response => setStats(response.data))
+        .then(response => {
+          console.log("Stats: ", response.data.player);
+          setStats(response.data.player);
+        })
         .catch(() => setStats(null));
     }
   }, [id]);
@@ -117,9 +120,10 @@ export const PlayersPage: React.FC = () => {
           {tab === 'stats' && stats ? (
             <Box>
               <Typography variant="h6" fontWeight="bold">Статистика</Typography>
-              <Typography color="textSecondary">Голы: {player.goals}</Typography>
-              <Typography color="textSecondary">Пенальти: {player.penalties}</Typography>
-              <Typography color="textSecondary">Голевые передачи: {player.assists}</Typography>
+              <Typography color="textSecondary">Голы: {stats.goals}</Typography>
+              <Typography color="textSecondary">Голы в игре: {stats.goalInGames}</Typography>
+              <Typography color="textSecondary">Пенальти: {stats.penalties}</Typography>
+              <Typography color="textSecondary">Голевые передачи: {stats.assists}</Typography>
             </Box>
           ) : (
             <Box>

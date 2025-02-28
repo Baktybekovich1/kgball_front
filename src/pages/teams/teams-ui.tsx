@@ -76,7 +76,6 @@ export const TeamsPage: React.FC = () => {
     }
   }, [id]);
   
-    
 
   const [selectedTab, setSelectedTab] = useState<string>("обзор");
   const [viewMode, setViewMode] = useState<"cards" | "table">("cards"); 
@@ -396,3 +395,5 @@ export const TeamsPage: React.FC = () => {
     </Container>
   );
 };
+
+
