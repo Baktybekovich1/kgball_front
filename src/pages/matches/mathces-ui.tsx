@@ -62,7 +62,7 @@ export const MatchesPage: React.FC = () => {
             };
           });
   
-          console.log("Matches:", updatedGames);
+          // console.log("Matches:", updatedGames);
           setMatches(updatedGames);
         } catch (error) {
           console.error("Ошибка загрузки данных:", error);
@@ -91,12 +91,13 @@ export const MatchesPage: React.FC = () => {
         const match = matchResponse.data;
   
         // Запрашиваем обе команды и голы ПАРАЛЛЕЛЬНО
-        const [winnerResponse, loserResponse, goalsResponse, winnerSquadResponse, loserSquadResponse] = await Promise.all([
+        const [winnerResponse, loserResponse, goalsResponse, winnerSquadResponse, loserSquadResponse, statsResponse] = await Promise.all([
           apiClient.get(match.winnerTeam),
           apiClient.get(match.loserTeam),
           apiClient.get(`/game/scores/${id}`),
           apiClient.get(`/team/squad_list/${match.winnerTeam.split('/').pop()}`),
           apiClient.get(`/team/squad_list/${match.loserTeam.split('/').pop()}`),
+          apiClient.get(`/team/game_statistics/${match.winnerTeam.split('/').pop()}/${match.loserTeam.split('/').pop()}`),  // New call for stats
         ]);
   
         setMatch({
@@ -111,6 +112,9 @@ export const MatchesPage: React.FC = () => {
           winner: winnerSquadResponse.data.players,
           loser: loserSquadResponse.data.players,
         });
+        // console.log(statsResponse.data);
+        setStatistics(statsResponse.data); 
+  
       } catch (error) {
         console.error("Ошибка загрузки данных матча:", error);
         setError("Ошибка загрузки данных матча");
@@ -121,7 +125,6 @@ export const MatchesPage: React.FC = () => {
   
     fetchMatchData();
   }, [id]);
-  
   
   const [selectedTab, setSelectedTab] = useState<string>("гол");
 
@@ -147,7 +150,7 @@ export const MatchesPage: React.FC = () => {
               <p className="text-xl">Goals: {goals.filter(goal => goal.winnerTeamId === match.winnerTeamData.id).reduce((sum, goal) => sum + goal.winnerTeamScore, 0)}</p>
             </div>
           </div>
-          <Box className="flex gap-4 mb-6 mt-2">
+          <Box className="flex max-md:flex gap-4 mb-6 mt-2">
             <Button
               variant={selectedTab === "гол" ? "contained" : "outlined"}
               onClick={() => setSelectedTab("гол")}
@@ -171,7 +174,7 @@ export const MatchesPage: React.FC = () => {
             </Button>
           </Box>
 
-          <MatchContent selectedTab={selectedTab} match={match} goals={goals} teams={teams} />
+          <MatchContent selectedTab={selectedTab} statistics={statistics} match={match} goals={goals} teams={teams} />
         </>
       ) : (
         <>

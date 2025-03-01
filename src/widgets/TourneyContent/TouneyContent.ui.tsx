@@ -55,42 +55,69 @@ export const TourneyContent: React.FC<Props> = ({ selectedTab, tournament, playe
           <Typography className="col-span-2 max-md:text-base sm:col-span-3 text-lg font-bold text-white mt-2">
             Рейтинг команд
           </Typography>
-          {[
-            { title: tournament.firstPosition.teamTitle, goals: tournament.firstPosition.goalsCount },
-            { title: tournament.secondPosition.teamTitle, goals: tournament.secondPosition.goalsCount },
-            { title: tournament.thirdPosition.teamTitle, goals: tournament.thirdPosition.goalsCount }
-          ].map((team, index) => (
-            <div key={index} className="flex max-md:flex-col justify-between bg-white max-md:text-xs text-black rounded-lg p-3">
-              <div className="flex gap-2">
-                <Typography className="max-md:hidden">{index + 1}.</Typography> 
-                <Typography>{team.title}</Typography>
+          
+          <div className="grid grid-cols-3 max-md:grid-cols-1 gap-3 col-span-2 sm:col-span-3">
+            {[
+              { title: tournament.firstPosition.teamTitle, goals: tournament.firstPosition.goalsCount, assists: tournament.firstPosition.assistsCount },
+              { title: tournament.secondPosition.teamTitle, goals: tournament.secondPosition.goalsCount, assists: tournament.secondPosition.assistsCount },
+              { title: tournament.thirdPosition.teamTitle, goals: tournament.thirdPosition.goalsCount, assists: tournament.thirdPosition.assistsCount }
+            ].map((team, index) => (
+              <div key={index} className="flex flex-col gap-2">
+                <div className="flex gap-2 justify-between bg-white max-md:text-xs text-black rounded-lg p-3">
+                  <Typography className="max-md:text-base font-semibold">
+                    {team.title}
+                  </Typography>
+                  <Typography className="max-md:text-base text-xl">
+                    {index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉'}
+                  </Typography>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <Typography className="bg-white max-md:text-xs text-black rounded-lg p-3 font-semibold">
+                    Голы: {team.goals}
+                  </Typography>
+                  <Typography className="bg-white max-md:text-xs text-black rounded-lg p-3 font-semibold">
+                    Асситы: {team.assists}
+                  </Typography>
+                </div>
               </div>
-              <Typography className="text-bold">Голы: {team.goals}</Typography>
-            </div>
-          ))}
-           <Typography className="col-span-2 max-md:text-base sm:col-span-3 text-lg font-bold text-white mt-2">
-              Статистика игроков
-            </Typography>
-            <Typography className="bg-white max-md:text-xs text-black rounded-lg p-3">
-              Бомбардиры: {playersData.filter(player => player.goals > 0).length}
-            </Typography>
-            <Typography className="bg-white max-md:text-xs text-black rounded-lg p-3">
-              Ассистенты: {playersData.filter(player => player.assists > 0).length}
-            </Typography>
-            <Typography className="bg-white max-md:text-xs text-black rounded-lg p-3">
-              Всего голов: {tournament.firstPosition.goalsCount + tournament.secondPosition.goalsCount + tournament.thirdPosition.goalsCount}
-            </Typography>
-            <Typography className="bg-white max-md:text-xs text-black rounded-lg p-3">
-              Голевые передачи: {tournament.firstPosition.assistsCount + tournament.secondPosition.assistsCount + tournament.thirdPosition.assistsCount}
-            </Typography>
-            {/* <Typography className="bg-white max-md:text-xs text-black rounded-lg p-3">
-              Пенальти: 3
-            </Typography>
-            <Typography className="bg-white max-md:text-xs text-black rounded-lg p-3">
-              Авто голы: 2
-            </Typography> */}
-        </Box>
-      </div>
+            ))}
+          </div>
+    <Typography className="col-span-2 max-md:text-base sm:col-span-3 text-lg font-bold text-white mt-2">
+      Статистика игроков
+    </Typography>
+    <Typography className="bg-white max-md:text-xs text-black rounded-lg p-3">
+      <strong>Бомбардиры турнира:</strong> 
+      {playersData
+        .sort((a, b) => b.goals - a.goals)  
+        .slice(0, 1) 
+        .map((player, index) => (
+          <div key={index} className="flex items-center">
+            <span>{player.name} - {player.goals} гол(ов)</span>
+          </div>
+        ))}
+    </Typography>
+
+    <Typography className="bg-white max-md:text-xs text-black rounded-lg p-3">
+      <strong>Ассистенты турнира:</strong> 
+      {playersData
+        .sort((a, b) => b.assists - a.assists)  
+        .slice(0, 1) 
+        .map((player, index) => (
+          <div key={index} className="flex items-center">
+            <span>{player.name} - {player.assists} ассист(ов)</span>
+          </div>
+        ))}
+    </Typography>
+
+    <Typography className="bg-white max-md:text-xs text-black rounded-lg p-3">
+      Всего голов: {tournament.firstPosition.goalsCount + tournament.secondPosition.goalsCount + tournament.thirdPosition.goalsCount}
+    </Typography>
+    <Typography className="bg-white max-md:text-xs text-black rounded-lg p-3">
+      Асситы: {tournament.firstPosition.assistsCount + tournament.secondPosition.assistsCount + tournament.thirdPosition.assistsCount}
+    </Typography>
+  </Box>
+</div>
+
     );
   };
 

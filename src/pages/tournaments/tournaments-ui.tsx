@@ -33,7 +33,6 @@ export const TournamentsPage: React.FC = () => {
       });
   }, []);
   
-
   useEffect(() => {
     if (id) {
       apiClient.get(`tourney/review/${id}`)
@@ -82,12 +81,11 @@ export const TournamentsPage: React.FC = () => {
       {!tournament && <h1 className="text-xl font-bold mb-4">Турниры</h1>}
       {tournament ? (
         <div className="flex flex-col items-center justify-center px-4 py-8">
-          <Box mb={3}>
+          {/* <Box mb={3}>
             <Typography className="text-black" variant="h4" sx={{ fontWeight: "bold", mb: 1, textAlign: "center" }}>
               {tournament.title}
             </Typography>
-          </Box>
-
+          </Box> */}
           <Box className="flex gap-5 justify-center items-center mb-4">
             <Typography className="max-md:text-xl text-bold text-[30px]">
               Победитель: {tournament.firstPosition.teamTitle}
@@ -150,16 +148,8 @@ export const TournamentsPage: React.FC = () => {
                     <Typography variant="body2">
                       <strong>Всего матчей:</strong> {tournament.games.length}
                     </Typography>
-                    {/* <Typography variant="body2">
-                      <strong>Total Goals:</strong>
-                    </Typography> */}
-                  </Box>
-
-                  <Divider sx={{ my: 2 }} />
-
-                  <Box display="flex" justifyContent="space-between" alignItems="center">
-                    <Typography variant="h6" color="primary">
-                      Победитель:  
+                    <Typography variant="body2">
+                      <strong>Всего команд:</strong> {tournament.teamsSum}
                     </Typography>
                   </Box>
                 </Paper>

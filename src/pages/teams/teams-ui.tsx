@@ -14,6 +14,7 @@ export const TeamsPage: React.FC = () => {
   
   const { id } = useParams<{ id: string }>();
   const [team, setTeam] = useState(null);
+  const [matches, setMatches] = useState([]);
 
   useEffect(() => {
     apiClient.get("/api/teams")
@@ -34,77 +35,64 @@ export const TeamsPage: React.FC = () => {
     }, []);
     
 
-    useEffect(() => {
-      if (id) {
-        apiClient.get(`/api/teams/${id}`)
-          .then(response => {
-            console.log("Server response:", response);
-            console.log("Response data:", response.data); 
-    
-            if (response.data && typeof response.data === 'object') {
-              const selectedTeam = response.data;
-              
-              Promise.all([
-                ...selectedTeam.players.map((url: string) => apiClient.get(url)),
-                ...selectedTeam.goals.map((url: string) => apiClient.get(url)), 
-                ...selectedTeam.assists.map((url: string) => apiClient.get(url)),
-                ...selectedTeam.tourneyTeamPrizes.map((url: string) => apiClient.get(url)), // Загружаем призы
-              ])
-              .then((responses) => {
-                const players = responses.slice(0, selectedTeam.players.length);
-                const goals = responses.slice(selectedTeam.players.length, selectedTeam.players.length + selectedTeam.goals.length);
-                const assists = responses.slice(selectedTeam.players.length + selectedTeam.goals.length, selectedTeam.players.length + selectedTeam.goals.length + selectedTeam.assists.length);
-                const tourneyTeamPrizes = responses.slice(selectedTeam.players.length + selectedTeam.goals.length + selectedTeam.assists.length);
-    
-                setTeam({
-                  ...selectedTeam,
-                  players: players.map(player => player.data), 
-                  goals: goals.map(goal => goal.data),         
-                  assists: assists.map(assist => assist.data),
-                  tourneyTeamPrizes: tourneyTeamPrizes.map(prize => prize.data), // Обновляем призы
-                });
-              })
-              .catch((error) => {
-                console.error("Error fetching related data:", error);
-                setError("Ошибка загрузки дополнительных данных");
+  useEffect(() => {
+    if (id) {
+      apiClient.get(`/api/teams/${id}`)
+        .then(response => {
+          console.log("Server response:", response);
+          console.log("Response data:", response.data); 
+  
+          if (response.data && typeof response.data === 'object') {
+            const selectedTeam = response.data;
+            
+            Promise.all([
+              ...selectedTeam.players.map((url: string) => apiClient.get(url)),
+              ...selectedTeam.goals.map((url: string) => apiClient.get(url)), 
+              ...selectedTeam.assists.map((url: string) => apiClient.get(url)),
+              ...selectedTeam.tourneyTeamPrizes.map((url: string) => apiClient.get(url)), // Загружаем призы
+            ])
+            .then((responses) => {
+              const players = responses.slice(0, selectedTeam.players.length);
+              const goals = responses.slice(selectedTeam.players.length, selectedTeam.players.length + selectedTeam.goals.length);
+              const assists = responses.slice(selectedTeam.players.length + selectedTeam.goals.length, selectedTeam.players.length + selectedTeam.goals.length + selectedTeam.assists.length);
+              const tourneyTeamPrizes = responses.slice(selectedTeam.players.length + selectedTeam.goals.length + selectedTeam.assists.length);
+  
+              setTeam({
+                ...selectedTeam,
+                players: players.map(player => player.data), 
+                goals: goals.map(goal => goal.data),         
+                assists: assists.map(assist => assist.data),
+                tourneyTeamPrizes: tourneyTeamPrizes.map(prize => prize.data), // Обновляем призы
               });
-            } else {
-              setError("Неверный формат данных от сервера");
-            }
-          })
-          .catch(error => {
-            console.error("API Error:", error);
-            setError("Ошибка загрузки данных команды");
-          });
-      }
-    }, [id]);
+            })
+            .catch((error) => {
+              console.error("Error fetching related data:", error);
+              setError("Ошибка загрузки дополнительных данных");
+            });
+          } else {
+            setError("Неверный формат данных от сервера");
+          }
+        })
+        .catch(error => {
+          console.error("API Error:", error);
+          setError("Ошибка загрузки данных команды");
+        });
+        apiClient.get(`/team/game_list/${id}`)
+        .then(response => {
+          if (response.data && response.data.games && Array.isArray(response.data.games)) {
+            console.log("Match: ", response.data.games);
+            setMatches(response.data.games);
+          } else {
+            setError("Некорректный формат данных матчей");
+          }
+        })
+        .catch(() => setError("Ошибка загрузки матчей"));
+    }
+  }, [id]);
     
   const [selectedTab, setSelectedTab] = useState<string>("обзор");
   const [viewMode, setViewMode] = useState<"cards" | "table">("cards"); 
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
-
-  const matches = teams.length > 1 ? [
-    {
-      winnerTeam: "",
-      loserTeam: "",
-      id: 1,
-      date: "2025-02-25",
-      team1: teams[0],
-      team2: teams[1],
-      score1: 2,
-      score2: 3,
-    },
-    {
-      winnerTeam: "",
-      loserTeam: "",
-      id: 2,
-      date: "2025-02-26",
-      team1: teams[0],
-      team2: teams[3],
-      score1: 1,
-      score2: 1,
-    },
-  ] : [];
 
   const getSortedPlayers = (players: { id: number, name: string, position: string, photo: string, goals: number, assists: number }[], category: string) => {
     let sortedPlayers = [...players];

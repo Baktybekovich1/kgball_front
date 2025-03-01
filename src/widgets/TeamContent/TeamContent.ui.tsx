@@ -91,29 +91,29 @@ export const RenderContent: React.FC<RenderContentProps> = ({
       ) : null;
     case "матчи":
       return matches ? (
-        <Box className="flex flex-col gap-5 mb-10">
-          {matches.map(match => (
-            <div className="flex-1 sm:w-[48%] md:w-[30%]">
+        <Box className="grid grid-cols-2 max-md:grid-cols-1 gap-4">
+          {matches.map((match, index) => (
+            <div>
+              <span className="max-md:text-md font-semibold text-xl">{match.tourney.title}</span> 
               <div className="border p-4 rounded-md block">
                 <Box className="flex items-center justify-between">
                   <div className="flex flex-col items-center">
-                    <img src={match.team1.logo || DefaultAvatar} alt={match.team1.title} className="w-10 h-10" />
-                    <span className="text-lg font-semibold">{match.team1.title}</span>
+                    <span className="text-lg font-semibold">{match.loserTeam.name}</span>
                   </div>
-                  <span className="text-md">{match.date}</span>
+                  <span className="text-md">{match.tourney.date}</span>
                   <div className="flex flex-col items-center">
-                    <img src={match.team2.logo || DefaultAvatar} alt={match.team2.title} className="w-10 h-10" />
-                    <span className="text-lg font-semibold">{match.team2.title}</span>
+                    <span className="text-lg font-semibold">{match.winnerTeam.name}</span>
                   </div>
                 </Box>
                 <Box className="flex justify-between">
-                  <span className="text-md">Score: {match.score1}</span>
-                  <span className="text-md">Score: {match.score2}</span>
+                  <span className="text-md">Счет: {match.loserTeam.goalTotalInGame}</span>
+                  <span className="text-md">Счет: {match.winnerTeam.goalTotalInGame}</span>
                 </Box>
               </div>
             </div>
           ))}
         </Box>
+
       ) : null;
     case "лучшие":
       return team ? (

@@ -5,11 +5,12 @@ interface MatchContentProps {
   selectedTab: string;
   match: any;
   goals: any[];
+  statistics: any[];
   teams: any;
 }
 
-export const MatchContent: React.FC<MatchContentProps> = ({ selectedTab, match, goals, teams }) => {
-  switch (selectedTab) {
+export const MatchContent: React.FC<MatchContentProps> = ({ selectedTab, match, goals, teams, statistics }) => {
+  switch (selectedTab) { 
     case "гол":
       return match ? (
         <Box>
@@ -57,11 +58,38 @@ export const MatchContent: React.FC<MatchContentProps> = ({ selectedTab, match, 
         </Box>
       ) : null;
     case "статистика":
-      return match ? (
-        <Box>
-          <Typography variant="h6">Статистика встреч</Typography>
+      return match && statistics ? (
+        <Box >
+          <Typography variant="h6" className="font-semibold">Статистика встречи</Typography>     
+          <div className="flex max-md:flex-col justify-between">
+            <Box className="mt-4">
+              <Typography className="font-semibold" variant="h6">{match.loserTeamData.title}:</Typography>
+              <Typography>Победы: {statistics.secondTeam.winning}</Typography>
+              <Typography>Голы: {statistics.secondTeam.goals}</Typography>
+              <Typography>Ассисты: {statistics.secondTeam.assists}</Typography>
+              <Typography>
+                Бомбардир: {statistics.secondTeam.bombardier.playerName || "Не определён"}
+              </Typography>
+              <Typography>
+                Ассистент: {statistics.secondTeam.assistant.playerName || "Не определён"}
+              </Typography>
+            </Box>
+            <Box className="mt-4">
+              <Typography className="font-semibold" variant="h6">{match.winnerTeamData.title}:</Typography>
+              <Typography>Победы: {statistics.firstTeam.winning}</Typography>
+              <Typography>Голы: {statistics.firstTeam.goals}</Typography>
+              <Typography>Ассисты: {statistics.firstTeam.assists}</Typography>
+              <Typography>
+                Бомбардир: {statistics.firstTeam.bombardier.playerName || "Не определён"}
+              </Typography>
+              <Typography>
+                Ассистент: {statistics.firstTeam.assistant.playerName || "Не определён"}
+              </Typography>
+            </Box>
+          </div>     
         </Box>
       ) : null;
+      
     default:
       return null;
   }

@@ -59,20 +59,13 @@ export const PlayerPage: React.FC = () => {
           <Button variant={tab === 'awards' ? "contained" : "outlined"} onClick={() => setTab('awards')}>Награды</Button>
         </Box>
 
-        {tab === 'stats' && stats ? (
-          <Box>
-            <Typography variant="h6" fontWeight="bold">Статистика</Typography>
-            <Typography color="textSecondary">Голы: {stats.goals}</Typography>
-            <Typography color="textSecondary">Голы в игре: {stats.goalInGames}</Typography>
-            <Typography color="textSecondary">Пенальти: {stats.penalties}</Typography>
-            <Typography color="textSecondary">Голевые передачи: {stats.assists}</Typography>
-          </Box>
-        ) : (
-          <Box>
-            <Typography variant="h6" fontWeight="bold">Награды</Typography>
-            {/* Awards List */}
-          </Box>
-        )}
+        <Box>
+          <Typography variant="h6" fontWeight="bold">Статистика</Typography>
+          <Typography color="textSecondary">Голы: {stats.goals}</Typography>
+          <Typography color="textSecondary">Голы в игре: {stats.goalInGames}</Typography>
+          <Typography color="textSecondary">Пенальти: {stats.penalties}</Typography>
+          <Typography color="textSecondary">Голевые передачи: {stats.assists}</Typography>
+        </Box>
 
         <Link to={pathKeys.players.root()} className="mt-6 inline-block text-blue hover:underline">Назад к списку</Link>
       </Card>
