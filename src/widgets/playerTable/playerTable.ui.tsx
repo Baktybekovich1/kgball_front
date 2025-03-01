@@ -8,16 +8,14 @@ export const PlayerTable = ({ players }: { players: any[] }) => (
         <TableRow>
           <TableCell>Имя</TableCell>
           <TableCell>Команда</TableCell>
-          <TableCell>Позиция</TableCell>
           <TableCell>Действие</TableCell>
         </TableRow>
       </TableHead>
       <TableBody>
         {players.map(player => (
-          <TableRow key={player.id}>
-            <TableCell>{player.name} {player.surname}</TableCell>
-            <TableCell>{player.teamName}</TableCell>
-            <TableCell>{player.position}</TableCell>
+          <TableRow key={player.playerId}>
+            <TableCell>{player.playerName} {player.surname}</TableCell>
+            <TableCell>{player.teamTitle}</TableCell>
             <TableCell>
               <Link to={pathKeys.players.bySlug(String(player.id))} className="text-blue hover:underline">Подробнее</Link>
             </TableCell>

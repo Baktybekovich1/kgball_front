@@ -1,8 +1,8 @@
-import { Container, Box, Button, Select, MenuItem, Typography, } from "@mui/material";
+import { Container, Box, Button, Select, MenuItem, Typography, TextField } from "@mui/material";
 import { useState, useEffect } from "react";
 import { apiClient } from "~shared/lib/api";
-import { PlayerCard } from '~widgets/playerCard/playerCard.ui'; 
-import { PlayerTable } from '~widgets/playerTable/playerTable.ui'; 
+import { PlayerCard } from '~widgets/playerCard/playerCard.ui';
+import { PlayerTable } from '~widgets/playerTable/playerTable.ui';
 
 export const PlayersPage: React.FC = () => {
   const [players, setPlayers] = useState<any[]>([]);
@@ -10,13 +10,15 @@ export const PlayersPage: React.FC = () => {
   const [error, setError] = useState("");
   const [filter, setFilter] = useState("all");
   const [view, setView] = useState<'cards' | 'table'>('cards');
+  const [searchQuery, setSearchQuery] = useState(""); 
 
   useEffect(() => {
-    apiClient.get("/player/list")
+    apiClient.get("/player/best_players")
       .then(response => {
-        if (response.data && Array.isArray(response.data.players)) {
-          console.log("Api: ", response.data.players);
-          setPlayers(response.data.players);
+        // Проверка структуры ответа и установка игроков
+        if (response.data && Array.isArray(response.data)) {
+          console.log(response.data);
+          setPlayers(response.data);
         } else {
           setError("Некорректный формат данных от сервера");
         }
@@ -29,11 +31,22 @@ export const PlayersPage: React.FC = () => {
       });
   }, []);
 
-  const filteredPlayers = players.filter(player => {
+  const filteredAndSortedPlayers = players
+  .filter(player => {
+    if (searchQuery && !player.playerName?.toLowerCase().includes(searchQuery.toLowerCase())) {
+      return false;
+    }
+
     if (filter === "bombers") return player.goals > 0;
     if (filter === "assistants") return player.assists > 0;
     return true;
+  })
+  .sort((a, b) => {
+    if (filter === "bombers") return b.goals - a.goals;
+    if (filter === "assistants") return b.assists - a.assists;
+    return 0; 
   });
+
 
   if (loading) return <Typography>Загрузка...</Typography>;
   if (error) return <Typography color="error">{error}</Typography>;
@@ -55,6 +68,14 @@ export const PlayersPage: React.FC = () => {
           <MenuItem value="bombers">Бомбардиры</MenuItem>
           <MenuItem value="assistants">Ассистенты</MenuItem>
         </Select>
+        <TextField
+          label="Поиск по имени"
+          variant="outlined"
+          size="small"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          sx={{ minWidth: 180 }}
+        />
         <Button 
           className="max-md:text-xs" 
           variant={view === 'cards' ? "contained" : "outlined"} 
@@ -72,17 +93,15 @@ export const PlayersPage: React.FC = () => {
       </Box>
       {view === 'cards' ? (
         <Box className="grid grid-cols-2 max-md:grid-cols-1 gap-6">
-          {filteredPlayers.map(player => (
-            <PlayerCard key={player.id} player={player} />
+          {filteredAndSortedPlayers.map(player => (
+            <PlayerCard key={player.playerId} player={player} />
           ))}
         </Box>
       ) : (
         <Box>
-          <PlayerTable players={filteredPlayers} />
+          <PlayerTable players={filteredAndSortedPlayers} />
         </Box>
       )}
-
     </Container>
   );
 };
-

@@ -13,9 +13,10 @@ export const MatchesPage: React.FC = () => {
   
   const { id } = useParams<{ id: string }>();
   const [match, setMatch] = useState<any>(null);
-  const [goals, setGoals] = useState<any[]>([]);  
+  const [scores, setScores] = useState<any[]>([]);  
   const [teams, setTeams] = useState<any[]>([]);  
   const [statistics, setStatistics] = useState<any>(null); 
+  const [goals, setGoals] = useState<any[]>([]);
 
   useEffect(() => {
     setLoading(true);
@@ -36,12 +37,12 @@ export const MatchesPage: React.FC = () => {
         const teamPromises = teamUrls.map(url => apiClient.get(url));
         
         // Получаем данные голов (параллельно)
-        const goalPromises = games.map(game => apiClient.get(`/game/scores/${game.id}`));
+        const scorePromises = games.map(game => apiClient.get(`/game/scores/${game.id}`));
   
         try {
-          const [teamsResponses, goalsResponses] = await Promise.all([
+          const [teamsResponses, scoresResponses] = await Promise.all([
             Promise.all(teamPromises),
-            Promise.all(goalPromises),
+            Promise.all(scorePromises),
           ]);
   
           // Создаём мапу команд
@@ -58,7 +59,7 @@ export const MatchesPage: React.FC = () => {
               ...game,
               winnerTeamData: teamMap[winnerTeamId] || {},
               loserTeamData: teamMap[loserTeamId] || {},
-              goals: Array.isArray(goalsResponses[index].data) ? goalsResponses[index].data : [goalsResponses[index].data],
+              scores: Array.isArray(scoresResponses[index].data) ? scoresResponses[index].data : [scoresResponses[index].data],
             };
           });
   
@@ -91,13 +92,14 @@ export const MatchesPage: React.FC = () => {
         const match = matchResponse.data;
   
         // Запрашиваем обе команды и голы ПАРАЛЛЕЛЬНО
-        const [winnerResponse, loserResponse, goalsResponse, winnerSquadResponse, loserSquadResponse, statsResponse] = await Promise.all([
+        const [winnerResponse, loserResponse, scoresResponse, winnerSquadResponse, loserSquadResponse, statsResponse, goalsResponse] = await Promise.all([
           apiClient.get(match.winnerTeam),
           apiClient.get(match.loserTeam),
           apiClient.get(`/game/scores/${id}`),
           apiClient.get(`/team/squad_list/${match.winnerTeam.split('/').pop()}`),
           apiClient.get(`/team/squad_list/${match.loserTeam.split('/').pop()}`),
           apiClient.get(`/team/game_statistics/${match.winnerTeam.split('/').pop()}/${match.loserTeam.split('/').pop()}`),  // New call for stats
+          apiClient.get(`/game/goals/${id}`),  // Fetch goal data
         ]);
   
         setMatch({
@@ -106,14 +108,15 @@ export const MatchesPage: React.FC = () => {
           loserTeamData: loserResponse.data,
         });
   
-        setGoals(Array.isArray(goalsResponse.data) ? goalsResponse.data : [goalsResponse.data]);
+        setScores(Array.isArray(scoresResponse.data) ? scoresResponse.data : [scoresResponse.data]);
   
         setTeams({
           winner: winnerSquadResponse.data.players,
           loser: loserSquadResponse.data.players,
         });
-        // console.log(statsResponse.data);
         setStatistics(statsResponse.data); 
+        console.log(goalsResponse.data);
+        setGoals(goalsResponse.data);  
   
       } catch (error) {
         console.error("Ошибка загрузки данных матча:", error);
@@ -139,7 +142,7 @@ export const MatchesPage: React.FC = () => {
             <div className="items-center">
               <img src={match.loserTeamData.logo || DefaultAvatar} alt={match.loserTeamData.title} className="w-16 h-16" />
               <h2 className="text-lg font-semibold">{match.loserTeamData.title}</h2>
-              <p className="text-xl">Goals: {goals.filter(goal => goal.loserTeamId === match.loserTeamData.id).reduce((sum, goal) => sum + goal.loserTeamScore, 0)}</p>
+              <p className="text-xl">Scores: {scores.filter(score => score.loserTeamId === match.loserTeamData.id).reduce((sum, score) => sum + score.loserTeamScore, 0)}</p>
             </div>
             <div className="flex flex-col items-center">
               <p className="text-xl font-bold">VS</p>
@@ -147,10 +150,10 @@ export const MatchesPage: React.FC = () => {
             <div className="items-center">
               <img src={match.winnerTeamData.logo || DefaultAvatar} alt={match.winnerTeamData.title} className="w-16 h-16" />
               <h2 className="text-lg font-semibold">{match.winnerTeamData.title}</h2>
-              <p className="text-xl">Goals: {goals.filter(goal => goal.winnerTeamId === match.winnerTeamData.id).reduce((sum, goal) => sum + goal.winnerTeamScore, 0)}</p>
+              <p className="text-xl">Scores: {scores.filter(score => score.winnerTeamId === match.winnerTeamData.id).reduce((sum, score) => sum + score.winnerTeamScore, 0)}</p>
             </div>
           </div>
-          <Box className="flex max-md:flex gap-4 mb-6 mt-2">
+          <Box className="flex max-md:flex-col gap-4 mb-6 mt-2">
             <Button
               variant={selectedTab === "гол" ? "contained" : "outlined"}
               onClick={() => setSelectedTab("гол")}
@@ -174,7 +177,7 @@ export const MatchesPage: React.FC = () => {
             </Button>
           </Box>
 
-          <MatchContent selectedTab={selectedTab} statistics={statistics} match={match} goals={goals} teams={teams} />
+          <MatchContent selectedTab={selectedTab} statistics={statistics} match={match} scores={scores} teams={teams} goals={goals} />
         </>
       ) : (
         <>
@@ -194,7 +197,7 @@ export const MatchesPage: React.FC = () => {
                   </Box>
                   <Box className="flex justify-between">
                     <span className="text-md">
-                      Score: {match.goals.filter(goal => goal.loserTeamId === match.loserTeamData.id).reduce((sum, goal) => sum + goal.loserTeamScore, 0)} - {match.goals.filter(goal => goal.winnerTeamId === match.winnerTeamData.id).reduce((sum, goal) => sum + goal.winnerTeamScore, 0)}
+                      Score: {match.scores.filter(score => score.loserTeamId === match.loserTeamData.id).reduce((sum, score) => sum + score.loserTeamScore, 0)} - {match.scores.filter(score => score.winnerTeamId === match.winnerTeamData.id).reduce((sum, score) => sum + score.winnerTeamScore, 0)}
                     </span>
                   </Box>
                 </Link>

@@ -70,25 +70,31 @@ export const RenderContent: React.FC<RenderContentProps> = ({
           </div>
         </Box>
       ) : null;
-    case "состав":
-      return team ? (
-        <Box className="flex flex-col gap-5 mb-10">
-          <Typography variant="h6" fontWeight="bold">Состав команды</Typography>
-          {team.players && team.players.length > 0 ? (
-            team.players.map(player => (
-              <Box key={player.id} className="flex items-center gap-4 p-4 border border-gray-300 rounded-md">
-                <img src={player.photo || DefaultAvatar} alt={player.name} className="w-12 h-12 rounded-full" />
-                <div>
-                  <Typography variant="h6" className="font-semibold">{player.name}</Typography>
-                  <Typography variant="body2" color="textSecondary">{player.position}</Typography>
-                </div>
-              </Box>
-            ))
-          ) : (
-            <Typography className="text-lg text-gray-700">Нет игроков в составе</Typography>
-          )}
-        </Box>
-      ) : null;
+      case "состав":
+        return team ? (
+          <Box className="flex flex-col gap-5 mb-10">
+            <Typography variant="h6" fontWeight="bold">Состав команды</Typography>
+            {team.players && team.players.length > 0 ? (
+              team.players.map(player => (
+                <Box key={player.id} className="flex items-center gap-4 p-4 border border-gray-300 rounded-md">
+                  <img src={player.photo || DefaultAvatar} alt={player.name} className="w-12 h-12 rounded-full" />
+                  <div className="flex w-full justify-between items-center">
+                    <div>
+                      <Typography variant="h6" className="font-semibold">{player.name}</Typography>
+                      <Typography variant="body2" color="textSecondary">{player.position}</Typography>
+                    </div>
+                    <Typography variant="body2" className="text-base">
+                      {player.goals.length} + {player.assists.length}
+                    </Typography>
+                  </div>
+                </Box>
+              ))
+            ) : (
+              <Typography className="text-lg text-gray-700">Нет игроков в составе</Typography>
+            )}
+          </Box>
+        ) : null;
+      
     case "матчи":
       return matches ? (
         <Box className="grid grid-cols-2 max-md:grid-cols-1 gap-4">

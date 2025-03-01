@@ -4,33 +4,66 @@ import { Box, Typography } from "@mui/material";
 interface MatchContentProps {
   selectedTab: string;
   match: any;
-  goals: any[];
+  scores: any[];
   statistics: any[];
   teams: any;
+  goals: any[]; 
 }
 
-export const MatchContent: React.FC<MatchContentProps> = ({ selectedTab, match, goals, teams, statistics }) => {
+export const MatchContent: React.FC<MatchContentProps> = ({ selectedTab, match, scores, teams, statistics, goals }) => {
   switch (selectedTab) { 
     case "гол":
       return match ? (
         <Box>
-          <Typography variant="h6">Голы:</Typography>
-          {Array.isArray(goals) && goals.length > 0 ? (
-            goals.map((goal: any, index: number) => (
+          <Typography variant="h6">Счет:</Typography>
+          {Array.isArray(scores) && scores.length > 0 ? (
+            scores.map((score: any, index: number) => (
               <Box className="flex justify-between" key={index} mb={2}>
                 <Typography className="max-md:text-xl text-[25px]">
-                  {goal.loserTeamTitle} - {goal.loserTeamScore}
+                  {score.loserTeamTitle} - {score.loserTeamScore}
                 </Typography>
                 <Typography className="max-md:text-xl text-[25px]">
-                  {goal.winnerTeamTitle} - {goal.winnerTeamScore}
+                  {score.winnerTeamTitle} - {score.winnerTeamScore}
                 </Typography>
               </Box>
             ))
           ) : (
-            <Typography variant="body2">No goals available</Typography>
+            <Typography variant="body2">No scores available</Typography>
           )}
+          <div className="flex max-md:flex-col justify-between">
+            {goals.loserTeamGoals && goals.loserTeamGoals.length > 0 ? (
+              goals.loserTeamGoals.map((goal: any, index: number) => (
+                <Box key={goal.goalId} mb={2}>
+                  <Typography variant="body1">
+                    {goal.goalAuthor.playerName} (Гол)
+                  </Typography>
+                  <Typography variant="body1">
+                    {goal.assistAuthor ? `${goal.assistAuthor.playerName} (Пас)` : 'Без паса'}
+                  </Typography>
+                </Box>
+              ))
+            ) : (
+              <Typography variant="body2">Нет</Typography>
+            )}
+            
+            {goals.winnerTeamGoals && goals.winnerTeamGoals.length > 0 ? (
+              goals.winnerTeamGoals.map((goal: any, index: number) => (
+                <Box key={goal.goalId} mb={2}>
+                  <Typography variant="body1">
+                    {goal.goalAuthor.playerName} (Гол)
+                  </Typography>
+                  <Typography variant="body1">
+                    {goal.assistAuthor ? `${goal.assistAuthor.playerName} (Пас)` : 'Без паса'}
+                  </Typography>
+                </Box>
+              ))
+            ) : (
+              <Typography variant="body2">Нет</Typography>
+            )}
+          </div>
         </Box>
       ) : null;
+
     case "состав":
       return match ? (
         <Box className="flex justify-between">
