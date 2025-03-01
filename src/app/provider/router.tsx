@@ -7,6 +7,7 @@ import {
 import { errorPageRoute } from '~pages/error'
 import { homePageRoute } from '~pages/home'
 import { playersPageRoute } from '~pages/players'
+import { playerPageRoute } from '~pages/player'
 import { teamsPageRoute } from '~pages/teams'
 import { matchesPageRoute } from '~pages/matches'
 import { tournamentsPageRoute } from '~pages/tournaments'
@@ -35,6 +36,7 @@ const router = createBrowserRouter([
     children: [
       homePageRoute,
       playersPageRoute,
+      playerPageRoute,
       teamsPageRoute,
       tournamentsPageRoute,
       matchesPageRoute,

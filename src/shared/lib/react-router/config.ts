@@ -5,10 +5,11 @@ export const pathKeys = {
   },
   players: {
     root() {
-      return pathKeys.root.concat('player/list/')
+      return pathKeys.root + 'player/list/';
     },
-    bySlug(slug: string) {
-      return pathKeys.players.root().concat(`${slug}`);
+
+    bySlug(id: string) {  
+      return pathKeys.players.root() + id;  
     },
   },
   teams: {

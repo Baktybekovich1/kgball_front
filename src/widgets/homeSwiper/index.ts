@@ -1,0 +1,1 @@
+export { HomeSwiper } from './homeSwiper.ui'
