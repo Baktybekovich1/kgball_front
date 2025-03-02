@@ -43,7 +43,7 @@ export const TourneyContent: React.FC<Props> = ({ selectedTab, tournament, playe
       <div className="w-full">
         <Typography variant="h6" fontWeight="bold">Обзор турнира</Typography>
         <Box className="grid grid-cols-2 sm:grid-cols-3 gap-3 mt-2 p-4 bg-tundora rounded-lg shadow-lg">
-          <Typography className="col-span-2 max-md:text-base sm:col-span-3 text-lg font-bold text-white">
+          <Typography component="div" className="col-span-2 max-md:text-base sm:col-span-3 text-lg font-bold text-white">
             Турнирная статистика
           </Typography>
           <Typography className="bg-white max-md:text-xs text-black rounded-lg p-3 font-semibold">
@@ -82,42 +82,43 @@ export const TourneyContent: React.FC<Props> = ({ selectedTab, tournament, playe
               </div>
             ))}
           </div>
-    <Typography className="col-span-2 max-md:text-base sm:col-span-3 text-lg font-bold text-white mt-2">
-      Статистика игроков
-    </Typography>
-    <Typography className="bg-white max-md:text-xs text-black rounded-lg p-3">
-      <strong>Бомбардиры турнира:</strong> 
-      {playersData
-        .sort((a, b) => b.goals - a.goals)  
-        .slice(0, 1) 
-        .map((player, index) => (
-          <div key={index} className="flex items-center">
-            <span>{player.name} - {player.goals} гол(ов)</span>
-          </div>
-        ))}
-    </Typography>
+          <Typography className="col-span-2 max-md:text-base sm:col-span-3 text-lg font-bold text-white mt-2">
+            Статистика игроков
+          </Typography>
+          <Typography component="div" className="bg-white max-md:text-xs text-black rounded-lg p-3">
+            <strong>Бомбардиры турнира:</strong> 
+            {playersData
+              .slice()
+              .sort((a, b) => b.goals - a.goals)  
+              .slice(0, 1) 
+              .map((player, index) => (
+                <div key={index} className="flex items-center">
+                  <span>{player.name} - {player.goals} гол(ов)</span>
+                </div>
+              ))}
+          </Typography>
 
-    <Typography className="bg-white max-md:text-xs text-black rounded-lg p-3">
-      <strong>Ассистенты турнира:</strong> 
-      {playersData
-        .sort((a, b) => b.assists - a.assists)  
-        .slice(0, 1) 
-        .map((player, index) => (
-          <div key={index} className="flex items-center">
-            <span>{player.name} - {player.assists} ассист(ов)</span>
-          </div>
-        ))}
-    </Typography>
+          <Typography component="div" className="bg-white max-md:text-xs text-black rounded-lg p-3">
+            <strong>Ассистенты турнира:</strong> 
+            {playersData
+              .slice()
+              .sort((a, b) => b.assists - a.assists)  
+              .slice(0, 1) 
+              .map((player, index) => (
+                <div key={index} className="flex items-center">
+                  <span>{player.name} - {player.assists} ассист(ов)</span>
+                </div>
+              ))}
+          </Typography>
 
-    <Typography className="bg-white max-md:text-xs text-black rounded-lg p-3">
-      Всего голов: {tournament.firstPosition.goalsCount + tournament.secondPosition.goalsCount + tournament.thirdPosition.goalsCount}
-    </Typography>
-    <Typography className="bg-white max-md:text-xs text-black rounded-lg p-3">
-      Асситы: {tournament.firstPosition.assistsCount + tournament.secondPosition.assistsCount + tournament.thirdPosition.assistsCount}
-    </Typography>
-  </Box>
-</div>
-
+          <Typography className="bg-white max-md:text-xs text-black rounded-lg p-3">
+            Всего голов: {tournament.firstPosition.goalsCount + tournament.secondPosition.goalsCount + tournament.thirdPosition.goalsCount}
+          </Typography>
+          <Typography className="bg-white max-md:text-xs text-black rounded-lg p-3">
+            Асситы: {tournament.firstPosition.assistsCount + tournament.secondPosition.assistsCount + tournament.thirdPosition.assistsCount}
+          </Typography>
+        </Box>
+      </div>
     );
   };
 
@@ -136,7 +137,7 @@ export const TourneyContent: React.FC<Props> = ({ selectedTab, tournament, playe
           {playersData.filter(filter).map(player => (
             <TableRow key={player.playerId}>
               <TableCell>
-                <img className="w-12" src={player.photo || DefaultAvatar} />
+                <img className="w-12" src={player.photo || DefaultAvatar} alt={player.name} />
               </TableCell>
               <TableCell>{player.name}</TableCell>
               <TableCell>{player.goals}</TableCell>

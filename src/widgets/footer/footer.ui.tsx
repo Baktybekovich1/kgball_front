@@ -51,25 +51,24 @@ export const Footer: React.FC = () => {
         
         <div className="flex max-md:flex-col max-md:gap-4 gap-6 mt-4">
           {contacts.map((contact: Contact) => (
-            <ListItem sx={{ width: 'auto', p: 0 }}>
+            <ListItem key={contact.id} sx={{ width: 'auto', p: 0 }}>
                 <a
-                  key={contact.id}
                   href={contact.link}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full"
                 >
                   <div className="cursor-pointer flex items-center justify-between">
-                  <div className="flex gap-2 items-center">
-                    {contact.icon}
-                    <p className="max-md:text-base text-xl font-medium text-white">
-                      {contact.text}
-                    </p>
+                    <div className="flex gap-2 items-center">
+                      {contact.icon}
+                      <p className="max-md:text-base text-xl font-medium text-white">
+                        {contact.text}
+                      </p>
+                    </div>
                   </div>
-                </div>
                 </a>
-              </ListItem>
-            ))}
+            </ListItem>
+          ))}
         </div>
       </Container>
     </footer>
