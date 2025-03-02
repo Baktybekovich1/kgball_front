@@ -57,7 +57,7 @@ export const PlayersPage: React.FC = () => {
         Список игроков
       </Typography>
 
-      <Box className="max-md:text-sm mb-4 flex gap-2 justify-center text-center">
+      <Box className="max-md:flex-col mb-4 flex gap-2 justify-center text-center">
         <Select 
           value={filter} 
           onChange={(e) => setFilter(e.target.value)}
@@ -77,14 +77,12 @@ export const PlayersPage: React.FC = () => {
           sx={{ minWidth: 180 }}
         />
         <Button 
-          className="max-md:text-xs" 
           variant={view === 'cards' ? "contained" : "outlined"} 
           onClick={() => setView('cards')}
           size="small"
           sx={{ minWidth: 80, padding: "4px 8px", fontSize: "12px" }}
         >Карточки</Button>
         <Button 
-          className="max-md:text-xs" 
           variant={view === 'table' ? "contained" : "outlined"} 
           onClick={() => setView('table')}
           size="small"

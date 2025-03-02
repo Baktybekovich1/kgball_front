@@ -45,7 +45,7 @@ export const RenderContent: React.FC<RenderContentProps> = ({
             <Typography 
               className="max-md:text-base border border-gray-300 bg-gray-50 p-3 rounded-md text-lg text-gray-700"
             >
-              Всего сыграно матчей: <span className="font-semibold"></span>
+              Всего сыграно матчей: <span className="font-semibold">{matches.length}</span>
             </Typography>
             <Typography 
               className="max-md:text-base border border-gray-300 bg-gray-50 p-3 rounded-md text-lg text-gray-700"
@@ -94,7 +94,6 @@ export const RenderContent: React.FC<RenderContentProps> = ({
             )}
           </Box>
         ) : null;
-      
     case "матчи":
       return matches ? (
         <Box className="grid grid-cols-2 max-md:grid-cols-1 gap-4">

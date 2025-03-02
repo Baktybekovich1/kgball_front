@@ -1,7 +1,7 @@
 import { Container, Typography, List, ListItem, Box, IconButton } from '@mui/material';
 import { InstagramIcon } from '~shared/assets/icons/InstagramIcon';
 import { WhatsappIcon } from '~shared/assets/icons/whatsappIcon';
-import { GmailIcon } from '~shared/assets/icons/GmailIcon';
+import { TelegramIcon } from '~shared/assets/icons/telegramIcon';
 import { Link } from 'react-router-dom';
 import { ArrowIcon } from '~shared/assets/icons/ArrowIcon';
 
@@ -18,20 +18,20 @@ export const Footer: React.FC = () => {
     {
       id: 1,
       icon: <WhatsappIcon />,
-      text: "+996 333 333 333",
-      link: "https://wa.me/996333333333",
+      text: "+996 503794400",
+      link: "https://wa.me/0503794400",
     },
     {
       id: 2,
       icon: <InstagramIcon />,
-      text: "kyrgyzBall.kg",
-      link: "https://www.instagram.com/kyrgyzBall",
+      text: "@kelechek_city_ ",
+      link: "https://www.instagram.com/@kelechek_city_",
     },
     {
       id: 3,
-      icon: <GmailIcon />,
-      text: "kyrgyzBall@gmail.col",
-      link: "mailto:kyrgyzBall.kg@gmail.com",
+      icon: <TelegramIcon />,
+      text: "@baktybekovich.k",
+      link: "https://web.telegram.org/k/#@baktybekovich",
     },
   ];
   

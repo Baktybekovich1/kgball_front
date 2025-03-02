@@ -8,9 +8,12 @@ import { errorPageRoute } from '~pages/error'
 import { homePageRoute } from '~pages/home'
 import { playersPageRoute } from '~pages/players'
 import { playerPageRoute } from '~pages/player'
+import { teamPageRoute } from '~pages/team'
 import { teamsPageRoute } from '~pages/teams'
 import { matchesPageRoute } from '~pages/matches'
+import { matchPageRoute } from '~pages/match'
 import { tournamentsPageRoute } from '~pages/tournaments'
+import { tournamentPageRoute } from '~pages/tournament'
 import { GenericLayout } from '~app/layout'
 
 function BubbleError() {
@@ -38,8 +41,11 @@ const router = createBrowserRouter([
       playersPageRoute,
       playerPageRoute,
       teamsPageRoute,
+      teamPageRoute,
       tournamentsPageRoute,
+      tournamentPageRoute,
       matchesPageRoute,
+      matchPageRoute,
       errorPageRoute,
     ],
   },
