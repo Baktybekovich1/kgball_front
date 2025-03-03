@@ -3,6 +3,9 @@ export const pathKeys = {
   home() {
     return pathKeys.root
   },
+  dashboard() {
+    return pathKeys.root + 'dashboard';
+  },
   players: {
     root() {
       return pathKeys.root + 'player/list/';

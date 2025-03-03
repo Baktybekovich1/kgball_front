@@ -4,7 +4,10 @@ import {
   useRouteError,
 } from 'react-router-dom'
 
+import { DashboardLayout } from '~app/layout'
+
 import { errorPageRoute } from '~pages/error'
+import { dashboardPageRoute } from '~pages/dashboard'
 import { homePageRoute } from '~pages/home'
 import { playersPageRoute } from '~pages/players'
 import { playerPageRoute } from '~pages/player'
@@ -37,7 +40,7 @@ const router = createBrowserRouter([
     element: <GenericLayout />,
     errorElement: <BubbleError />,
     children: [
-      homePageRoute,
+      homePageRoute, 
       playersPageRoute,
       playerPageRoute,
       teamsPageRoute,
@@ -49,6 +52,11 @@ const router = createBrowserRouter([
       errorPageRoute,
     ],
   },
+  {
+    path: '/dashboard',
+    element: <DashboardLayout />,
+    children: [dashboardPageRoute], 
+  }
 ])
 
 export function BrowserRouter() {

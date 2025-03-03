@@ -5,7 +5,7 @@ import { pathKeys } from "~shared/lib/react-router";
 
 export const PlayerCard = ({ player }: { player: any }) => (
   <Link to={pathKeys.players.bySlug(String(player.playerId))} key={player.playerId} className="block">
-    <Card className="p-3 rounded-xl shadow-lg hover:shadow-xl transition-transform hover:scale-105">
+    <Card className="p-3 bg-[#e1e1e1] rounded-xl shadow-lg hover:shadow-xl transition-transform hover:scale-105">
       <CardContent className="flex items-center gap-4">
         <img 
           src={player.photo || DefaultAvatar} 
@@ -25,3 +25,4 @@ export const PlayerCard = ({ player }: { player: any }) => (
     </Card>
   </Link> 
 );
+ 

@@ -21,3 +21,12 @@ export function IntroLayout() {
     </div>
   )
 }
+
+export function DashboardLayout() {
+  return (
+    <div className="flex flex-col min-h-screen">
+      <Outlet />
+    </div>
+  )
+}
+

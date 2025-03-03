@@ -1,1 +1,1 @@
-export { GenericLayout, IntroLayout } from './layout.ui';
+export { GenericLayout, IntroLayout, DashboardLayout } from './layout.ui';

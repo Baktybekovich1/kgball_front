@@ -83,7 +83,7 @@ export const MatchesPage: React.FC = () => {
               </Box>
               <Box className="flex justify-between">
                 <span className="text-md">
-                  Score: {match.scores.filter(score => score.loserTeamId === match.loserTeamData.id).reduce((sum, score) => sum + score.loserTeamScore, 0)} - {match.scores.filter(score => score.winnerTeamId === match.winnerTeamData.id).reduce((sum, score) => sum + score.winnerTeamScore, 0)}
+                  Счет: {match.scores.filter(score => score.loserTeamId === match.loserTeamData.id).reduce((sum, score) => sum + score.loserTeamScore, 0)} - {match.scores.filter(score => score.winnerTeamId === match.winnerTeamData.id).reduce((sum, score) => sum + score.winnerTeamScore, 0)}
                 </span>
               </Box>
             </Link>

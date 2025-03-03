@@ -78,7 +78,7 @@ export const MatchPage: React.FC = () => {
             <div className="items-center">
               <img src={match.loserTeamData.logo || DefaultAvatar} alt={match.loserTeamData.title} className="w-16 h-16" />
               <h2 className="text-lg font-semibold">{match.loserTeamData.title}</h2>
-              <p className="text-xl">Scores: {scores.filter(score => score.loserTeamId === match.loserTeamData.id).reduce((sum, score) => sum + score.loserTeamScore, 0)}</p>
+              <p className="text-xl">Счет: {scores.filter(score => score.loserTeamId === match.loserTeamData.id).reduce((sum, score) => sum + score.loserTeamScore, 0)}</p>
             </div>
             <div className="flex flex-col items-center">
               <p className="text-xl font-bold">VS</p>
@@ -86,7 +86,7 @@ export const MatchPage: React.FC = () => {
             <div className="items-center">
               <img src={match.winnerTeamData.logo || DefaultAvatar} alt={match.winnerTeamData.title} className="w-16 h-16" />
               <h2 className="text-lg font-semibold">{match.winnerTeamData.title}</h2>
-              <p className="text-xl">Scores: {scores.filter(score => score.winnerTeamId === match.winnerTeamData.id).reduce((sum, score) => sum + score.winnerTeamScore, 0)}</p>
+              <p className="text-xl">Счет: {scores.filter(score => score.winnerTeamId === match.winnerTeamData.id).reduce((sum, score) => sum + score.winnerTeamScore, 0)}</p>
             </div>
           </div>
           <Box className="flex max-md:flex-col gap-4 mb-6 mt-2">

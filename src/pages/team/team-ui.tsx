@@ -42,7 +42,7 @@ export const TeamPage: React.FC = () => {
                 players: players.map(player => player.data), 
                 goals: goals.map(goal => goal.data),         
                 assists: assists.map(assist => assist.data),
-                tourneyTeamPrizes: tourneyTeamPrizes.map(prize => prize.data), // Обновляем призы
+                tourneyTeamPrizes: tourneyTeamPrizes.map(prize => prize.data), 
               });
             })
             .catch((error) => {
