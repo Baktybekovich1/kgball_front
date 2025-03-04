@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import { Container, Typography, Button, Box } from "@mui/material";
+import { Container, Typography, CircularProgress, Button, Box } from "@mui/material";
 import { apiClient } from "~shared/lib/api";
 import RenderContent from "~widgets/TeamContent/TeamContent.ui";
 import defaultTeam from "~shared/assets/img/defaultTeam.webp";
@@ -118,7 +118,7 @@ export const TeamPage: React.FC = () => {
           />
         </>
       ) : (
-        <Typography>Загрузка...</Typography>
+        <Typography className="flex justify-center items-center h-64"><CircularProgress /></Typography>
       )}
     </Container>
   );

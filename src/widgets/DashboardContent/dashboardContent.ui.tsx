@@ -1,7 +1,7 @@
-import { Box, Card, CardContent, Typography, Dialog, DialogActions, DialogContent, Button, Divider } from "@mui/material";
+import { Box, Dialog, DialogActions, DialogContent, DialogTitle, Button, TextField } from "@mui/material";
 import { useState, useEffect } from "react";
 import { apiClient } from "~shared/lib/api";
-import defaultTeam from "~shared/assets/img/defaultTeam.webp";
+import { DashboardRenderContent } from "~widgets/DashboardRenderContent";
 
 interface DashboardContentProps {
   activeTab: string;
@@ -13,21 +13,44 @@ interface DashboardContentProps {
 }
 
 export const DashboardContent: React.FC<DashboardContentProps> = ({ activeTab, loading, error, teams, tournaments, leagues }) => {
-  const [openModal, setOpenModal] = useState(false);
   const [selectedTeam, setSelectedTeam] = useState<any>(null);
   const [teamDetails, setTeamDetails] = useState<any>(null);
   const [teamError, setTeamError] = useState("");
+  const [openDialog, setOpenDialog] = useState(false); 
+  const [title, setTitle] = useState("");
+  const [logo, setLogo] = useState<File | null>(null);
 
-  const handleOpenModal = (team: any) => {
-    setSelectedTeam(team);
-    setOpenModal(true);
+  const handleCreateTeamClick = () => {
+    setOpenDialog(true);
   };
 
-  const handleCloseModal = () => {
-    setOpenModal(false);
-    setSelectedTeam(null);
-    setTeamDetails(null);
-    setTeamError("");
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+  };
+
+  const handleLogoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files[0]) {
+      setLogo(event.target.files[0]);
+    }
+  };
+
+  const handleSubmitTeam = () => {
+    if (title) {
+      const formData = new FormData();
+      formData.append("title", title);
+      if (logo) {
+        formData.append("logo", logo); 
+      }
+      apiClient.post("/team/add", formData)
+        .then((response) => {
+          setOpenDialog(false);
+        })
+        .catch((error) => {
+          console.error("Ошибка при добавлении команды:", error);
+        });
+    } else {
+      alert("Пожалуйста, заполните все поля!");
+    }
   };
 
   useEffect(() => {
@@ -53,7 +76,7 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({ activeTab, l
                   assists: assists.map(assist => assist.data),
                 });
               })
-              .catch((error) => {
+              .catch(() => {
                 setTeamError("Ошибка загрузки дополнительных данных");
               });
           } else {
@@ -64,145 +87,43 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({ activeTab, l
     }
   }, [selectedTeam]);
 
-  const renderContent = () => {
-    switch (activeTab) {
-      case "teams":
-        if (loading) return <Typography>Загрузка...</Typography>;
-        if (error) return <Typography color="error">{error}</Typography>;
-        return (
-          <Box>
-            <div className="mb-4 flex max-md:flex-col items-center justify-between">
-              <Typography variant="h5" fontWeight="bold">Список команд</Typography>
-              <Button
-              className="bg-tundora text-white text-base">
-                Создать Команду
-              </Button>
-            </div>
-            <div className="grid grid-cols-2 max-md:grid-cols-1 gap-5">
-              {teams.map((team) => (
-                <Card sx={{ height: "100%" }} key={team.id}>
-                  <CardContent>
-                    <Typography variant="h6" fontWeight="bold">{team.title}</Typography>
-                    <Button onClick={() => handleOpenModal(team)} sx={{ mt: 2 }}>
-                      Подробнее
-                    </Button>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </Box>
-        );
-      case "tournaments":
-        if (loading) return <Typography>Загрузка...</Typography>;
-        if (error) return <Typography color="error">{error}</Typography>;
-        return (
-          <Box>
-            <div className="mb-4 flex max-md:flex-col items-center justify-between">
-              <Typography variant="h5" fontWeight="bold">Список турниров</Typography>
-              <Button
-              className="bg-tundora text-white text-base">
-                Добавить Турнир
-              </Button>
-            </div>
-            <div className="grid grid-cols-2 max-md:grid-cols-1 gap-5">
-              {tournaments.map((tournament) => (
-                <Card sx={{ height: "100%" }} key={tournament.id}>
-                  <CardContent>
-                    <Typography variant="h6" fontWeight="bold">{tournament.title}</Typography>
-                    <Typography variant="body2" color="textSecondary">
-                      <strong>Дата:</strong> {tournament.date}
-                    </Typography>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </Box>
-        );
-      case "leagues":
-        if (loading) return <Typography>Загрузка...</Typography>;
-        if (error) return <Typography color="error">{error}</Typography>;
-        return (
-          <Box>
-            <div className="mb-4 flex max-md:flex-col items-center justify-between">
-              <Typography variant="h5" fontWeight="bold">Список лиг</Typography>
-              <Button
-              className="bg-tundora text-white text-base">
-                Создать лигу
-              </Button>
-            </div>
-            <div className="grid grid-cols-2 max-md:grid-cols-1 gap-5">
-              {leagues.map((league) => (
-                <Card sx={{ height: "100%" }} key={league.id}>
-                  <CardContent>
-                    <Typography variant="h6" fontWeight="bold">{league.title}</Typography>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </Box>
-        );
-      default:
-        return null;
-    }
-  };
-
   return (
     <Box>
-      {renderContent()}
-      
-      <Dialog open={openModal} onClose={handleCloseModal} fullScreen sx={{ padding: 3 }}>
-        <DialogActions sx={{ justifyContent: "flex-start" }}>
-          <Button onClick={handleCloseModal} color="primary">
-            Закрыть
-          </Button>
-        </DialogActions>
-        <DialogContent sx={{ padding: 3 }}>
-          {teamError && <Typography color="error" sx={{ marginBottom: 2 }}>{teamError}</Typography>}
-          {teamDetails ? (
-            <Box>
-              <div style={{ gap: '4px', display: 'flex', alignItems: 'center' }}>
-                <img 
-                  src={teamDetails.logo || defaultTeam} 
-                  alt={teamDetails.title} 
-                  className="rounded-full shadow-lg" 
-                  style={{ width: '50px', height: '50px' }} 
-                />
-                <Typography variant="h4" fontWeight="bold">
-                  {teamDetails.title}
-                </Typography>
-              </div>
+      <DashboardRenderContent
+        activeTab={activeTab}
+        loading={loading}
+        error={error}
+        teams={teams}
+        tournaments={tournaments}
+        leagues={leagues}
+        selectedTeam={selectedTeam}
+        setSelectedTeam={setSelectedTeam}
+        teamDetails={teamDetails}
+        teamError={teamError}
+        handleCreateTeamClick={handleCreateTeamClick}
+      />
 
-              <Divider sx={{ marginBottom: 2 }} />
-            
-              <Button
-                sx={{
-                  color: 'white', 
-                  background: "gray",
-                  fontSize: '14px', 
-                  fontWeight: 'bold', 
-                  marginBottom: '5px',
-                  '&:hover': {
-                    cursor: 'pointer',
-                  }
-                }}
-                >
-                Добавить Игрока
-              </Button>
-              <Typography variant="h5" fontWeight="bold">Игроки:</Typography>
-              <ul style={{ listStyleType: "none", paddingLeft: 0 }}>
-                {teamDetails.players.map((player: any, index: number) => (
-                  <li key={index} style={{ marginBottom: "10px", padding: "10px", borderRadius: "8px", backgroundColor: "#f5f5f5", transition: "background-color 0.3s" }}>
-                    <Typography variant="body1" sx={{ fontWeight: "bold", marginBottom: "5px" }}>
-                      {player.name} {player.surname} - {player.position}
-                    </Typography>
-                  </li>
-                ))}
-              </ul>
-            </Box>
-          ) : (
-            <Typography>Загрузка...</Typography>
-          )}
+      <Dialog open={openDialog} onClose={handleCloseDialog}>
+        <DialogTitle>Создать команду</DialogTitle>
+        <DialogContent>
+          <TextField
+            label="Название команды"
+            fullWidth
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            sx={{ marginBottom: 2 }}
+          />
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleLogoChange}
+            style={{ marginBottom: 2 }}
+          />
         </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDialog}>Отмена</Button>
+          <Button onClick={handleSubmitTeam}>Создать</Button>
+        </DialogActions>
       </Dialog>
     </Box>
   );

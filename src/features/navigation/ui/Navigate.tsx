@@ -4,6 +4,7 @@ import {
   IconButton,
   List,
   ListItem,
+  Button,
   ListItemText,
   Toolbar,
   useMediaQuery,
@@ -12,9 +13,12 @@ import {
   Typography,
 } from '@mui/material';
 import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import MenuIcon from '@mui/icons-material/Menu';
 import { pathKeys } from '~shared/lib/react-router';
+import { useEffect } from 'react';
+import { removeAuthToken } from '~shared/slices/auth/authSlice';
+import { useDispatch, useSelector } from 'react-redux';
 
 const listLink = [
   { title: 'Главная', url: '/' },
@@ -31,8 +35,15 @@ export const Navigate: React.FC = () => {
   const location = useLocation(); 
 
   const toggleDrawer = (state: boolean) => () => setOpen(state);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const isAuthenticated = useSelector((state: any) => state.auth.isAuthenticated); 
 
-  
+  const handleLogout = () => {
+    dispatch(removeAuthToken()); 
+    navigate('/');
+  };
+
   return (
     <div className="static">
       <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -70,6 +81,18 @@ export const Navigate: React.FC = () => {
                     </ListItemText>
                   </ListItem>
                 ))}
+                {isAuthenticated && (
+                  <ListItem onClick={toggleDrawer(false)}>
+                    <ListItemText>
+                      <Button
+                        onClick={handleLogout}
+                        sx={{ padding: '8px 18px', color: 'black' }}
+                      >
+                        Выйти
+                      </Button>
+                    </ListItemText>
+                  </ListItem>
+                )}
               </List>
             </Drawer>
           </>
@@ -98,9 +121,18 @@ export const Navigate: React.FC = () => {
                 {item.title}
               </Typography>
             ))}
+            {isAuthenticated && (
+              <Button
+                onClick={handleLogout}
+                className="bg-white p-2 text-black font-semibold rounded-lg transition"
+                sx={{ marginLeft: '20px' }}
+              >
+                Выйти
+              </Button>
+            )}
           </Box>
         )}
       </Toolbar>
     </div>
-  );
+  ); 
 };

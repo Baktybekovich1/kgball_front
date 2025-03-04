@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Container, Box, Typography, Button } from "@mui/material";
+import { Container, Box, CircularProgress, Typography, Button } from "@mui/material";
 import { apiClient } from "~shared/lib/api";
 import { Link } from "react-router-dom";
 
@@ -62,7 +62,7 @@ export const MatchesPage: React.FC = () => {
       });
   }, []);
 
-  if (loading) return <Typography>Загрузка...</Typography>;
+  if (loading) return <Box className="flex justify-center items-center h-64"><CircularProgress /></Box>;
   if (error) return <Typography color="error">{error}</Typography>;
 
   return (
@@ -71,7 +71,7 @@ export const MatchesPage: React.FC = () => {
       <div className="grid w-full max-md:grid-cols-1 grid-cols-2 gap-4">
         {matches.map((match, index) => (
           <div className="flex-1 sm:w-[48%] md:w-[30%]" key={index}>
-            <Link to={`/matches/${match.id}`} className="border p-4 rounded-md block">
+            <Link to={`/matches/${match.id}`} className="border p-4 bg-alto rounded-md block">
               <Box className="flex items-center justify-between">
                 <div className="flex flex-col items-center">
                   <span className="text-lg font-semibold">{match.loserTeamData.title}</span>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Container, Paper, Typography, Box } from "@mui/material";
+import { Container, Paper, CircularProgress, Typography, Box } from "@mui/material";
 import { pathKeys } from "~shared/lib/react-router";
 import { Link } from "react-router-dom";
 import { apiClient } from "~shared/lib/api";
@@ -27,7 +27,7 @@ export const TournamentsPage: React.FC = () => {
       });
   }, []);
 
-  if (loading) return <Typography>Загрузка...</Typography>;
+  if (loading) return <Box className="flex justify-center items-center h-64"><CircularProgress /></Box>;
   if (error) return <Typography color="error">{error}</Typography>;
 
   return (

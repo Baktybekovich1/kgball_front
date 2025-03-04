@@ -76,7 +76,7 @@ export const DashboardPage: React.FC = () => {
         <Box sx={{ width: 300, p: 2 }}>
           <Box sx={{ display: "flex", justifyContent: "space-between", width: "100%" }}>
             <Typography variant="h6">KYRGYZBALL</Typography>
-            <Button 
+            <Button  
               onClick={() => setIsSidebarOpen(false)} 
               sx={{
                 color: 'black', 

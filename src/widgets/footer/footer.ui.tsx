@@ -1,45 +1,22 @@
-import { Container, Typography, List, ListItem, Box, IconButton } from '@mui/material';
-import { InstagramIcon } from '~shared/assets/icons/InstagramIcon';
-import { WhatsappIcon } from '~shared/assets/icons/whatsappIcon';
-import { TelegramIcon } from '~shared/assets/icons/telegramIcon';
-import { Link } from 'react-router-dom';
-import { ArrowIcon } from '~shared/assets/icons/ArrowIcon';
+import { Container, Typography, ListItem, Box, Button } from '@mui/material';
+import { useDispatch, useSelector } from 'react-redux';
+import { removeAuthToken } from '~shared/slices/auth/authSlice';
+import { Link, useNavigate } from 'react-router-dom';
 
 export const Footer: React.FC = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const isAuthenticated = useSelector((state: any) => state.auth.isAuthenticated); 
 
-  interface Contact {
-    id: number;
-    icon: JSX.Element;
-    text: string;
-    link: string;
-  }
-
-  const contacts: Contact[] = [
-    {
-      id: 1,
-      icon: <WhatsappIcon />,
-      text: "+996 503794400",
-      link: "https://wa.me/0503794400",
-    },
-    {
-      id: 2,
-      icon: <InstagramIcon />,
-      text: "@kelechek_city_ ",
-      link: "https://www.instagram.com/@kelechek_city_",
-    },
-    {
-      id: 3,
-      icon: <TelegramIcon />,
-      text: "@baktybekovich.k",
-      link: "https://web.telegram.org/k/#@baktybekovich",
-    },
-  ];
-  
+  const handleLogout = () => {
+    dispatch(removeAuthToken()); 
+    navigate('/');
+  };
 
   return (
     <footer className="mt-auto bg-[#5640C9] py-6 border-t border-gray-700 text-white">
-      <Container className='max-w-[1440px]'>
-        <Box>
+      <Container className="max-w-[1440px]">
+        <Box className="flex justify-between">
           <Typography
             component={Link}
             to="/"
@@ -47,29 +24,19 @@ export const Footer: React.FC = () => {
           >
             KYRGYZBALL
           </Typography>
+          {isAuthenticated ? (
+            <Button onClick={handleLogout} className="bg-white p-2 text-black font-semibold rounded-lg transition">
+              Выйти
+            </Button>
+          ) : (
+            <Link 
+              to="/login" 
+              className="bg-white p-2 text-black font-semibold rounded-lg transition"
+            >
+              Войти
+            </Link>
+          )}
         </Box>
-        
-        <div className="flex max-md:flex-col max-md:gap-4 gap-6 mt-4">
-          {contacts.map((contact: Contact) => (
-            <ListItem key={contact.id} sx={{ width: 'auto', p: 0 }}>
-                <a
-                  href={contact.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full"
-                >
-                  <div className="cursor-pointer flex items-center justify-between">
-                    <div className="flex gap-2 items-center">
-                      {contact.icon}
-                      <p className="max-md:text-base text-xl font-medium text-white">
-                        {contact.text}
-                      </p>
-                    </div>
-                  </div>
-                </a>
-            </ListItem>
-          ))}
-        </div>
       </Container>
     </footer>
   );

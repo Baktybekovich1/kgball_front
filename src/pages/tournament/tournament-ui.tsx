@@ -1,6 +1,6 @@
 // TournamentPage.tsx
 import React, { useState, useEffect } from "react";
-import { Container, Box, Button, Typography } from "@mui/material";
+import { Container, Box, Button, Typography, CircularProgress } from "@mui/material";
 import { pathKeys } from "~shared/lib/react-router";
 import { Link, useParams } from "react-router-dom";
 import { apiClient } from "~shared/lib/api";
@@ -98,7 +98,7 @@ export const TournamentPage: React.FC = () => {
           />
         </div>
       ) : (
-        <Typography>Загрузка...</Typography>
+        <Typography className="flex justify-center items-center h-64"><CircularProgress /></Typography>
       )}
     </Container>
   );

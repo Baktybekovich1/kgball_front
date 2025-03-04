@@ -8,7 +8,7 @@ export const HomePage: React.FC = () => {
     <Container className="max-w-[1440px] mb-10">
       <HomeSwiper />
       <News />
-      < BestPlayers />
+      <BestPlayers />
     </Container>
   );
 };

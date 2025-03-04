@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Container, Box, Typography, Button } from "@mui/material";
+import { Container, Box, Typography, Button, CircularProgress } from "@mui/material";
 import { Link, useParams } from "react-router-dom";
 import { apiClient } from "~shared/lib/api";
 import { MatchContent } from "~widgets/MatchContent/MatchContent.ui";
@@ -64,7 +64,7 @@ export const MatchPage: React.FC = () => {
     fetchMatchData();
   }, [id]);
 
-  if (loading) return <Typography>Загрузка...</Typography>;
+  if (loading) return <Box className="flex justify-center items-center h-64"><CircularProgress /></Box>;
   if (error) return <Typography color="error">{error}</Typography>;
 
   return (

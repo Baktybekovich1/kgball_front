@@ -7,6 +7,8 @@ import {
 import { QueryClientProvider as TanStackQueryClientProvider } from '@tanstack/react-query';
 import { queryClient } from '~shared/lib/react-query/react-query.lib';
 import { ToastContainer } from 'react-toastify';
+import { Provider } from 'react-redux'; 
+import { store} from "~shared/slices/store"
 
 const theme = createTheme({
   typography: {
@@ -15,7 +17,7 @@ const theme = createTheme({
 
 function App() {
   return (
-    <>
+    <Provider store={store}> 
       <TanStackQueryClientProvider client={queryClient}>
         <StyledEngineProvider injectFirst>
           <ThemeProvider theme={theme}>
@@ -32,7 +34,7 @@ function App() {
           </ThemeProvider>
         </StyledEngineProvider>
       </TanStackQueryClientProvider>
-    </>
+    </Provider>
   );
 }
 

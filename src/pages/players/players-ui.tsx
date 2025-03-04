@@ -1,4 +1,4 @@
-import { Container, Box, Button, Select, MenuItem, Typography, TextField } from "@mui/material";
+import { Container, CircularProgress, Box, Button, Select, MenuItem, Typography, TextField } from "@mui/material";
 import { useState, useEffect } from "react";
 import { apiClient } from "~shared/lib/api";
 import { PlayerCard } from '~widgets/playerCard/playerCard.ui';
@@ -48,7 +48,7 @@ export const PlayersPage: React.FC = () => {
   });
 
 
-  if (loading) return <Typography>Загрузка...</Typography>;
+  if (loading) return <Box className="flex justify-center items-center h-64"><CircularProgress /></Box>;
   if (error) return <Typography color="error">{error}</Typography>;
 
   return (

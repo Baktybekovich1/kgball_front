@@ -28,7 +28,6 @@ export const BestPlayers: React.FC = () => {
       });
   }, []);
 
-  // Sorting players based on the selected category
   const topBombers = players
     .sort((a, b) => b.goals - a.goals)
     .slice(0, 3);
@@ -81,11 +80,11 @@ export const BestPlayers: React.FC = () => {
       <Box className="flex max-md:flex-col gap-4 justify-center">
         {selectedPlayers.map((player, index) => (
           <Box className="w-full" key={player.playerId}>
-            <Typography variant="body2" fontWeight="bold">
+            <Typography className="mt-2" variant="body2" fontWeight="bold">
               {index + 1} место
             </Typography>
             <PlayerCard player={player} />
-            <Typography variant="body2" color="textSecondary">
+            <Typography className="mt-2" variant="body2" color="textSecondary">
               Голы: {player.goals}, Ассисты: {player.assists}
             </Typography>
           </Box>

@@ -1,5 +1,5 @@
 import { Link, useParams } from "react-router-dom";
-import { Container, Box, Button, Card, CardContent, Typography } from "@mui/material";
+import { Container, Box, Button, CircularProgress, Card, CardContent, Typography } from "@mui/material";
 import { useState, useEffect } from "react";
 import { apiClient } from "~shared/lib/api";
 import { pathKeys } from "~shared/lib/react-router";
@@ -33,7 +33,7 @@ export const PlayerPage: React.FC = () => {
     }
   }, [id]);
 
-  if (!player) return <Typography>Загрузка...</Typography>;
+  if (!player) return <Box className="flex justify-center items-center h-64"><CircularProgress /></Box>;
 
   return (
     <Container className="max-w-[1440px] mb-10">

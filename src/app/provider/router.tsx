@@ -7,6 +7,7 @@ import {
 import { DashboardLayout } from '~app/layout'
 
 import { errorPageRoute } from '~pages/error'
+import { signInPageRoute } from '~pages/signIn'
 import { dashboardPageRoute } from '~pages/dashboard'
 import { homePageRoute } from '~pages/home'
 import { playersPageRoute } from '~pages/players'
@@ -50,6 +51,7 @@ const router = createBrowserRouter([
       matchesPageRoute,
       matchPageRoute,
       errorPageRoute,
+      signInPageRoute,
     ],
   },
   {

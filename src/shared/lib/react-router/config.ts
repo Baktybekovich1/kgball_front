@@ -6,6 +6,9 @@ export const pathKeys = {
   dashboard() {
     return pathKeys.root + 'dashboard';
   },
+  signIn() {
+    return pathKeys.root + 'login';
+  },
   players: {
     root() {
       return pathKeys.root + 'player/list/';

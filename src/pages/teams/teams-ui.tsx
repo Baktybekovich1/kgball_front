@@ -1,6 +1,6 @@
 // TeamsPage.tsx
 import React, { useState, useEffect } from "react";
-import { Container, Typography, Button, Box } from "@mui/material";
+import { Container, Typography, CircularProgress, Button, Box } from "@mui/material";
 import { apiClient } from "~shared/lib/api";
 import { TeamsList } from "~widgets/TeamList/TeamList.ui";
 
@@ -26,7 +26,7 @@ export const TeamsPage: React.FC = () => {
       });
   }, []);
 
-  if (loading) return <Typography>Загрузка...</Typography>;
+  if (loading) return <Box className="flex justify-center items-center h-64"><CircularProgress /></Box>;
   if (error) return <Typography color="error">{error}</Typography>;
 
   return (
