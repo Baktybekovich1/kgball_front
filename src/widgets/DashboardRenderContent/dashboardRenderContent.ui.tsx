@@ -16,6 +16,8 @@ interface DashboardRenderContentProps {
   teamError: string;
   handleCreateTeamClick: () => void; 
   handleDeleteTeam: (id) => void; 
+  handleOpenAddPlayerDialog: () => void; 
+  handleDeletePlayer: (playerId: string) => void; 
 }
 
 export const DashboardRenderContent: React.FC<DashboardRenderContentProps> = ({
@@ -23,7 +25,7 @@ export const DashboardRenderContent: React.FC<DashboardRenderContentProps> = ({
   loading, 
   error, 
   teams, 
-  tournaments, 
+  tournaments,  
   leagues, 
   selectedTeam, 
   setSelectedTeam, 
@@ -31,6 +33,8 @@ export const DashboardRenderContent: React.FC<DashboardRenderContentProps> = ({
   teamError ,
   handleCreateTeamClick,
   handleDeleteTeam,
+  handleOpenAddPlayerDialog,
+  handleDeletePlayer,
 }) => {
   switch (activeTab) {
     case "teams":
@@ -46,13 +50,20 @@ export const DashboardRenderContent: React.FC<DashboardRenderContentProps> = ({
             {teams.map((team) => (
               <Card sx={{ height: "100%" }} key={team.id}>
                 <CardContent className="flex justify-between">
-                  <div>
-                    <Typography variant="h6" fontWeight="bold">
-                      {team.title}
-                    </Typography>
-                    <Button onClick={() => setSelectedTeam(team)} sx={{ mt: 2 }}>
-                      Подробнее
-                    </Button>
+                  <div className="flex items-center gap-2">
+                    <img 
+                      src={team.logo || defaultTeam} 
+                      alt={team.title} 
+                      className="rounded-full shadow-lg h-20 w-20" 
+                      />
+                    <div>
+                      <Typography variant="h6" fontWeight="bold">
+                        {team.title}
+                      </Typography>
+                      <Button onClick={() => setSelectedTeam(team)} sx={{ mt: 2 }}>
+                        Подробнее
+                      </Button>
+                    </div>
                   </div>
                   <div className="flex flex-col justify-between">
                     <Button
@@ -97,6 +108,7 @@ export const DashboardRenderContent: React.FC<DashboardRenderContentProps> = ({
               <Divider sx={{ marginBottom: 2 }} />
             
               <Button
+                onClick={handleOpenAddPlayerDialog}
                 sx={{
                   color: 'white', 
                   background: "gray",
@@ -111,26 +123,44 @@ export const DashboardRenderContent: React.FC<DashboardRenderContentProps> = ({
                 Добавить Игрока
               </Button>
 
-              <Typography style={{marginBottom: '10px'}} variant="h5" fontWeight="bold">Игроки:</Typography>
+              <Typography style={{ marginBottom: '10px' }} variant="h5" fontWeight="bold">Игроки:</Typography>
               <ul style={{ listStyleType: "none", paddingLeft: 0 }}>
-                {teamDetails.players.map((player: any, index: number) => (
-                  <li key={index} className="flex items-center gap-5" style={{ marginBottom: "10px", padding: "10px", borderRadius: "8px", backgroundColor: "#f5f5f5", transition: "background-color 0.3s" }}>
-                    <img 
-                      src={player.photo || DefaultAvatar} 
-                      alt={player.name} 
-                      className="max-md:w-14 max-md:h-14 w-20 h-20 rounded-full border border-gray-400 object-cover"
-                    />
-                    
-                    <div className="flex flex-col">
-                      <Typography className="max-md:text-base text-xl font-semibold text-gray-900">
-                        {player.name} {player.surname}
-                      </Typography>
-                      <Typography variant="body2" color="textSecondary" className="text-gray-600">
-                        {player.position}
-                      </Typography>
-                    </div>
-                  </li>
-                ))}
+                {teamDetails.players && teamDetails.players.length > 0 ? (
+                  teamDetails.players.map((player: any, index: number) => (
+                    <li key={index} className="flex items-center justify-between" style={{ marginBottom: "10px", padding: "10px", borderRadius: "8px", backgroundColor: "#f5f5f5", transition: "background-color 0.3s" }}>
+                      <div className="flex items-center gap-2">
+                        <img 
+                          src={player.img || DefaultAvatar} 
+                          alt={player.name} 
+                          className="max-md:w-14 max-md:h-14 w-20 h-20 rounded-full border border-gray-400 object-cover"
+                        />
+                        <div className="flex flex-col">
+                          <Typography className="max-md:text-base text-xl font-semibold text-gray-900">
+                            {player.name} {player.surname}
+                          </Typography>
+                          <Typography variant="body2" color="textSecondary" className="text-gray-600">
+                            {player.position}
+                          </Typography>
+                        </div>
+                      </div>
+                      <Button
+                        onClick={() => handleDeletePlayer(player.id)}
+                        sx={{
+                          backgroundColor: "error.main",
+                          color: "white",
+                          fontWeight: "bold",
+                          "&:hover": {
+                            backgroundColor: "error.dark",
+                          },
+                        }}
+                      >
+                        Удалить
+                      </Button>
+                    </li>
+                  ))
+                ) : (
+                  <Typography variant="body2">Нет игроков в команде</Typography>
+                )}
               </ul>
             </Box>
           )}

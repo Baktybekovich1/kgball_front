@@ -19,29 +19,23 @@ export const TeamPage: React.FC = () => {
     if (id) {
       apiClient.get(`/api/teams/${id}`)
         .then(response => {
-          console.log("Server response:", response);
-          console.log("Response data:", response.data); 
+          // console.log("Server response:", response);
+          // console.log("Response data:", response.data); 
   
           if (response.data && typeof response.data === 'object') {
             const selectedTeam = response.data;
             
             Promise.all([
               ...selectedTeam.players.map((url: string) => apiClient.get(url)),
-              ...selectedTeam.goals.map((url: string) => apiClient.get(url)), 
-              ...selectedTeam.assists.map((url: string) => apiClient.get(url)),
               ...selectedTeam.tourneyTeamPrizes.map((url: string) => apiClient.get(url)), // Загружаем призы
             ])
             .then((responses) => {
               const players = responses.slice(0, selectedTeam.players.length);
-              const goals = responses.slice(selectedTeam.players.length, selectedTeam.players.length + selectedTeam.goals.length);
-              const assists = responses.slice(selectedTeam.players.length + selectedTeam.goals.length, selectedTeam.players.length + selectedTeam.goals.length + selectedTeam.assists.length);
               const tourneyTeamPrizes = responses.slice(selectedTeam.players.length + selectedTeam.goals.length + selectedTeam.assists.length);
   
               setTeam({
                 ...selectedTeam,
                 players: players.map(player => player.data), 
-                goals: goals.map(goal => goal.data),         
-                assists: assists.map(assist => assist.data),
                 tourneyTeamPrizes: tourneyTeamPrizes.map(prize => prize.data), 
               });
             })
@@ -60,7 +54,7 @@ export const TeamPage: React.FC = () => {
         apiClient.get(`/team/game_list/${id}`)
         .then(response => {
           if (response.data && response.data.games && Array.isArray(response.data.games)) {
-            console.log("Match: ", response.data.games);
+            // console.log("Match: ", response.data.games);
             setMatches(response.data.games);
           } else {
             setError("Некорректный формат данных матчей");
@@ -88,8 +82,6 @@ export const TeamPage: React.FC = () => {
     return sortedPlayers;
   };
   
-  
-
 
   if (error) return <Typography color="error">{error}</Typography>;
 

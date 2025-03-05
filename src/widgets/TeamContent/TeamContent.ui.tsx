@@ -79,7 +79,7 @@ export const RenderContent: React.FC<RenderContentProps> = ({
             {team.players && team.players.length > 0 ? (
               team.players.map(player => (
                 <Box key={player.id} className="flex items-center gap-4 p-4 border border-gray-300 rounded-md">
-                  <img src={player.photo || DefaultAvatar} alt={player.name} className="w-12 h-12 rounded-full" />
+                  <img src={player.img || DefaultAvatar} alt={player.name} className="w-12 h-12 rounded-full" />
                   <div className="flex w-full justify-between items-center">
                     <div>
                       <Typography variant="h6" className="font-semibold">{player.name}</Typography>
@@ -142,7 +142,7 @@ export const RenderContent: React.FC<RenderContentProps> = ({
           <Box className="grid w-full grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             {getSortedPlayers(team.players, selectedCategory).map((player) => (
               <Box key={player.id} className="flex items-center gap-4 p-4 border border-gray-300 rounded-md">
-                <img src={player.photo || DefaultAvatar} alt={player.name} className="w-12 h-12 rounded-full" />
+                <img src={player.img || DefaultAvatar} alt={player.name} className="w-12 h-12 rounded-full" />
                 <div className="flex  w-full justify-between items-center">
                   <div>
                     <Typography variant="h6" className="font-semibold">{player.name}</Typography>
