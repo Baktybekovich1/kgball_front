@@ -19,6 +19,7 @@ export const TournamentPage: React.FC = () => {
       apiClient.get(`tourney/review/${id}`)
         .then(response => {
           if (response.data) {
+            console.log(response.data);
             setTournament(response.data);
           } else {
             setError("Турнир не найден");

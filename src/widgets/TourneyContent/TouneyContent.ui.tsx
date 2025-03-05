@@ -86,29 +86,17 @@ export const TourneyContent: React.FC<Props> = ({ selectedTab, tournament, playe
             Статистика игроков
           </Typography>
           <Typography component="div" className="bg-white max-md:text-xs text-black rounded-lg p-3">
-            <strong>Бомбардиры турнира:</strong> 
-            {playersData
-              .slice()
-              .sort((a, b) => b.goals - a.goals)  
-              .slice(0, 1) 
-              .map((player, index) => (
-                <div key={index} className="flex items-center">
-                  <span>{player.name} - {player.goals} гол(ов)</span>
-                </div>
-              ))}
+            <strong>Бомбардиры турнира: </strong> 
+            <span className="font-semibold">
+             {tournament.bombardier.playerName} - {tournament.bombardier.goalsCount} голов
+            </span>
           </Typography>
 
           <Typography component="div" className="bg-white max-md:text-xs text-black rounded-lg p-3">
-            <strong>Ассистенты турнира:</strong> 
-            {playersData
-              .slice()
-              .sort((a, b) => b.assists - a.assists)  
-              .slice(0, 1) 
-              .map((player, index) => (
-                <div key={index} className="flex items-center">
-                  <span>{player.name} - {player.assists} ассист(ов)</span>
-                </div>
-              ))}
+            <strong>Ассистенты турнира: </strong> 
+            <span className="font-semibold">
+             {tournament.assistant.playerName} - {tournament.assistant.assistsCount} пасов
+            </span>
           </Typography>
 
           <Typography className="bg-white max-md:text-xs text-black rounded-lg p-3">

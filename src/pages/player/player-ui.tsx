@@ -46,7 +46,7 @@ export const PlayerPage: React.FC = () => {
       <Card className="p-6 rounded-lg shadow-lg">
         <Box className="flex flex-col sm:flex-row items-center mb-6 space-y-6 sm:space-y-0 sm:space-x-6">
           <div className="flex max-md:flex-col items-center gap-6">
-            <img src={player.photo || DefaultAvatar} alt={player.name} className="w-32 h-32 rounded-full border-2 border-gray-300 mx-auto sm:mx-0" />
+            <img src={player.playerImg || DefaultAvatar} alt={player.name} className="w-32 h-32 rounded-full border-2 border-gray-300 mx-auto sm:mx-0" />
             <div>
               <Typography variant="h5" fontWeight="bold">{player.surname} {player.name}</Typography>
               <Typography color="textSecondary">Родился: {player.birthday}</Typography>

@@ -29,30 +29,30 @@ export const PlayersPage: React.FC = () => {
         setError("Ошибка загрузки списка игроков");
         setLoading(false);
       });
-  }, []);
+  }, []); 
 
   const filteredAndSortedPlayers = players
-  .filter(player => {
-    if (searchQuery && !player.playerName?.toLowerCase().includes(searchQuery.toLowerCase())) {
-      return false;
-    }
-
-    if (filter === "bombers") return player.goals > 0;
-    if (filter === "assistants") return player.assists > 0;
-    if (filter === "all") return player.goals > 0 || player.assists > 0;  
-    return true;
-  })
-  .sort((a, b) => {
-    if (filter === "bombers") return b.goals - a.goals;
-    if (filter === "assistants") return b.assists - a.assists;
-    if (filter === "all") {
-      if (b.goals === a.goals) {
-        return b.assists - a.assists;
+    .filter(player => {
+      // Убираем фильтрацию, чтобы все игроки были включены
+      if (searchQuery && !player.playerName?.toLowerCase().includes(searchQuery.toLowerCase())) {
+        return false;
       }
-      return b.goals - a.goals; 
-    }
-    return 0; 
-  });
+      return true; // Все игроки проходят фильтрацию по имени
+    })
+    .sort((a, b) => {
+      if (filter === "bombers") return b.goals - a.goals;
+      if (filter === "assistants") return b.assists - a.assists;
+      if (filter === "all") {
+        // Если голы равны, сортируем по ассистам
+        if (b.goals === a.goals) {
+          return b.assists - a.assists;
+        }
+        // Иначе, сортируем по голам
+        return b.goals - a.goals;
+      }
+      return 0;
+    });
+
 
 
 
