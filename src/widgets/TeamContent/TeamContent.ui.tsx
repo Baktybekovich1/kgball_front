@@ -6,6 +6,7 @@ interface RenderContentProps {
   selectedTab: string;
   team: any;
   selectedCategory: string;
+  setSelectedCategory: React.Dispatch<React.SetStateAction<string>>; 
   matches: any[];
   getSortedPlayers: (players: any[], category: string) => any[];
 }
@@ -14,6 +15,7 @@ export const RenderContent: React.FC<RenderContentProps> = ({
   selectedTab,
   team,
   selectedCategory,
+  setSelectedCategory, 
   matches,
   getSortedPlayers,
 }) => {

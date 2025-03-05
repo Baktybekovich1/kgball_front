@@ -39,13 +39,21 @@ export const PlayersPage: React.FC = () => {
 
     if (filter === "bombers") return player.goals > 0;
     if (filter === "assistants") return player.assists > 0;
+    if (filter === "all") return player.goals > 0 || player.assists > 0;  
     return true;
   })
   .sort((a, b) => {
     if (filter === "bombers") return b.goals - a.goals;
     if (filter === "assistants") return b.assists - a.assists;
+    if (filter === "all") {
+      if (b.goals === a.goals) {
+        return b.assists - a.assists;
+      }
+      return b.goals - a.goals; 
+    }
     return 0; 
   });
+
 
 
   if (loading) return <Box className="flex justify-center items-center h-64"><CircularProgress /></Box>;

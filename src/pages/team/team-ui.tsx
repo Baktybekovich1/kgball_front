@@ -70,17 +70,25 @@ export const TeamPage: React.FC = () => {
     }
   }, [id]);
 
-  const getSortedPlayers = (players: { id: number, name: string, position: string, photo: string, goals: number, assists: number }[], category: string) => {
+   
+  const getSortedPlayers = (
+    players: { id: number, name: string, position: string, photo: string, goals: any[], assists: any[] }[], 
+    category: string
+  ) => {
     let sortedPlayers = [...players];
+  
     if (category === "scorers") {
-      sortedPlayers.sort((a, b) => b.goals - a.goals);
+      sortedPlayers.sort((a, b) => b.goals.length - a.goals.length);
     } else if (category === "assistants") {
-      sortedPlayers.sort((a, b) => b.assists - a.assists);
+      sortedPlayers.sort((a, b) => b.assists.length - a.assists.length);
     } else {
-      sortedPlayers.sort((a, b) => b.goals - a.goals); 
+      sortedPlayers.sort((a, b) => (b.goals.length + b.assists.length) - (a.goals.length + a.assists.length));
     }
+  
     return sortedPlayers;
   };
+  
+  
 
 
   if (error) return <Typography color="error">{error}</Typography>;
@@ -113,6 +121,7 @@ export const TeamPage: React.FC = () => {
             selectedTab={selectedTab} 
             team={team} 
             selectedCategory={selectedCategory} 
+            setSelectedCategory={setSelectedCategory}
             matches={matches} 
             getSortedPlayers={getSortedPlayers} 
           />

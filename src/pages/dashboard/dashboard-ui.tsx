@@ -14,7 +14,7 @@ export const DashboardPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  useEffect(() => {
+  useEffect(() => { 
     setLoading(true);
     if (activeTab === "teams") {
       apiClient.get("/api/teams")
@@ -43,7 +43,7 @@ export const DashboardPage: React.FC = () => {
         .catch(() => {
           setError("Ошибка загрузки списка турниров");
           setLoading(false);
-        });
+        }); 
     } else if (activeTab === "leagues") { 
       apiClient.get("/api/ligas")
         .then(response => {
@@ -116,6 +116,7 @@ export const DashboardPage: React.FC = () => {
         teams={teams} 
         tournaments={tournaments} 
         leagues={leagues} 
+        setTeams={setTeams}
       />
     </Container>
   );

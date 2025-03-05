@@ -1,6 +1,7 @@
 import { Box, Card, CardContent, Typography, CircularProgress, Button, Divider } from "@mui/material";
 import { apiClient } from "~shared/lib/api";
 import defaultTeam from "~shared/assets/img/defaultTeam.webp";
+import DefaultAvatar from "~shared/assets/img/User-avatar.png";
 
 interface DashboardRenderContentProps {
   activeTab: string;
@@ -14,6 +15,7 @@ interface DashboardRenderContentProps {
   teamDetails: any;
   teamError: string;
   handleCreateTeamClick: () => void; 
+  handleDeleteTeam: (id) => void; 
 }
 
 export const DashboardRenderContent: React.FC<DashboardRenderContentProps> = ({
@@ -28,6 +30,7 @@ export const DashboardRenderContent: React.FC<DashboardRenderContentProps> = ({
   teamDetails, 
   teamError ,
   handleCreateTeamClick,
+  handleDeleteTeam,
 }) => {
   switch (activeTab) {
     case "teams":
@@ -42,14 +45,33 @@ export const DashboardRenderContent: React.FC<DashboardRenderContentProps> = ({
           <div className="grid grid-cols-2 max-md:grid-cols-1 gap-5">
             {teams.map((team) => (
               <Card sx={{ height: "100%" }} key={team.id}>
-                <CardContent>
-                  <Typography variant="h6" fontWeight="bold">{team.title}</Typography>
-                  <Button onClick={() => setSelectedTeam(team)} sx={{ mt: 2 }}>
-                    Подробнее
-                  </Button>
+                <CardContent className="flex justify-between">
+                  <div>
+                    <Typography variant="h6" fontWeight="bold">
+                      {team.title}
+                    </Typography>
+                    <Button onClick={() => setSelectedTeam(team)} sx={{ mt: 2 }}>
+                      Подробнее
+                    </Button>
+                  </div>
+                  <div className="flex flex-col justify-between">
+                    <Button
+                      onClick={() => handleDeleteTeam(team.id)}
+                      sx={{
+                        backgroundColor: "error.main",
+                        color: "white",
+                        fontWeight: "bold",
+                        "&:hover": {
+                          backgroundColor: "error.dark",
+                        },
+                      }}
+                    >
+                      Удалить
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
-            ))}
+            ))} 
           </div>
 
           {selectedTeam && teamDetails === null && (
@@ -84,7 +106,7 @@ export const DashboardRenderContent: React.FC<DashboardRenderContentProps> = ({
                   '&:hover': {
                     cursor: 'pointer',
                   }
-                }}
+                }} 
               >
                 Добавить Игрока
               </Button>
@@ -92,10 +114,21 @@ export const DashboardRenderContent: React.FC<DashboardRenderContentProps> = ({
               <Typography style={{marginBottom: '10px'}} variant="h5" fontWeight="bold">Игроки:</Typography>
               <ul style={{ listStyleType: "none", paddingLeft: 0 }}>
                 {teamDetails.players.map((player: any, index: number) => (
-                  <li key={index} style={{ marginBottom: "10px", padding: "10px", borderRadius: "8px", backgroundColor: "#f5f5f5", transition: "background-color 0.3s" }}>
-                    <Typography variant="body1" sx={{ fontWeight: "bold", marginBottom: "5px" }}>
-                      {player.name} {player.surname} - {player.position}
-                    </Typography>
+                  <li key={index} className="flex items-center gap-5" style={{ marginBottom: "10px", padding: "10px", borderRadius: "8px", backgroundColor: "#f5f5f5", transition: "background-color 0.3s" }}>
+                    <img 
+                      src={player.photo || DefaultAvatar} 
+                      alt={player.name} 
+                      className="max-md:w-14 max-md:h-14 w-20 h-20 rounded-full border border-gray-400 object-cover"
+                    />
+                    
+                    <div className="flex flex-col">
+                      <Typography className="max-md:text-base text-xl font-semibold text-gray-900">
+                        {player.name} {player.surname}
+                      </Typography>
+                      <Typography variant="body2" color="textSecondary" className="text-gray-600">
+                        {player.position}
+                      </Typography>
+                    </div>
                   </li>
                 ))}
               </ul>

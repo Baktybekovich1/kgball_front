@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Container, Box, CircularProgress, Typography, Button } from "@mui/material";
+import { Container, Box, CircularProgress, Typography } from "@mui/material";
 import { apiClient } from "~shared/lib/api";
 import { Link } from "react-router-dom";
 
@@ -12,52 +12,28 @@ export const MatchesPage: React.FC = () => {
     setLoading(true);
     setError("");
 
-    apiClient.get("api/games")
-      .then(async (response) => {
+    apiClient.get("/game/all_games")
+      .then(response => {
+        console.log(response.data);
         if (!response.data || !Array.isArray(response.data)) {
           setError("Некорректный формат данных от сервера");
           setLoading(false);
           return;
         }
 
-        const games = response.data;
-        const teamUrls = [...new Set(games.flatMap(game => [game.winnerTeam, game.loserTeam]))];
-        const teamPromises = teamUrls.map(url => apiClient.get(url));
-        const scorePromises = games.map(game => apiClient.get(`/game/scores/${game.id}`));
+        const games = response.data.map(game => ({
+          ...game,
+          winnerTeamData: { id: game.winnerTeamId, title: game.winnerTeamTitle },
+          loserTeamData: { id: game.loserTeamId, title: game.loserTeamTitle }
+        }));
 
-        try {
-          const [teamsResponses, scoresResponses] = await Promise.all([
-            Promise.all(teamPromises),
-            Promise.all(scorePromises),
-          ]);
-
-          const teamMap = Object.fromEntries(
-            teamsResponses.map(team => [team.data.id, team.data])
-          );
-
-          const updatedGames = games.map((game, index) => {
-            const winnerTeamId = game.winnerTeam.split('/').pop();
-            const loserTeamId = game.loserTeam.split('/').pop();
-
-            return {
-              ...game,
-              winnerTeamData: teamMap[winnerTeamId] || {},
-              loserTeamData: teamMap[loserTeamId] || {},
-              scores: Array.isArray(scoresResponses[index].data) ? scoresResponses[index].data : [scoresResponses[index].data],
-            };
-          });
-
-          setMatches(updatedGames);
-        } catch (error) {
-          console.error("Ошибка загрузки данных:", error);
-          setError("Ошибка загрузки данных матчей");
-        } finally {
-          setLoading(false);
-        }
+        setMatches(games);
       })
       .catch(error => {
         console.error("API Error:", error);
         setError("Ошибка загрузки списка матчей");
+      })
+      .finally(() => {
         setLoading(false);
       });
   }, []);
@@ -71,19 +47,19 @@ export const MatchesPage: React.FC = () => {
       <div className="grid w-full max-md:grid-cols-1 grid-cols-2 gap-4">
         {matches.map((match, index) => (
           <div className="flex-1 sm:w-[48%] md:w-[30%]" key={index}>
-            <Link to={`/matches/${match.id}`} className="border p-4 bg-alto rounded-md block">
+            <Link to={`/matches/${match.gameId}`} className="border p-4 bg-alto rounded-md block">
               <Box className="flex items-center justify-between">
                 <div className="flex flex-col items-center">
                   <span className="text-lg font-semibold">{match.loserTeamData.title}</span>
                 </div>
-                <span className="text-md">{match.date}</span>
+                <span className="text-md font-semibold">VS</span>
                 <div className="flex flex-col items-center">
                   <span className="text-lg font-semibold">{match.winnerTeamData.title}</span>
                 </div>
               </Box>
               <Box className="flex justify-between">
                 <span className="text-md">
-                  Счет: {match.scores.filter(score => score.loserTeamId === match.loserTeamData.id).reduce((sum, score) => sum + score.loserTeamScore, 0)} - {match.scores.filter(score => score.winnerTeamId === match.winnerTeamData.id).reduce((sum, score) => sum + score.winnerTeamScore, 0)}
+                  Счет: {match.loserTeamScore} - {match.winnerTeamScore}
                 </span>
               </Box>
             </Link>

@@ -8,6 +8,7 @@ export const PlayerTable = ({ players }: { players: any[] }) => (
         <TableRow>
           <TableCell>Имя</TableCell>
           <TableCell>Команда</TableCell>
+          <TableCell>Голы(Пасы)</TableCell>
           <TableCell>Действие</TableCell>
         </TableRow>
       </TableHead>
@@ -16,8 +17,9 @@ export const PlayerTable = ({ players }: { players: any[] }) => (
           <TableRow key={player.playerId}>
             <TableCell>{player.playerName} {player.surname}</TableCell>
             <TableCell>{player.teamTitle}</TableCell>
+            <TableCell>{player.goals}({player.assists})</TableCell>
             <TableCell>
-              <Link to={pathKeys.players.bySlug(String(player.id))} className="text-blue hover:underline">Подробнее</Link>
+              <Link to={pathKeys.players.bySlug(String(player.playerId))} className="text-blue hover:underline">Подробнее</Link>
             </TableCell>
           </TableRow>
         ))}

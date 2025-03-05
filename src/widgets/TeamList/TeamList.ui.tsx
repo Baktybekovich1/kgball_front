@@ -7,11 +7,9 @@ import defaultTeam from "~shared/assets/img/defaultTeam.webp";
 interface Team {
   id: number;
   title: string;
+  points: number;
+  goals: [];
   logo: string;
-  stats: {
-    totalMatches: number;
-    totalGoals: number;
-  };
 }
 
 interface TeamsListProps {
@@ -50,11 +48,11 @@ export const TeamsList: React.FC<TeamsListProps> = ({ teams, viewMode }) => {
           </tr>
         </thead>
         <tbody>
-          {teams.map((team) => (
+          {teams.map((team, index) => (
             <tr key={team.id} className="border-b">
               <td className="p-2">
                 <div className="flex items-center gap-6">
-                  <div className="text-xl text-bold">{team.id}.</div>
+                  <div className="text-xl text-bold">{index + 1}.</div>
                   <div className="flex justify-between items-center w-full">
                     <div className="flex max-md:flex-col max-md:items-baseline items-center">
                       <img
@@ -64,10 +62,10 @@ export const TeamsList: React.FC<TeamsListProps> = ({ teams, viewMode }) => {
                       />
                       <Typography>{team.title}</Typography>
                     </div>
-                    {/* <div className="max-md:hidden">
-                      <Typography>Всего матчей: {team.stats.totalMatches}</Typography>
-                      <Typography>Всего голов: {team.stats.totalGoals}</Typography>
-                    </div> */}
+                    <div className="max-md:hidden">
+                      <Typography>Всего голов: {team.goals.length}</Typography>
+                      <Typography>Всего очков: {team.points}</Typography>
+                    </div>
                     <Link
                       className="text-blue hover:underline"
                       to={pathKeys.teams.bySlug(String(team.id))}

@@ -10,9 +10,10 @@ interface DashboardContentProps {
   teams: any[];
   tournaments: any[];
   leagues: any[];
+  setTeams: React.Dispatch<React.SetStateAction<any[]>>; 
 }
 
-export const DashboardContent: React.FC<DashboardContentProps> = ({ activeTab, loading, error, teams, tournaments, leagues }) => {
+export const DashboardContent: React.FC<DashboardContentProps> = ({ activeTab, loading, error, teams, tournaments, leagues, setTeams }) => {
   const [selectedTeam, setSelectedTeam] = useState<any>(null);
   const [teamDetails, setTeamDetails] = useState<any>(null);
   const [teamError, setTeamError] = useState("");
@@ -41,9 +42,12 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({ activeTab, l
       if (logo) {
         formData.append("logo", logo); 
       }
-      apiClient.post("/team/add", formData)
+      apiClient.post("/api/admin/team/add", formData)
         .then((response) => {
+          const newTeam = response.data; 
+          setTeams((prevTeams) => [...prevTeams, newTeam]); 
           setOpenDialog(false);
+          window.location.reload();  
         })
         .catch((error) => {
           console.error("Ошибка при добавлении команды:", error);
@@ -53,6 +57,20 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({ activeTab, l
     }
   };
 
+  const handleDeleteTeam = (id: string) => {
+    if (window.confirm("Вы уверены, что хотите удалить эту команду?")) {
+      apiClient.delete(`/api/admin/team/remove/${id}`)
+        .then(() => {
+          setTeams((prevTeams) => prevTeams.filter((team) => team.id !== id));
+          alert("Команда удалена успешно");
+        })
+        .catch((error) => {
+          console.error("Ошибка при удалении команды:", error);
+          alert("Не удалось удалить команду");
+        });
+    }
+  };
+ 
   useEffect(() => {
     if (selectedTeam) {
       apiClient.get(`/api/teams/${selectedTeam.id}`)
@@ -101,6 +119,7 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({ activeTab, l
         teamDetails={teamDetails}
         teamError={teamError}
         handleCreateTeamClick={handleCreateTeamClick}
+        handleDeleteTeam={handleDeleteTeam} 
       />
 
       <Dialog open={openDialog} onClose={handleCloseDialog}>
