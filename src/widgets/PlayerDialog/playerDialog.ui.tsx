@@ -47,16 +47,16 @@ export const PlayerDialog: React.FC<PlayerDialogProps> = ({ open, onClose, teamI
   const handleImgChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
       const file = event.target.files[0];
+      setPreviewImg(URL.createObjectURL(file));
   
       const reader = new FileReader();
+      reader.readAsDataURL(file);
       reader.onloadend = () => {
-        const base64Image = reader.result as string;
-        setImg(base64Image); // сохраняем base64 строку изображения
-        setPreviewImg(base64Image); // создаем превью изображения
+        setImg(reader.result as string);
       };
-      reader.readAsDataURL(file); // преобразуем файл в base64
     }
   };
+  
   
   const handleAddOrEditPlayer = () => {
     if (!name || !surname || !position || !birthday || !teamId) {
