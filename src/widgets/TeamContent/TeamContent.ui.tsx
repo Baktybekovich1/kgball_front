@@ -1,24 +1,60 @@
 import React from "react";
 import { Box, Typography } from "@mui/material";
 import DefaultAvatar from "~shared/assets/img/User-avatar.png";
+import { useState } from "react";
 
 interface RenderContentProps {
   selectedTab: string;
   team: any;
-  selectedCategory: string;
-  setSelectedCategory: React.Dispatch<React.SetStateAction<string>>; 
   matches: any[];
-  getSortedPlayers: (players: any[], category: string) => any[];
+  squad: any[]; 
+  bestPlayers: any[];
 }
 
 export const RenderContent: React.FC<RenderContentProps> = ({
   selectedTab,
   team,
-  selectedCategory,
-  setSelectedCategory, 
   matches,
-  getSortedPlayers,
+  squad,
+  bestPlayers
 }) => {
+  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+
+  const getSortedPlayers = (category: string) => {
+    let filteredPlayers = bestPlayers;
+
+    if (category === "scorers") {
+      filteredPlayers = bestPlayers.filter(player => player.goals > 0);
+    } else if (category === "assistants") {
+      filteredPlayers = bestPlayers.filter(player => player.assists > 0);
+    }
+  
+    return filteredPlayers.sort((a, b) => {
+      const aGoals = a.goals ? Number(a.goals) : 0;
+      const bGoals = b.goals ? Number(b.goals) : 0;
+  
+      const aAssists = a.assists ? Number(a.assists) : 0;
+      const bAssists = b.assists ? Number(b.assists) : 0;
+  
+      if (category === "assistants") {
+        if (bAssists !== aAssists) {
+          return bAssists - aAssists;  
+        }
+        return bGoals - aGoals; 
+      }
+  
+      if (bGoals !== aGoals) {
+        return bGoals - aGoals;
+      }
+      if (bAssists !== aAssists) {
+        return bAssists - aAssists;
+      }
+  
+      return (bGoals + bAssists) - (aGoals + aAssists);
+    });
+  };
+  
+
   switch (selectedTab) {
     case "обзор":
       return team ? (
@@ -73,29 +109,27 @@ export const RenderContent: React.FC<RenderContentProps> = ({
         </Box>
       ) : null;
       case "состав":
-        return team ? (
+        return squad && squad.length > 0 ? (
           <Box className="flex flex-col gap-5 mb-10">
             <Typography variant="h6" fontWeight="bold">Состав команды</Typography>
-            {team.players && team.players.length > 0 ? (
-              team.players.map(player => (
-                <Box key={player.id} className="flex items-center gap-4 p-4 border border-gray-300 rounded-md">
-                  <img src={player.img || DefaultAvatar} alt={player.name} className="w-12 h-12 rounded-full" />
-                  <div className="flex w-full justify-between items-center">
-                    <div>
-                      <Typography variant="h6" className="font-semibold">{player.name}</Typography>
-                      <Typography variant="body2" color="textSecondary">{player.position}</Typography>
-                    </div>
-                    <Typography variant="body2" className="text-base">
-                      {player.goals.length} + {player.assists.length}
-                    </Typography>
+            {squad.map(player => (
+              <Box key={player.id} className="flex items-center gap-4 p-4 border border-gray-300 rounded-md">
+                <img src={player.img || DefaultAvatar} alt={player.name} className="w-12 h-12 rounded-full" />
+                <div className="flex w-full justify-between items-center">
+                  <div>
+                    <Typography variant="h6" className="font-semibold">{player.name}</Typography>
+                    <Typography variant="body2" color="textSecondary">{player.teamTitle}</Typography>
                   </div>
-                </Box>
-              ))
-            ) : (
-              <Typography className="text-lg text-gray-700">Нет игроков в составе</Typography>
-            )}
+                  <Typography variant="body2" className="text-base">
+                    {player.position}
+                  </Typography>
+                </div>
+              </Box>
+            ))}
           </Box>
-        ) : null;
+        ) : (
+          <Typography className="text-lg text-gray-700">Нет игроков в составе</Typography>
+        );
     case "матчи":
       return matches ? (
         <Box className="grid grid-cols-2 max-md:grid-cols-1 gap-4">
@@ -138,9 +172,8 @@ export const RenderContent: React.FC<RenderContentProps> = ({
               <option value="assistants">Ассистенты</option>
             </select>
           </Box>
-
           <Box className="grid w-full grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            {getSortedPlayers(team.players, selectedCategory).map((player) => (
+            {getSortedPlayers(selectedCategory).map((player) => (
               <Box key={player.id} className="flex items-center gap-4 p-4 border border-gray-300 rounded-md">
                 <img src={player.img || DefaultAvatar} alt={player.name} className="w-12 h-12 rounded-full" />
                 <div className="flex  w-full justify-between items-center">
@@ -149,7 +182,7 @@ export const RenderContent: React.FC<RenderContentProps> = ({
                     <Typography variant="body2" color="textSecondary">{player.position}</Typography>
                   </div>
                   <Typography variant="body2" className="text-base">
-                    {player.goals.length} + ({player.assists.length}) = {player.goals.length + player.assists.length}
+                    {player.goals} + ({player.assists}) = {player.goals + player.assists}
                   </Typography>
                 </div>
               </Box>
@@ -163,3 +196,4 @@ export const RenderContent: React.FC<RenderContentProps> = ({
 };
 
 export default RenderContent;
+

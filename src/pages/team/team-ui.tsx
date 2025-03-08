@@ -11,38 +11,17 @@ export const TeamPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [team, setTeam] = useState(null);
   const [matches, setMatches] = useState([]);
+  const [bestPlayers, setBestPlayers] = useState([]);
+  const [squad, setSquad] = useState([]);
   const [error, setError] = useState("");
   const [selectedTab, setSelectedTab] = useState<string>("обзор");
-  const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
   useEffect(() => {
     if (id) {
       apiClient.get(`/api/teams/${id}`)
         .then(response => {
-          // console.log("Server response:", response);
-          // console.log("Response data:", response.data); 
-  
           if (response.data && typeof response.data === 'object') {
-            const selectedTeam = response.data;
-            
-            Promise.all([
-              ...selectedTeam.players.map((url: string) => apiClient.get(url)),
-              ...selectedTeam.tourneyTeamPrizes.map((url: string) => apiClient.get(url)), // Загружаем призы
-            ])
-            .then((responses) => {
-              const players = responses.slice(0, selectedTeam.players.length);
-              const tourneyTeamPrizes = responses.slice(selectedTeam.players.length + selectedTeam.goals.length + selectedTeam.assists.length);
-  
-              setTeam({
-                ...selectedTeam,
-                players: players.map(player => player.data), 
-                tourneyTeamPrizes: tourneyTeamPrizes.map(prize => prize.data), 
-              });
-            })
-            .catch((error) => {
-              console.error("Error fetching related data:", error);
-              setError("Ошибка загрузки дополнительных данных");
-            });
+            setTeam(response.data);
           } else {
             setError("Неверный формат данных от сервера");
           }
@@ -51,37 +30,39 @@ export const TeamPage: React.FC = () => {
           console.error("API Error:", error);
           setError("Ошибка загрузки данных команды");
         });
-        apiClient.get(`/team/game_list/${id}`)
+
+      apiClient.get(`/team/game_list/${id}`)
         .then(response => {
-          if (response.data && response.data.games && Array.isArray(response.data.games)) {
-            // console.log("Match: ", response.data.games);
+          if (response.data?.games && Array.isArray(response.data.games)) {
             setMatches(response.data.games);
           } else {
             setError("Некорректный формат данных матчей");
           }
         })
         .catch(() => setError("Ошибка загрузки матчей"));
+
+      apiClient.get(`/team/best_players/${id}`)
+        .then(response => {
+          if (response.data?.players && Array.isArray(response.data.players)) {
+            setBestPlayers(response.data.players);
+          } else {
+            setError("Некорректный формат данных лучших игроков");
+          }
+        })
+        .catch(() => setError("Ошибка загрузки лучших игроков"));
+
+      apiClient.get(`/team/squad_list/${id}`)
+        .then(response => {
+          if (response.data?.players && Array.isArray(response.data.players)) {
+            setSquad(response.data.players);  
+          } else {
+            setError("Некорректный формат данных состава команды");
+          }
+        })
+        .catch(() => setError("Ошибка загрузки состава команды"));
     }
   }, [id]);
 
-   
-  const getSortedPlayers = (
-    players: { id: number, name: string, position: string, photo: string, goals: any[], assists: any[] }[], 
-    category: string
-  ) => {
-    let sortedPlayers = [...players];
-  
-    if (category === "scorers") {
-      sortedPlayers.sort((a, b) => b.goals.length - a.goals.length);
-    } else if (category === "assistants") {
-      sortedPlayers.sort((a, b) => b.assists.length - a.assists.length);
-    } else {
-      sortedPlayers.sort((a, b) => (b.goals.length + b.assists.length) - (a.goals.length + a.assists.length));
-    }
-  
-    return sortedPlayers;
-  };
-  
 
   if (error) return <Typography color="error">{error}</Typography>;
 
@@ -112,10 +93,9 @@ export const TeamPage: React.FC = () => {
           <RenderContent 
             selectedTab={selectedTab} 
             team={team} 
-            selectedCategory={selectedCategory} 
-            setSelectedCategory={setSelectedCategory}
             matches={matches} 
-            getSortedPlayers={getSortedPlayers} 
+            bestPlayers={bestPlayers}
+            squad={squad} 
           />
         </>
       ) : (

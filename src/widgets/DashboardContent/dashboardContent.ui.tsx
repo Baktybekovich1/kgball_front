@@ -1,8 +1,11 @@
-import { Box, Dialog, DialogActions, DialogContent, DialogTitle, Button, TextField } from "@mui/material";
-import { useState, useEffect } from "react";
+import { Box } from "@mui/material";
+import { useState, useEffect, useCallback } from "react";
 import { apiClient } from "~shared/lib/api";
 import { DashboardRenderContent } from "~widgets/DashboardRenderContent";
-import { AddPlayerDialog } from "~widgets/AddPlayer";
+import { PlayerDialog } from "~widgets/PlayerDialog";
+import { TeamDialog } from "~widgets/TeamDialog";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 interface DashboardContentProps {
   activeTab: string;
@@ -14,125 +17,88 @@ interface DashboardContentProps {
   setTeams: React.Dispatch<React.SetStateAction<any[]>>; 
 }
 
-export const DashboardContent: React.FC<DashboardContentProps> = ({ activeTab, loading, error, teams, tournaments, leagues, setTeams }) => {
+export const DashboardContent: React.FC<DashboardContentProps> = ({
+  activeTab, loading, error, teams, tournaments, leagues, setTeams,
+}) => {
   const [selectedTeam, setSelectedTeam] = useState<any>(null);
   const [teamDetails, setTeamDetails] = useState<any>(null);
-  const [teamError, setTeamError] = useState("");
   const [openDialog, setOpenDialog] = useState(false); 
+  const [openPlayerDialog, setOpenPlayerDialog] = useState(false);
   const [title, setTitle] = useState("");
   const [logo, setLogo] = useState<File | null>(null);
   const [previewLogo, setPreviewLogo] = useState<string | null>(null);
+  
+  const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
+  const [playerDetails, setPlayerDetails] = useState<string | null>(null);
 
-  const [openAddPlayerDialog, setOpenAddPlayerDialog] = useState(false);
-  const handleOpenAddPlayerDialog = () => setOpenAddPlayerDialog(true);
-  const handleCloseAddPlayerDialog = () => setOpenAddPlayerDialog(false);
-
-  const handleCreateTeamClick = () => {
+  const handleOpenPlayerDialog = useCallback(() => setOpenPlayerDialog(true), []);
+  const handleClosePlayerDialog = useCallback(() => setOpenPlayerDialog(false), []);
+  const handleCreateTeamClick = useCallback(() => {
+    setSelectedTeam(null); 
     setOpenDialog(true);
-  };
-
-  const handleCloseDialog = () => {
-    setOpenDialog(false);
-  };
-
-  const handleLogoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files[0]) {
-      const file = event.target.files[0];
-      setLogo(file);
-      setPreviewLogo(URL.createObjectURL(file));
+  }, []);
+  const handleCloseDialog = useCallback(() => setOpenDialog(false), []);
   
-      // Конвертируем изображение в base64
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onloadend = () => {
-        setLogo(reader.result);
-      };
+  const fetchTeamDetails = useCallback(async (teamId: string) => {
+    setTeamDetails(null); 
+    try {
+      const [teamResponse, squadResponse] = await Promise.all([
+        apiClient.get(`/api/teams/${teamId}`),
+        apiClient.get(`/team/squad_list/${teamId}`),
+      ]);
+      console.log(squadResponse.data.players);
+      setTeamDetails({
+        ...teamResponse.data,
+        players: squadResponse.data.players,
+      });
+    } catch (error) {
+      console.log("Ошибка загрузки данных команды");
     }
-  };
-  
-  const handleSubmitTeam = () => {
-    if (title) {
-      const formData = new FormData();
-      formData.append("title", title);
-      if (logo) {
-        formData.append("logo", logo); 
-      }
-  
-      apiClient.post("/api/admin/team/add", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      })
-        .then((response) => {
-          const newTeam = response.data; 
-          setTeams((prevTeams) => [...prevTeams, newTeam]); 
-          setOpenDialog(false);
-          window.location.reload();
-        })
-        .catch((error) => {
-          console.error("Ошибка при добавлении команды:", error);
-        });
-    } else {
-      alert("Пожалуйста, заполните все поля!");
-    }
-  };
+  }, []);
 
-  const handleDeleteTeam = (id: string) => {
+  useEffect(() => {
+    if (selectedTeam) {
+      fetchTeamDetails(selectedTeam.id);
+    }
+  }, [selectedTeam]);
+  
+
+  const handleDeleteTeam = useCallback((id: string) => {
     if (window.confirm("Вы уверены, что хотите удалить эту команду?")) {
       apiClient.delete(`/api/admin/team/remove/${id}`)
         .then(() => {
           setTeams((prevTeams) => prevTeams.filter((team) => team.id !== id));
-          alert("Команда удалена успешно");
+          toast.success("Команда удалена успешно");
         })
         .catch((error) => {
           console.error("Ошибка при удалении команды:", error);
-          alert("Не удалось удалить команду");
+          toast.error("Не удалось удалить команду");
         });
     }
-  };
+  }, [setTeams]);
 
-
-  const handleDeletePlayer = (playerId: string) => {
+  const handleDeletePlayer = useCallback((playerId: string) => {
     apiClient.delete(`/api/admin/player/remove/${playerId}`)
-      .then((response) => {
+      .then(() => {
         setTeamDetails((prevDetails) => ({
           ...prevDetails,
           players: prevDetails.players.filter(player => player.id !== playerId),
         }));
+        toast.success("Игрок удален успешно");
       })
       .catch((error) => {
         console.error("Ошибка при удалении игрока:", error);
-        alert("Не удалось удалить игрока");
+        toast.error("Не удалось удалить игрока");
       });
-  };
- 
-  useEffect(() => {
-    if (selectedTeam) {
-      apiClient.get(`/api/teams/${selectedTeam.id}`)
-        .then((response) => {
-          if (response.data && typeof response.data === "object") {
-            const team = response.data;
-            Promise.all([
-              ...team.players.map((url: string) => apiClient.get(url)),
-            ])
-              .then((responses) => {
-                const players = responses.slice(0, team.players.length);
+  }, []);
 
-                setTeamDetails({
-                  ...team,
-                  players: players.map(player => player.data),
-                });
-              })
-              .catch(() => {
-                setTeamError("Ошибка загрузки дополнительных данных");
-              });
-          } else {
-            setTeamError("Неверный формат данных от сервера");
-          }
-        })
-        .catch(() => setTeamError("Ошибка загрузки данных команды"));
-    }
-  }, [selectedTeam]);
+  const handleEditTeam = (team: any) => {
+    setSelectedTeam(team);
+    setTitle(team.title); 
+    setPreviewLogo(team.logo); 
+    setLogo(null); 
+    setOpenDialog(true); 
+  };
 
   return (
     <Box>
@@ -146,45 +112,29 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({ activeTab, l
         selectedTeam={selectedTeam}
         setSelectedTeam={setSelectedTeam}
         teamDetails={teamDetails}
-        teamError={teamError}
         handleCreateTeamClick={handleCreateTeamClick}
+        handleEditTeam={handleEditTeam}
         handleDeleteTeam={handleDeleteTeam} 
-        handleOpenAddPlayerDialog={handleOpenAddPlayerDialog}
+        handleOpenPlayerDialog={handleOpenPlayerDialog}
         handleDeletePlayer={handleDeletePlayer}
+        setSelectedPlayerId={setSelectedPlayerId}
+        setPlayerDetails={setPlayerDetails}
       />
-
-      <Dialog open={openDialog} onClose={handleCloseDialog}>
-        <DialogTitle>Создать команду</DialogTitle>
-        <DialogContent>
-        {previewLogo && (
-          <img 
-            src={previewLogo} 
-            alt="Предпросмотр логотипа" 
-            style={{ width: 100, height: 100, objectFit: "cover", marginBottom: 10, borderRadius: "8px" }} 
-          />
-        )}
-        <TextField
-          label="Название команды"
-          fullWidth
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          sx={{ marginBottom: 2 }}
-        />
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handleLogoChange}
-          style={{ marginBottom: 2 }}
-        />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog}>Отмена</Button>
-          <Button onClick={handleSubmitTeam}>Создать</Button>
-        </DialogActions>
-      </Dialog>
-      <AddPlayerDialog open={openAddPlayerDialog} onClose={handleCloseAddPlayerDialog} teamId={selectedTeam?.id} setTeamDetails={setTeamDetails}/>
-  </Box>
+      <TeamDialog
+        open={openDialog}
+        onClose={handleCloseDialog}
+        selectedTeam={selectedTeam}
+        setTeams={setTeams}
+      />
+      <PlayerDialog 
+        open={openPlayerDialog} 
+        onClose={handleClosePlayerDialog} 
+        teamId={selectedTeam?.id} 
+        setTeamDetails={setTeamDetails}
+        playerId={selectedPlayerId} 
+        playerDetails={playerDetails}
+      />
+    </Box>
   );
 };
-
 export default DashboardContent;

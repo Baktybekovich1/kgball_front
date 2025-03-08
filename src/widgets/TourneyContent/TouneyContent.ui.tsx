@@ -7,7 +7,7 @@ interface Player {
   name: string;
   goals: number;
   assists: number;
-  photo?: string;
+  img?: string;
 }
 
 interface Tournament {
@@ -110,8 +110,8 @@ export const TourneyContent: React.FC<Props> = ({ selectedTab, tournament, playe
     );
   };
 
-  const renderPlayersTable = (filter: (player: Player) => boolean) => (
-    <TableContainer className="w-full " component={Paper}>
+  const renderPlayersTable = (filter: (player: Player) => boolean, sortKey: "goals" | "assists") => (
+    <TableContainer className="w-full" component={Paper}>
       <Table>
         <TableHead>
           <TableRow>
@@ -122,20 +122,24 @@ export const TourneyContent: React.FC<Props> = ({ selectedTab, tournament, playe
           </TableRow>
         </TableHead>
         <TableBody>
-          {playersData.filter(filter).map(player => (
-            <TableRow key={player.playerId}>
-              <TableCell>
-                <img className="w-12" src={player.photo || DefaultAvatar} alt={player.name} />
-              </TableCell>
-              <TableCell>{player.name}</TableCell>
-              <TableCell>{player.goals}</TableCell>
-              <TableCell>{player.assists}</TableCell>
-            </TableRow>
-          ))}
+          {playersData
+            .filter(filter)
+            .sort((a, b) => b[sortKey] - a[sortKey]) // Сортировка по убыванию
+            .map(player => (
+              <TableRow key={player.playerId}>
+                <TableCell>
+                  <img className="w-12" src={player.img || DefaultAvatar} alt={player.name} />
+                </TableCell>
+                <TableCell>{player.name}</TableCell>
+                <TableCell>{player.goals}</TableCell>
+                <TableCell>{player.assists}</TableCell>
+              </TableRow>
+            ))}
         </TableBody>
       </Table>
     </TableContainer>
   );
+  
 
   switch (selectedTab) {
     case "обзор":
@@ -144,22 +148,22 @@ export const TourneyContent: React.FC<Props> = ({ selectedTab, tournament, playe
       return (
         <div className="w-full">
           <Typography className="mb-2" variant="h5">Бомбардиры</Typography>
-          {renderPlayersTable(player => player.goals > 0)}
-        </div>
+          {renderPlayersTable(player => player.goals > 0, "goals")}
+          </div>
       );
     case "ассистенты":
       return (
-        <div className="w-full">
+        <div className="w-full"> 
           <Typography className="mb-2" variant="h5">Ассистенты</Typography>
-          {renderPlayersTable(player => player.assists > 0)}
+          {renderPlayersTable(player => player.assists > 0, "assists")}
         </div>
       );
     case "результативные":
       return (
         <div className="w-full">
           <Typography className="mb-2" variant="h5">Результативные</Typography>
-          {renderPlayersTable(player => player.assists > 0 || player.goals > 0)}
-        </div>
+          {renderPlayersTable(player => player.assists > 0 || player.goals > 0, "goals")}
+          </div>
       );
     default:
       return null;

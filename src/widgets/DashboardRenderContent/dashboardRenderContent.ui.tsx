@@ -1,7 +1,7 @@
 import { Box, Card, CardContent, Typography, CircularProgress, Button, Divider } from "@mui/material";
-import { apiClient } from "~shared/lib/api";
 import defaultTeam from "~shared/assets/img/defaultTeam.webp";
 import DefaultAvatar from "~shared/assets/img/User-avatar.png";
+import { useRef } from "react";
 
 interface DashboardRenderContentProps {
   activeTab: string;
@@ -12,16 +12,18 @@ interface DashboardRenderContentProps {
   leagues: any[];
   selectedTeam: any;
   setSelectedTeam: (team: any) => void;
+  setSelectedPlayerId: (player: any) => void;
   teamDetails: any;
-  teamError: string;
   handleCreateTeamClick: () => void; 
   handleDeleteTeam: (id) => void; 
-  handleOpenAddPlayerDialog: () => void; 
+  handleEditTeam: (team: any) => void; 
+  handleOpenPlayerDialog: () => void; 
   handleDeletePlayer: (playerId: string) => void; 
+  setPlayerDetails: (player: any) => void;
 }
 
 export const DashboardRenderContent: React.FC<DashboardRenderContentProps> = ({
-  activeTab, 
+  activeTab,  
   loading, 
   error, 
   teams, 
@@ -29,190 +31,165 @@ export const DashboardRenderContent: React.FC<DashboardRenderContentProps> = ({
   leagues, 
   selectedTeam, 
   setSelectedTeam, 
+  setSelectedPlayerId,
   teamDetails, 
-  teamError ,
   handleCreateTeamClick,
   handleDeleteTeam,
-  handleOpenAddPlayerDialog,
+  handleOpenPlayerDialog,
   handleDeletePlayer,
-}) => {
-  switch (activeTab) {
-    case "teams":
-      if (loading) return <Typography className="flex justify-center items-center h-64"><CircularProgress /></Typography>;
-      if (error) return <Typography color="error">{error}</Typography>;
-      return (
-        <Box>
-          <div className="mb-4 flex max-md:flex-col items-center justify-between">
-            <Typography variant="h5" fontWeight="bold">Список команд</Typography>
-            <Button className="bg-tundora text-white text-base" onClick={handleCreateTeamClick}>Создать Команду</Button>
-          </div>
-          <div className="grid grid-cols-2 max-md:grid-cols-1 gap-5">
-            {teams.map((team) => (
-              <Card sx={{ height: "100%" }} key={team.id}>
-                <CardContent className="flex justify-between">
-                  <div className="flex items-center gap-2">
-                    <img 
-                      src={team.logo || defaultTeam} 
-                      alt={team.title} 
-                      className="rounded-full shadow-lg h-20 w-20" 
-                      />
-                    <div>
-                      <Typography variant="h6" fontWeight="bold">
-                        {team.title}
-                      </Typography>
-                      <Button onClick={() => setSelectedTeam(team)} sx={{ mt: 2 }}>
-                        Подробнее
-                      </Button>
-                    </div>
-                  </div>
-                  <div className="flex flex-col justify-between">
-                    <Button
-                      onClick={() => handleDeleteTeam(team.id)}
-                      sx={{
-                        backgroundColor: "error.main",
-                        color: "white",
-                        fontWeight: "bold",
-                        "&:hover": {
-                          backgroundColor: "error.dark",
-                        },
-                      }}
-                    >
-                      Удалить
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))} 
-          </div>
+  handleEditTeam,
+  setPlayerDetails,
+}) => {  
 
-          {selectedTeam && teamDetails === null && (
-            <Typography className="flex justify-center items-center h-64">
-              <CircularProgress />
-            </Typography>
-          )}
+  const playersSectionRef = useRef<HTMLDivElement>(null);
 
-          {selectedTeam && teamDetails && (
-            <Box sx={{ marginTop: 4 }}>
-              <div style={{ gap: '4px', display: 'flex', alignItems: 'center' }}>
-                <img 
-                  src={teamDetails.logo || defaultTeam} 
-                  alt={teamDetails.title} 
-                  className="rounded-full shadow-lg" 
-                  style={{ width: '50px', height: '50px' }} 
-                />
-                <Typography variant="h4" fontWeight="bold">
-                  {teamDetails.title}
+  const handleScrollToPlayers = () => {
+    if (playersSectionRef.current) {
+      playersSectionRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
+  const handleEditPlayer = (playerId: string) => {
+    setSelectedPlayerId(playerId);
+    const player = teamDetails?.players.find((p) => p.id === playerId); 
+    setPlayerDetails(player);
+    handleOpenPlayerDialog();
+  };
+
+  const handleAddPlayer = () => {
+    setSelectedPlayerId(null);
+    setPlayerDetails(null);
+    handleOpenPlayerDialog();
+  };
+
+  const renderLoading = <Typography className="flex justify-center items-center h-64"><CircularProgress /></Typography>;
+  const renderError = <Typography color="error">{error}</Typography>;
+
+  const renderCard = (item: any, onDelete: Function, onEdit: Function, isPlayer = false) => {
+    const handleDelete = () => onDelete(item.id);
+    const handleEdit = () => (isPlayer ? handleEditPlayer(item.id) : onEdit(item));
+  
+    return (
+      <Card sx={{ height: "100%" }} key={item.id}>
+        <CardContent className="flex bg-[#e1e1e1]">
+          <div className="flex max-md:flex-col max-md:items-baseline items-center justify-between w-full gap-2">
+            <div className="flex gap-2">
+              <img
+                src={isPlayer ? item.img || DefaultAvatar : item.logo || defaultTeam}
+                alt={item.title || item.name}
+                className="rounded-full shadow-lg h-20 w-20"
+              />
+              <div>
+                <Typography variant="h6" fontWeight="bold">
+                  {item.title || item.name} {item.surname}
                 </Typography>
-              </div>
-
-              <Divider sx={{ marginBottom: 2 }} />
-            
-              <Button
-                onClick={handleOpenAddPlayerDialog}
-                sx={{
-                  color: 'white', 
-                  background: "gray",
-                  fontSize: '14px', 
-                  fontWeight: 'bold', 
-                  marginBottom: '5px',
-                  '&:hover': {
-                    cursor: 'pointer',
-                  }
-                }} 
-              >
-                Добавить Игрока
-              </Button>
-
-              <Typography style={{ marginBottom: '10px' }} variant="h5" fontWeight="bold">Игроки:</Typography>
-              <ul style={{ listStyleType: "none", paddingLeft: 0 }}>
-                {teamDetails.players && teamDetails.players.length > 0 ? (
-                  teamDetails.players.map((player: any, index: number) => (
-                    <li key={index} className="flex items-center justify-between" style={{ marginBottom: "10px", padding: "10px", borderRadius: "8px", backgroundColor: "#f5f5f5", transition: "background-color 0.3s" }}>
-                      <div className="flex items-center gap-2">
-                        <img 
-                          src={player.img || DefaultAvatar} 
-                          alt={player.name} 
-                          className="max-md:w-14 max-md:h-14 w-20 h-20 rounded-full border border-gray-400 object-cover"
-                        />
-                        <div className="flex flex-col">
-                          <Typography className="max-md:text-base text-xl font-semibold text-gray-900">
-                            {player.name} {player.surname}
-                          </Typography>
-                          <Typography variant="body2" color="textSecondary" className="text-gray-600">
-                            {player.position}
-                          </Typography>
-                        </div>
-                      </div>
-                      <Button
-                        onClick={() => handleDeletePlayer(player.id)}
-                        sx={{
-                          backgroundColor: "error.main",
-                          color: "white",
-                          fontWeight: "bold",
-                          "&:hover": {
-                            backgroundColor: "error.dark",
-                          },
-                        }}
-                      >
-                        Удалить
-                      </Button>
-                    </li>
-                  ))
-                ) : (
-                  <Typography variant="body2">Нет игроков в команде</Typography>
+                {!isPlayer && (
+                  <Button onClick={() => { setSelectedTeam(item); handleScrollToPlayers(); }} sx={{ mt: 2 }}>
+                    Подробнее
+                  </Button>
                 )}
-              </ul>
-            </Box>
-          )}
-        </Box>
-      );
-
-    case "tournaments":
-      if (loading) return <Typography className="flex justify-center items-center h-64"><CircularProgress /></Typography>;
-      if (error) return <Typography color="error">{error}</Typography>;
-      return (
-        <Box>
-          <div className="mb-4 flex max-md:flex-col items-center justify-between">
-            <Typography variant="h5" fontWeight="bold">Список турниров</Typography>
-            <Button className="bg-tundora text-white text-base">Добавить Турнир</Button> 
-          </div>
-          <div className="grid grid-cols-2 max-md:grid-cols-1 gap-5">
-            {tournaments.map((tournament) => (
-              <Card sx={{ height: "100%" }} key={tournament.id}>
-                <CardContent>
-                  <Typography variant="h6" fontWeight="bold">{tournament.title}</Typography>
+                {isPlayer && (
                   <Typography variant="body2" color="textSecondary">
-                    <strong>Дата:</strong> {tournament.date}
+                    {item.position}
                   </Typography>
-                </CardContent>
-              </Card>
-            ))}
+                )}
+              </div>
+            </div>
+            <div className="flex flex-col max-md:w-full gap-3">
+              <Button
+                onClick={handleDelete}
+                sx={{ backgroundColor: "error.main", color: "white" }}
+              >
+                Удалить
+              </Button>
+              <Button
+                onClick={handleEdit}
+                sx={{ backgroundColor: "#ff9800", color: "white" }}
+              >
+                Редактировать
+              </Button>
+            </div>
           </div>
-        </Box>
-      );
+        </CardContent>
+      </Card>
+    );
+  };
 
-    case "leagues":
-      if (loading) return <Typography className="flex justify-center items-center h-64"><CircularProgress /></Typography>;
-      if (error) return <Typography color="error">{error}</Typography>;
-      return (
-        <Box>
-          <div className="mb-4 flex max-md:flex-col items-center justify-between">
-            <Typography variant="h5" fontWeight="bold">Список лиг</Typography>
-            <Button className="bg-tundora text-white text-base">Создать лигу</Button>
-          </div>
-          <div className="grid grid-cols-2 max-md:grid-cols-1 gap-5">
-            {leagues.map((league) => (
-              <Card sx={{ height: "100%" }} key={league.id}>
-                <CardContent>
-                  <Typography variant="h6" fontWeight="bold">{league.title}</Typography>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </Box>
-      );
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case "teams":
+        if (loading) return renderLoading;
+        if (error) return renderError;
+        return (
+          <Box>
+            <div className="mb-4 flex justify-between items-center">
+              <Typography variant="h5" fontWeight="bold">Список команд</Typography>
+              <Button className="bg-tundora text-white text-base" onClick={handleCreateTeamClick}>Создать Команду</Button>
+            </div>
+            <div className="grid grid-cols-2 max-md:grid-cols-1 gap-5">
+              {teams.map((team) => renderCard(team, handleDeleteTeam, handleEditTeam))}
+            </div>
 
-    default:
-      return null;
-  }
+            {selectedTeam && !teamDetails && renderLoading}
+
+            {selectedTeam && teamDetails && (
+              <Box ref={playersSectionRef} key={selectedTeam.id} sx={{ marginTop: 4 }}>
+                <div className="flex items-center gap-2">
+                  <img 
+                    src={teamDetails.logo || defaultTeam} 
+                    alt={teamDetails.title} 
+                    className="rounded-full shadow-lg h-20 w-20" 
+                  />
+                  <Typography variant="h4" fontWeight="bold">{teamDetails.title}</Typography>
+                </div>
+
+                <Divider sx={{ marginBottom: 2 }} />
+                <Button onClick={handleAddPlayer} sx={{ color: 'white', background: "gray", fontSize: '14px' }}>Добавить Игрока</Button>
+
+                <Typography variant="h5" fontWeight="bold">Игроки:</Typography>
+                <ul style={{ listStyleType: "none", paddingLeft: 0 }}>
+                  {teamDetails.players?.length > 0 ? teamDetails.players.map((player) => (
+                    <li key={player.id} className="mt-4">
+                      {renderCard(player, handleDeletePlayer, handleEditPlayer, true)}
+                    </li>
+                  )) : <Typography variant="body2">Нет игроков в команде</Typography>}
+                </ul>
+              </Box>
+            )}
+          </Box>
+        );
+      case "tournaments":
+        if (loading) return renderLoading;
+        if (error) return renderError;
+        return (
+          <Box>
+            <div className="mb-4 flex justify-between items-center">
+              <Typography variant="h5" fontWeight="bold">Список турниров</Typography>
+              <Button className="bg-tundora text-white text-base">Добавить Турнир</Button>
+            </div>
+            <div className="grid grid-cols-2 max-md:grid-cols-1 gap-5">
+              {tournaments.map((tournament) => renderCard(tournament, () => {}, () => {}))}
+            </div>
+          </Box>
+        );
+      case "leagues":
+        if (loading) return renderLoading;
+        if (error) return renderError;
+        return (
+          <Box>
+            <div className="mb-4 flex justify-between items-center">
+              <Typography variant="h5" fontWeight="bold">Список лиг</Typography>
+              <Button className="bg-tundora text-white text-base">Создать лигу</Button>
+            </div>
+            <div className="grid grid-cols-2 max-md:grid-cols-1 gap-5">
+              {leagues.map((league) => renderCard(league, () => {}, () => {}))}
+            </div>
+          </Box>
+        );
+      default:
+        return null;
+    }
+  };
+
+  return renderTabContent();
 };

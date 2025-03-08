@@ -7,7 +7,7 @@ import { DashboardContent } from "~widgets/DashboardContent";
 
 export const DashboardPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState("teams");
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [teams, setTeams] = useState<any[]>([]);
   const [tournaments, setTournaments] = useState<any[]>([]);
   const [leagues, setLeagues] = useState<any[]>([]); 
