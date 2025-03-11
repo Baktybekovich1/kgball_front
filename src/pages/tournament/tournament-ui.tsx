@@ -74,7 +74,7 @@ export const TournamentPage: React.FC = () => {
     <Container className="max-w-[1440px] mb-10">
       {tournament ? (
         <div className="flex flex-col items-center justify-center max-md:px-2 max-md:py-2 px-4 py-8">
-          <Box className="flex max-md:flex-col w-full gap-5 justify-between items-center mb-4">
+          <Box className="flex max-md:flex-col max-md:gap-1 max-md:mb-0 w-full gap-5 justify-between items-center mb-4">
             <Link to={pathKeys.matches.root()} className="bg-dove mb-1 p-2 rounded text-white inline-block text-blue hover:underline">
               <ArrowBackIcon className="max-md:text-xs"/> Назад
             </Link>
@@ -95,28 +95,28 @@ export const TournamentPage: React.FC = () => {
             <Button
               variant={selectedTab === "обзор" ? "contained" : "outlined"}
               onClick={() => setSelectedTab("обзор")}
-              className="w-full max-w-[200px] mb-2"
+              className="w-full max-w-[200px] mb-2 max-md:max-w-full"
             >
               Обзор
             </Button>
             <Button
               variant={selectedTab === "бомбардиры" ? "contained" : "outlined"}
               onClick={() => setSelectedTab("бомбардиры")}
-              className="w-full max-w-[200px] mb-2"
+              className="w-full max-w-[200px] mb-2 max-md:max-w-full"
             >
               Бомбардиры
             </Button>
             <Button
               variant={selectedTab === "ассистенты" ? "contained" : "outlined"}
               onClick={() => setSelectedTab("ассистенты")}
-              className="w-full max-w-[200px] mb-2"
+              className="w-full max-w-[200px] mb-2 max-md:max-w-full"
             >
               Ассистенты
             </Button>
             <Button
               variant={selectedTab === "результативные" ? "contained" : "outlined"}
               onClick={() => setSelectedTab("результативные")}
-              className="w-full max-w-[200px] mb-2"
+              className="w-full max-w-[200px] mb-2 max-md:max-w-full"
             >
               Результативные
             </Button>

@@ -52,7 +52,7 @@ export const TeamDialog: React.FC<TeamDialogProps> = ({ open, onClose, selectedT
       };
 
       const request = selectedTeam
-        ? apiClient.patch(`/api/admin/team/edit`, requestBody)
+        ? apiClient.patch(`/api/admin/team/edit/${selectedTeam.id}`, requestBody)
         : apiClient.post("/api/admin/team/add", requestBody);
 
         request

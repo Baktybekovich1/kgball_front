@@ -6,13 +6,21 @@ import { apiClient } from "~shared/lib/api";
 import { DashboardContent } from "~widgets/DashboardContent";
 
 export const DashboardPage: React.FC = () => {
-  const [activeTab, setActiveTab] = useState("teams");
+  const [activeTab, setActiveTab] = useState<string>(() => {
+    const storedTab = localStorage.getItem("activeTab");
+    return storedTab ? storedTab : "teams";
+  });
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [teams, setTeams] = useState<any[]>([]);
   const [tournaments, setTournaments] = useState<any[]>([]);
   const [leagues, setLeagues] = useState<any[]>([]); 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  
+  useEffect(() => {
+    localStorage.setItem("activeTab", activeTab);
+  }, [activeTab]);
 
   useEffect(() => { 
     setLoading(true);
@@ -115,8 +123,10 @@ export const DashboardPage: React.FC = () => {
         error={error} 
         teams={teams} 
         tournaments={tournaments} 
+        setTournaments={setTournaments}
         leagues={leagues} 
         setTeams={setTeams}
+        setActiveTab={setActiveTab}
       />
     </Container>
   );

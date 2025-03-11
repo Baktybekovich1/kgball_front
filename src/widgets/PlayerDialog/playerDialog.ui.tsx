@@ -75,7 +75,7 @@ export const PlayerDialog: React.FC<PlayerDialogProps> = ({ open, onClose, teamI
     };
   
     const apiRequest = playerId
-      ? apiClient.patch(`/api/admin/player/edit`, requestBody)
+      ? apiClient.patch(`/api/admin/player/edit/${playerId}`, requestBody)
       : apiClient.post("/api/admin/player/add", requestBody);
   
     apiRequest

@@ -99,10 +99,10 @@ export const TourneyContent: React.FC<Props> = ({ selectedTab, tournament, playe
             </span>
           </Typography>
 
-          <Typography className="bg-white max-md:text-xs text-black rounded-lg p-3">
+          <Typography className="bg-white max-md:text-sm text-black rounded-lg p-3">
             Всего голов: {tournament.firstPosition.goalsCount + tournament.secondPosition.goalsCount + tournament.thirdPosition.goalsCount}
           </Typography>
-          <Typography className="bg-white max-md:text-xs text-black rounded-lg p-3">
+          <Typography className="bg-white max-md:text-sm text-black rounded-lg p-3">
             Асситы: {tournament.firstPosition.assistsCount + tournament.secondPosition.assistsCount + tournament.thirdPosition.assistsCount}
           </Typography>
         </Box>

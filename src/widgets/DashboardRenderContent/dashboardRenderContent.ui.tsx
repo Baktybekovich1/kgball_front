@@ -8,6 +8,7 @@ interface DashboardRenderContentProps {
   loading: boolean;
   error: string;
   teams: any[];
+  matches: any[];
   tournaments: any[];
   leagues: any[];
   selectedTeam: any;
@@ -20,6 +21,13 @@ interface DashboardRenderContentProps {
   handleOpenPlayerDialog: () => void; 
   handleDeletePlayer: (playerId: string) => void; 
   setPlayerDetails: (player: any) => void;
+  handleOpenTournamentClick: () => void; 
+  setSelectedTourney: (tourney: any) => void;
+  handleDeleteTourney: (id) => void; 
+  setActiveTab: (tab: string) => void; 
+  setOpenPrizeDialog: (boolean) => void; 
+  setSelectedTourneyId: (id) => void; 
+  selectedTourneyId: any;
 }
 
 export const DashboardRenderContent: React.FC<DashboardRenderContentProps> = ({
@@ -27,6 +35,7 @@ export const DashboardRenderContent: React.FC<DashboardRenderContentProps> = ({
   loading, 
   error, 
   teams, 
+  matches,
   tournaments,  
   leagues, 
   selectedTeam, 
@@ -39,6 +48,13 @@ export const DashboardRenderContent: React.FC<DashboardRenderContentProps> = ({
   handleDeletePlayer,
   handleEditTeam,
   setPlayerDetails,
+  handleOpenTournamentClick,
+  setSelectedTourney,
+  handleDeleteTourney,
+  setActiveTab,
+  setOpenPrizeDialog,
+  setSelectedTourneyId,
+  selectedTourneyId,
 }) => {  
 
   const playersSectionRef = useRef<HTMLDivElement>(null);
@@ -62,6 +78,25 @@ export const DashboardRenderContent: React.FC<DashboardRenderContentProps> = ({
     handleOpenPlayerDialog();
   };
 
+  const handleEditTourney = (tourney: any) => {
+    setSelectedTourney(tourney);
+    handleOpenTournamentClick();
+  };
+  
+  const handleAddTourney = () => {
+    setSelectedTourney(null);
+    handleOpenTournamentClick();
+  };
+
+  const handleOpenPrizeDialog = (tourneyId: number) => {
+    setSelectedTourneyId(tourneyId);
+    setOpenPrizeDialog(true);
+  };
+
+  const handleAddPrize = (tourneyId: number) => {
+    handleOpenPrizeDialog(tourneyId);
+  };
+
   const renderLoading = <Typography className="flex justify-center items-center h-64"><CircularProgress /></Typography>;
   const renderError = <Typography color="error">{error}</Typography>;
 
@@ -69,6 +104,20 @@ export const DashboardRenderContent: React.FC<DashboardRenderContentProps> = ({
     const handleDelete = () => onDelete(item.id);
     const handleEdit = () => (isPlayer ? handleEditPlayer(item.id) : onEdit(item));
   
+    const handleDetailsClick = () => {
+      if (!isPlayer) {
+        if (item.players) { 
+          setSelectedTeam(item);
+          handleScrollToPlayers();
+        } else {
+          setSelectedTourney(item);
+          setSelectedTourneyId(item.id);  
+          setActiveTab("matches");
+        }
+      }
+    };
+    
+    
     return (
       <Card sx={{ height: "100%" }} key={item.id}>
         <CardContent className="flex bg-[#e1e1e1]">
@@ -84,7 +133,7 @@ export const DashboardRenderContent: React.FC<DashboardRenderContentProps> = ({
                   {item.title || item.name} {item.surname}
                 </Typography>
                 {!isPlayer && (
-                  <Button onClick={() => { setSelectedTeam(item); handleScrollToPlayers(); }} sx={{ mt: 2 }}>
+                  <Button onClick={handleDetailsClick} sx={{ mt: 2 }}>
                     Подробнее
                   </Button>
                 )}
@@ -92,7 +141,7 @@ export const DashboardRenderContent: React.FC<DashboardRenderContentProps> = ({
                   <Typography variant="body2" color="textSecondary">
                     {item.position}
                   </Typography>
-                )}
+                )} 
               </div>
             </div>
             <div className="flex flex-col max-md:w-full gap-3">
@@ -165,10 +214,13 @@ export const DashboardRenderContent: React.FC<DashboardRenderContentProps> = ({
           <Box>
             <div className="mb-4 flex justify-between items-center">
               <Typography variant="h5" fontWeight="bold">Список турниров</Typography>
-              <Button className="bg-tundora text-white text-base">Добавить Турнир</Button>
+              <Button className="bg-tundora text-white text-base" onClick={handleAddTourney}>
+                Добавить Турнир
+              </Button>
+
             </div>
             <div className="grid grid-cols-2 max-md:grid-cols-1 gap-5">
-              {tournaments.map((tournament) => renderCard(tournament, () => {}, () => {}))}
+              {tournaments.map((tournament) => renderCard(tournament, handleDeleteTourney, handleEditTourney))}
             </div>
           </Box>
         );
@@ -183,6 +235,48 @@ export const DashboardRenderContent: React.FC<DashboardRenderContentProps> = ({
             </div>
             <div className="grid grid-cols-2 max-md:grid-cols-1 gap-5">
               {leagues.map((league) => renderCard(league, () => {}, () => {}))}
+            </div>
+          </Box>
+        );
+      case "matches":
+        // if (loading) return renderLoading;
+        if (error) return renderError;
+        return (
+          <Box>
+            <div className="mb-4 flex justify-between items-center max-md:flex-col">
+              <Typography variant="h5" fontWeight="bold">Список Матчей</Typography>
+              <div className="flex gap-2 max-md:mt-2">
+                <Button className="bg-tundora text-white text-base max-md:text-sm">Добавить Матч</Button>
+                <Button 
+                  className="bg-blue text-white text-base max-md:text-sm"
+                  onClick={() => handleAddPrize(selectedTourneyId)} 
+                >
+                  Распределить места
+                </Button>
+                </div>
+            </div>
+            <div className="grid grid-cols-2 max-md:grid-cols-1 gap-5">
+              {matches.map((match, index) => (
+                <div className="flex-1 sm:w-[48%] md:w-[30%]" key={index}>
+                  <div  className="border p-4 bg-[#c1c1c1] rounded-md block">
+                    <Box className="flex items-center justify-between">
+                      <div className="flex flex-col items-center">
+                        <span className="text-lg font-semibold">{match.loserTeamTitle}</span>
+                      </div>
+                      <div className="flex gap-4 text-md font-semibold">
+                        <span>{match.loserTeamScore}</span> 
+                        <span className="">
+                          VS
+                        </span>
+                        <span>{match.winnerTeamScore}</span>
+                      </div>
+                      <div className="flex flex-col items-center">
+                        <span className="text-lg font-semibold">{match.winnerTeamTitle}</span>
+                      </div>
+                    </Box>
+                  </div>
+                </div>
+              ))}
             </div>
           </Box>
         );

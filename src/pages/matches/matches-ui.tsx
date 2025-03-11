@@ -47,20 +47,21 @@ export const MatchesPage: React.FC = () => {
       <div className="grid w-full max-md:grid-cols-1 grid-cols-2 gap-4">
         {matches.map((match, index) => (
           <div className="flex-1 sm:w-[48%] md:w-[30%]" key={index}>
-            <Link to={`/matches/${match.gameId}`} className="border p-4 bg-alto rounded-md block">
+            <Link to={`/matches/${match.gameId}`} className="border p-4 bg-[#c1c1c1] rounded-md block">
               <Box className="flex items-center justify-between">
                 <div className="flex flex-col items-center">
                   <span className="text-lg font-semibold">{match.loserTeamData.title}</span>
                 </div>
-                <span className="text-md font-semibold">VS</span>
+                <div className="flex gap-4 text-md font-semibold">
+                  <span>{match.loserTeamScore}</span> 
+                  <span className="">
+                    VS
+                  </span>
+                  <span>{match.winnerTeamScore}</span>
+                </div>
                 <div className="flex flex-col items-center">
                   <span className="text-lg font-semibold">{match.winnerTeamData.title}</span>
                 </div>
-              </Box>
-              <Box className="flex justify-between">
-                <span className="text-md">
-                  Счет: {match.loserTeamScore} - {match.winnerTeamScore}
-                </span>
               </Box>
             </Link>
           </div>
