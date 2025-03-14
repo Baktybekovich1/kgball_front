@@ -21,38 +21,27 @@ export const RenderContent: React.FC<RenderContentProps> = ({
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
   const getSortedPlayers = (category: string) => {
-    let filteredPlayers = bestPlayers;
-
-    if (category === "scorers") {
-      filteredPlayers = bestPlayers.filter(player => player.goals > 0);
-    } else if (category === "assistants") {
-      filteredPlayers = bestPlayers.filter(player => player.assists > 0);
-    }
+    const players = bestPlayers.map(player => ({
+      ...player,
+      goals: Number(player.goals) || 0,
+      assists: Number(player.assists) || 0,
+    }));
   
-    return filteredPlayers.sort((a, b) => {
-      const aGoals = a.goals ? Number(a.goals) : 0;
-      const bGoals = b.goals ? Number(b.goals) : 0;
-  
-      const aAssists = a.assists ? Number(a.assists) : 0;
-      const bAssists = b.assists ? Number(b.assists) : 0;
-  
+    return players.sort((a, b) => {
       if (category === "assistants") {
-        if (bAssists !== aAssists) {
-          return bAssists - aAssists;  
-        }
-        return bGoals - aGoals; 
+        if (b.assists !== a.assists) return b.assists - a.assists;
+        return b.goals - a.goals;
       }
   
-      if (bGoals !== aGoals) {
-        return bGoals - aGoals;
-      }
-      if (bAssists !== aAssists) {
-        return bAssists - aAssists;
+      if (category === "scorers") {
+        if (b.goals !== a.goals) return b.goals - a.goals;
+        return b.assists - a.assists;
       }
   
-      return (bGoals + bAssists) - (aGoals + aAssists);
+      return (b.goals + b.assists) - (a.goals + a.assists);
     });
   };
+  
   
 
   switch (selectedTab) {

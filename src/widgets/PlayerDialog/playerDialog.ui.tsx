@@ -73,6 +73,8 @@ export const PlayerDialog: React.FC<PlayerDialogProps> = ({ open, onClose, teamI
       birthday,
       img: img || "",
     };
+    console.log("Player ID:", playerId); // Make sure this outputs a string or number, not an object
+
   
     const apiRequest = playerId
       ? apiClient.patch(`/api/admin/player/edit/${playerId}`, requestBody)

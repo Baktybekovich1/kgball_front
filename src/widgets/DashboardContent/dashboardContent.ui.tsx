@@ -6,6 +6,7 @@ import { PlayerDialog } from "~widgets/PlayerDialog";
 import { TeamDialog } from "~widgets/TeamDialog";
 import { TourneyDialog } from "~widgets/TourneyDialog";
 import { AddTourneyPrize } from "~widgets/AddTourneyPrize";
+import { MatchDialog } from "~widgets/MatchDialog";
 
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -33,8 +34,10 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
   const [logo, setLogo] = useState<File | null>(null);
   const [previewLogo, setPreviewLogo] = useState<string | null>(null);
   const [matches, setMatches] = useState<any[]>([]);
-  
+  const [goals, setGoals] = useState<any[]>([]);
+
   const [selectedTourney, setSelectedTourney] = useState<any>(null);
+  const [selectedMatch, setSelectedMatch] = useState<any>(null);
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
   const [playerDetails, setPlayerDetails] = useState<string | null>(null);
 
@@ -55,6 +58,9 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
   const handleClosePrizeDialog = () => setOpenPrizeDialog(false);
   const [selectedTourneyId, setSelectedTourneyId] = useState<number | null>(null); 
 
+  const [openMatchDialog, setOpenMatchDialog] = useState(false);
+  const handleCloseMatchDialog = () => setOpenMatchDialog(false);
+
   useEffect(() => {
     apiClient.get("/api/teams").then((res) => setTeams(res.data));
   }, []);
@@ -63,20 +69,34 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
     if (selectedTourneyId !== null) {
       localStorage.setItem("selectedTourneyId", selectedTourneyId.toString());
     }
-  }, [selectedTourneyId]);
+  }, [selectedTourneyId]); 
 
   const fetchMatches = useCallback(async (tourneyId: number) => {
-    console.log(tourneyId); 
     try {
       const response = await apiClient.get(`/game/tourney/games/${tourneyId}`);
       setMatches(response.data); 
-      console.log(response.data); 
     } catch (error) {
       console.error("Ошибка при загрузке матчей:", error);
       toast.error("Не удалось загрузить матчи");
     }
   }, []);
   
+  const fetchGoals = useCallback(async (matchId: string) => {
+    try {
+      const response = await apiClient.get(`/game/goals/${matchId}`);
+      setGoals(response.data);
+    } catch (error) {
+      console.error("Ошибка при получении голов:", error);
+      toast.error("Не удалось загрузить голы");
+    }
+  }, []);
+
+  useEffect(() => {
+    if (selectedMatch?.id) {
+      fetchGoals(selectedMatch.id);
+    }
+  }, [selectedMatch, fetchGoals]);
+
   useEffect(() => {
     const savedTourneyId = localStorage.getItem("selectedTourneyId");
     if (savedTourneyId) {
@@ -153,6 +173,22 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
       });
   }, []);
 
+  const handleDeleteMatch = useCallback((gameId: string) => {
+    if (window.confirm("Вы уверены, что хотите удалить этот матч?")) {
+      apiClient.delete(`/api/admin/game/remove/${gameId}`)
+        .then(() => {
+          setMatches((prevMatches) => prevMatches.filter((match) => match.id !== gameId));
+          toast.success("Матч удален успешно");
+          window.location.reload();
+        })
+        .catch((error) => {
+          console.error("Ошибка при удалении матча:", error);
+          toast.error("Не удалось удалить матч");
+        });
+    }
+  }, [setMatches]);
+  
+  
   const handleEditTeam = (team: any) => {
     setSelectedTeam(team);
     setTitle(team.title); 
@@ -188,6 +224,10 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
         setOpenPrizeDialog={setOpenPrizeDialog}
         setSelectedTourneyId={setSelectedTourneyId}
         selectedTourneyId={selectedTourneyId}
+        setOpenMatchDialog={setOpenMatchDialog}
+        setSelectedMatch={setSelectedMatch}
+        handleDeleteMatch={handleDeleteMatch}
+        goals={goals}
       />
       <TeamDialog
         open={openDialog}
@@ -214,6 +254,14 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
         onClose={handleClosePrizeDialog}
         tourneyId={Number(selectedTourneyId)}
         teams={teams} 
+      />
+      <MatchDialog 
+        open={openMatchDialog}
+        onClose={handleCloseMatchDialog}
+        setMatches={setMatches}
+        selectedMatch={selectedMatch}
+        tourneyId={Number(selectedTourneyId)}
+        teams={teams}
       />
     </Box>
   );

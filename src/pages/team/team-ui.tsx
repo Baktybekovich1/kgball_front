@@ -44,6 +44,7 @@ export const TeamPage: React.FC = () => {
       apiClient.get(`/team/best_players/${id}`)
         .then(response => {
           if (response.data?.players && Array.isArray(response.data.players)) {
+            console.log(response.data.players);
             setBestPlayers(response.data.players);
           } else {
             setError("Некорректный формат данных лучших игроков");

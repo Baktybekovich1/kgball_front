@@ -34,12 +34,11 @@ export const TournamentPage: React.FC = () => {
   }, [id]);
   
   useEffect(() => {
-    if (tournament?.firstPosition?.teamId) {
-      const teamId = tournament.firstPosition.teamId;
-      apiClient.get(`team/best_players/${teamId}`)
+    if (id) {
+      apiClient.get(`tourney/best_players/${id}`)
         .then(response => {
-          if (response.data.players) {
-            setPlayersData(response.data.players);
+          if (response.data) {
+            setPlayersData(response.data);
           } else {
             setError("Ошибка загрузки данных игроков");
           }
