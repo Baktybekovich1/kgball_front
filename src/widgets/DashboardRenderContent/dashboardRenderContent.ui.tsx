@@ -31,7 +31,11 @@ interface DashboardRenderContentProps {
   setOpenMatchDialog: (boolean) => void; 
   setSelectedMatch: (id) => void; 
   handleDeleteMatch: (id) => void; 
+  selectedMatch: any;
   goals: any[];
+  setOpenGoalDialog: (boolean) => void; 
+  handleDeleteGoal: (id) => void; 
+  setSelectedGoal: (team: any) => void;
 }
 
 export const DashboardRenderContent: React.FC<DashboardRenderContentProps> = ({
@@ -41,10 +45,9 @@ export const DashboardRenderContent: React.FC<DashboardRenderContentProps> = ({
   handleDeletePlayer, handleEditTeam, setPlayerDetails, handleOpenTournamentClick, 
   setSelectedTourney, handleDeleteTourney, setActiveTab, setOpenPrizeDialog, 
   setSelectedTourneyId, selectedTourneyId, setOpenMatchDialog, setSelectedMatch, 
-  handleDeleteMatch, goals,
+  handleDeleteMatch, selectedMatch, goals, setOpenGoalDialog, handleDeleteGoal, setSelectedGoal
 }) => {  
   const playersSectionRef = useRef<HTMLDivElement>(null);
-  const [expandedMatchId, setExpandedMatchId] = useState<string | null>(null);
 
   const handleScrollToPlayers = () => playersSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
 
@@ -89,7 +92,21 @@ export const DashboardRenderContent: React.FC<DashboardRenderContentProps> = ({
     setOpenMatchDialog(true);
   };
 
-  const toggleMatchDetails = (matchId: string) => setExpandedMatchId(prevId => (prevId === matchId ? null : matchId));
+  const toggleMatchDetails = (matchId: string) => {
+    setSelectedMatch(prevMatch => (prevMatch?.gameId === matchId ? null : matches.find(m => m.gameId === matchId)));
+  };
+
+  const handleAddGoal = (match: any) => {
+    setSelectedGoal(null);
+    setSelectedMatch(match); 
+    setOpenGoalDialog(true);
+  };
+
+  const handleEditGoal = (match: any, goal: any) => {
+    setSelectedGoal(goal);
+    setSelectedMatch(match); 
+    setOpenGoalDialog(true);
+  };
 
   const renderLoading = <Typography className="flex justify-center items-center h-64"><CircularProgress /></Typography>;
   const renderError = <Typography color="error">{error}</Typography>;
@@ -102,7 +119,6 @@ export const DashboardRenderContent: React.FC<DashboardRenderContentProps> = ({
         onDelete(item.id);
       }
     };
-
     const handleEdit = () => isPlayer ? handleEditPlayer(item.id) : onEdit(item);
     const handleDetailsClick = () => {
       if (!isPlayer && !isMatch) {
@@ -231,28 +247,80 @@ export const DashboardRenderContent: React.FC<DashboardRenderContentProps> = ({
               {matches.map(match => renderCard(match, handleDeleteMatch, handleEditMatch, false, true))}
             </div>
             <Box className="mt-10">
-              {expandedMatchId && (
+              {selectedMatch && (
                 <>
-                  <Button className="bg-tundora text-white text-base max-md:text-sm">Добавить Голы</Button>
-                  <Typography variant="h5" fontWeight="bold">Голы:</Typography>
-                  {goals.length === 0 ? (
-                    <Typography variant="body2">Голов в этом матче пока нет.</Typography>
-                  ) : (
-                    <>
-                      {goals.filter(goal => String(goal.game) === String(expandedMatchId)).length > 0 ? (
-                        <ul className="list-disc pl-6 mt-2">
-                          {goals.filter(goal => goal.game === expandedMatchId).map((goal, index) => (
-                            <li key={goal.id || index}><Typography variant="body2">Гол: игрок #{goal.playerId}</Typography></li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <Typography variant="body2">Голов в этом матче пока нет.</Typography>
-                      )}
-                    </>
+                  <Button
+                    className="bg-tundora text-white text-base max-md:text-sm"
+                    onClick={() => handleAddGoal(selectedMatch)}
+                  >
+                    Добавить Голы
+                  </Button>
+
+                  {goals && (
+                    <div className="flex flex-col mt-4 gap-4">
+                      <div className="flex max-md:hidden justify-between font-bold text-lg text-center">
+                        <div className="w-1/2 pr-4">
+                          {selectedMatch.loserTeamTitle || "Команда 1"}
+                        </div>
+                        <div className="w-1/2 pl-4">
+                          {selectedMatch.winnerTeamTitle || "Команда 2"}
+                        </div>
+                      </div>
+                      <div className="flex max-md:flex-col gap-6">
+                        {['loser', 'winner'].map((teamType) => (
+                          <div key={teamType} className="w-full">
+                            <ul className="">
+                              {goals[`${teamType}TeamGoals`] && goals[`${teamType}TeamGoals`].length > 0 ? (
+                                goals[`${teamType}TeamGoals`].map((goal, index) => (
+                                  <li key={goal.id || index} className="mb-2">
+                                    <Card
+                                      sx={{
+                                        padding: 2,
+                                        boxShadow: 3,
+                                        borderRadius: 2,
+                                      }}
+                                    >
+                                      <Typography className="max-md:text-base text-xl font-semibold text-gray-800">
+                                        {goal.goalAuthor ? `${goal.goalAuthor.playerName} (Гол)` : 'Неизвестен'}
+                                      </Typography>
+                                      {goal.assistAuthor && (
+                                        <Typography variant="body2" color="textSecondary">
+                                          Ассист: {goal.assistAuthor.playerName}
+                                        </Typography>
+                                      )}
+                                      <div className="flex max-md:flex-col justify-end gap-2 mt-2">
+                                        <Button
+                                          onClick={() => handleEditGoal(selectedMatch, goal)}
+                                          sx={{ backgroundColor: "#ff9800", color: "white", padding: 1 }}
+                                          className="max-md:"
+                                        >
+                                          Редактировать
+                                        </Button>
+                                        <Button
+                                          onClick={() => handleDeleteGoal(goal.goalId)}
+                                          sx={{ backgroundColor: "error.main", color: "white", padding: 1 }}
+                                          className="max-md:"
+                                        >
+                                          Удалить
+                                        </Button>
+                                        
+                                      </div>
+                                    </Card>
+                                  </li>
+                                ))
+                              ) : (
+                                <Typography variant="body2" className="text-gray-500">Нет голов</Typography>
+                              )}
+                            </ul>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   )}
                 </>
               )}
             </Box>
+
           </Box>
         );
       default:

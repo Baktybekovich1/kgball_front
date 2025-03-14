@@ -2,11 +2,12 @@ import { Box } from "@mui/material";
 import { useState, useEffect, useCallback } from "react";
 import { apiClient } from "~shared/lib/api";
 import { DashboardRenderContent } from "~widgets/DashboardRenderContent";
-import { PlayerDialog } from "~widgets/PlayerDialog";
-import { TeamDialog } from "~widgets/TeamDialog";
-import { TourneyDialog } from "~widgets/TourneyDialog";
-import { AddTourneyPrize } from "~widgets/AddTourneyPrize";
-import { MatchDialog } from "~widgets/MatchDialog";
+import { PlayerDialog } from "~features/PlayerDialog";
+import { TeamDialog } from "~features/TeamDialog";
+import { TourneyDialog } from "~features/TourneyDialog";
+import { AddTourneyPrize } from "~features/AddTourneyPrize";
+import { MatchDialog } from "~features/MatchDialog";
+import { GoalDialog } from "~features/GoalDialog";
 
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -38,6 +39,7 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
 
   const [selectedTourney, setSelectedTourney] = useState<any>(null);
   const [selectedMatch, setSelectedMatch] = useState<any>(null);
+  const [selectedGoal, setSelectedGoal] = useState<any>(null);
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
   const [playerDetails, setPlayerDetails] = useState<string | null>(null);
 
@@ -60,6 +62,9 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
 
   const [openMatchDialog, setOpenMatchDialog] = useState(false);
   const handleCloseMatchDialog = () => setOpenMatchDialog(false);
+
+  const [openGoalDialog, setOpenGoalDialog] = useState(false);
+  const handleCloseGoalDialog = () => setOpenGoalDialog(false);
 
   useEffect(() => {
     apiClient.get("/api/teams").then((res) => setTeams(res.data));
@@ -92,8 +97,8 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
   }, []);
 
   useEffect(() => {
-    if (selectedMatch?.id) {
-      fetchGoals(selectedMatch.id);
+    if (selectedMatch?.gameId) {
+      fetchGoals(selectedMatch.gameId);
     }
   }, [selectedMatch, fetchGoals]);
 
@@ -173,21 +178,65 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
       });
   }, []);
 
-  const handleDeleteMatch = useCallback((gameId: string) => {
-    if (window.confirm("Вы уверены, что хотите удалить этот матч?")) {
-      apiClient.delete(`/api/admin/game/remove/${gameId}`)
-        .then(() => {
-          setMatches((prevMatches) => prevMatches.filter((match) => match.id !== gameId));
-          toast.success("Матч удален успешно");
-          window.location.reload();
-        })
-        .catch((error) => {
-          console.error("Ошибка при удалении матча:", error);
-          toast.error("Не удалось удалить матч");
-        });
+  const handleDeleteMatch = useCallback(async (gameId: string) => {
+    if (!window.confirm("Вы уверены, что хотите удалить этот матч и его голы?")) return;
+  
+    try {
+      // Получаем голы
+      const response = await apiClient.get(`/game/goals/${gameId}`);
+      const { winnerTeamGoals, loserTeamGoals } = response.data;
+  
+      const allGoals = [...winnerTeamGoals, ...loserTeamGoals];
+  
+      if (allGoals.length === 0) {
+        console.log("Нет голов для удаления");
+        toast.success("Матч удалён без голов");
+      } else {
+        await Promise.all(
+          allGoals.map((goal: any) => {
+            if (goal.goalId) { 
+              return apiClient.delete(`/api/admin/goal/remove/${goal.goalId}`);
+            } else {
+              console.error("Отсутствует goalId для гола", goal);
+              toast.error("Не удалось удалить гол: отсутствует goalId");
+            }
+          })
+        );
+        toast.success("Голы удалены успешно");
+      }
+  
+      // Удаляем сам матч
+      await apiClient.delete(`/api/admin/game/remove/${gameId}`);
+  
+      // Обновляем список матчей
+      setMatches((prevMatches) => prevMatches.filter((match) => match.id !== gameId));
+      toast.success("Матч удален успешно");
+      window.location.reload();
+    } catch (error) {
+      console.error("Ошибка при удалении матча и голов:", error);
+      toast.error("Не удалось удалить матч или его голы");
     }
   }, [setMatches]);
   
+  
+
+  const handleDeleteGoal = useCallback((goalId: string) => {
+    if (window.confirm("Вы уверены, что хотите удалить этот гол?")) {
+      apiClient.delete(`/api/admin/goal/remove/${goalId}`)
+        .then(() => {
+          // После успешного удаления получаем актуальные данные
+          const gameId = selectedMatch?.gameId;
+          if (gameId) {
+            fetchGoals(gameId); // Перезагружаем голы для матча
+          }
+          toast.success("Гол удален успешно");
+        })
+        .catch((error) => {
+          console.error("Ошибка при удалении гола:", error);
+          toast.error("Не удалось удалить гол");
+        });
+    }
+  }, [selectedMatch, fetchGoals]);
   
   const handleEditTeam = (team: any) => {
     setSelectedTeam(team);
@@ -227,7 +276,11 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
         setOpenMatchDialog={setOpenMatchDialog}
         setSelectedMatch={setSelectedMatch}
         handleDeleteMatch={handleDeleteMatch}
+        selectedMatch={selectedMatch}
         goals={goals}
+        setOpenGoalDialog={setOpenGoalDialog}
+        handleDeleteGoal={handleDeleteGoal}
+        setSelectedGoal={setSelectedGoal}
       />
       <TeamDialog
         open={openDialog}
@@ -262,6 +315,15 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
         selectedMatch={selectedMatch}
         tourneyId={Number(selectedTourneyId)}
         teams={teams}
+      />
+      <GoalDialog 
+        open={openGoalDialog}
+        onClose={handleCloseGoalDialog}
+        gameId={selectedMatch?.gameId}
+        teams={teams}
+        setMatches={setMatches} 
+        selectedMatch={selectedMatch} 
+        selectedGoal={selectedGoal}
       />
     </Box>
   );
