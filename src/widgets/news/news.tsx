@@ -35,7 +35,7 @@ export const News: React.FC = () => {
   return (
     <Container className="max-w-[1440px] mb-10">
       <Typography variant="h4" sx={{ fontWeight: "bold", color: "#333", marginBottom: 4 }}>Последние турниры</Typography>
-      <Box className="flex max:flex-col justify-center gap-4">
+      <Box className="grid gap-4 grid-cols-2 justify-center max-md:grid-cols-1">
         {latestTournaments.map((tournament, index) => (
           <Link className="w-full" to={pathKeys.tournaments.bySlug(String(tournament.id))} key={index}>
             <Paper
