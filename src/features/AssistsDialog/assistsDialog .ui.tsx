@@ -3,48 +3,30 @@ import { Dialog, DialogActions, DialogContent, DialogTitle, Button, MenuItem, Se
 import { apiClient } from "~shared/lib/api";
 import { toast } from "react-toastify";
 
-interface GoalDialogProps {
+interface AssistDialogProps {
   open: boolean;
   onClose: () => void;
   gameId: number;
+  goals: any[];
   teams: any[];
   setMatches: React.Dispatch<React.SetStateAction<any[]>>;
   selectedMatch: any;
-  selectedGoal: any;  
+  selectedAssist: any;
 }
 
-export const GoalDialog: React.FC<GoalDialogProps> = ({
-  open, onClose, gameId, teams, setMatches, selectedMatch, selectedGoal
+export const AssistDialog: React.FC<AssistDialogProps> = ({
+  open, onClose, gameId, goals, teams, setMatches, selectedMatch, selectedAssist
 }) => {
-  const [selectedTeamId, setSelectedTeamId] = useState<number | null>(null);
+  const [selectedTeamId, setSelectedTeamId] = useState<number | null>(null); 
   const [selectedPlayerId, setSelectedPlayerId] = useState<number | null>(null);
-  const [goalTypeId, setGoalTypeId] = useState<number | null>(null);
-  const [goalTypes, setGoalTypes] = useState<any[]>([]);
-  const [players, setPlayers] = useState<any[]>([]); 
+  const [selectedGoalId, setSelectedGoalId] = useState<number | null>(null);
+  const [players, setPlayers] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
-
+  // console.log(goals);
   const matchTeams = teams.filter(
     (team) => team.id === selectedMatch?.winnerTeamId || team.id === selectedMatch?.loserTeamId
   );
-
-  useEffect(() => {
-    const fetchGoalTypes = async () => {
-      try {
-        const response = await apiClient.get("/api/type_of_goals");
-        if (response.data && Array.isArray(response.data)) {
-          setGoalTypes(response.data);
-        } else {
-          setError("Некорректный формат данных типов голов");
-        }
-      } catch (error) {
-        console.error("Ошибка при загрузке типов голов:", error);
-        setError("Не удалось загрузить типы голов");
-      }
-    };
-
-    fetchGoalTypes();
-  }, []);
 
   useEffect(() => {
     if (selectedTeamId) {
@@ -68,48 +50,46 @@ export const GoalDialog: React.FC<GoalDialogProps> = ({
     }
   }, [selectedTeamId]);
 
-  const handleGoalSubmit = useCallback(async () => {
-    if (!selectedTeamId || !selectedPlayerId || !goalTypeId) {
+  const handleAssistSubmit = useCallback(async () => {
+    if (!selectedPlayerId || !selectedGoalId) {
       toast.error("Пожалуйста, выберите все поля.");
       return;
     }
 
     setLoading(true);
 
-    const goalData = {
+    const assistData = {
       playerId: selectedPlayerId,
-      gameId,
-      teamId: selectedTeamId,
-      vsTeamId: selectedMatch?.winnerTeamId === selectedTeamId ? selectedMatch?.loserTeamId : selectedMatch?.winnerTeamId,
-      typeOfGoalId: goalTypeId,
+      goalId: selectedGoalId,
     };
+
     try {
-      if (selectedGoal) {
-        await apiClient.patch(`/api/admin/goal/edit/${selectedGoal.goalId}`, goalData);
-        toast.success("Гол обновлён успешно");
+      if (selectedAssist) {
+        await apiClient.patch(`/api/admin/assist/edit/${selectedAssist.assistId}`, assistData);
+        toast.success("Ассист обновлён успешно");
       } else {
-        await apiClient.post("/api/admin/goal/add", goalData);
-        toast.success("Гол добавлен успешно");
+        await apiClient.post("/api/admin/assist/add", assistData);
+        toast.success("Ассист добавлен успешно");
       }
 
       setMatches((prevMatches) => prevMatches.map((match) =>
-        match.id === gameId ? { ...match, goals: [...match.goals, { playerId: selectedPlayerId }] } : match
+        match.id === gameId ? { ...match, assists: [...match.assists, { playerId: selectedPlayerId, goalId: selectedGoalId }] } : match
       ));
       onClose();
       window.location.reload();
     } catch (error) {
-      console.error("Ошибка при добавлении/редактировании гола:", error);
-      toast.error("Не удалось обработать гол");
+      console.error("Ошибка при добавлении/редактировании ассиста:", error);
+      toast.error("Не удалось обработать ассист");
     } finally {
       setLoading(false);
     }
-  }, [gameId, selectedPlayerId, selectedTeamId, goalTypeId, selectedMatch, setMatches, onClose, selectedGoal]);
+  }, [gameId, selectedPlayerId, selectedGoalId, setMatches, onClose, selectedAssist]);
 
   const handleClose = () => {
     setSelectedTeamId(null);
     setSelectedPlayerId(null);
-    setGoalTypeId(null);
-    setPlayers([]); 
+    setSelectedGoalId(null);
+    setPlayers([]);
     onClose();
   };
 
@@ -118,8 +98,8 @@ export const GoalDialog: React.FC<GoalDialogProps> = ({
   }
 
   return (
-    <Dialog open={open} onClose={handleClose}  maxWidth="sm" fullWidth>
-      <DialogTitle>{selectedGoal ? "Редактировать гол" : "Добавить гол"}</DialogTitle>
+    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+      <DialogTitle>{selectedAssist ? "Редактировать ассист" : "Добавить ассист"}</DialogTitle>
       <DialogContent>
         <FormControl fullWidth margin="normal">
           <InputLabel>Команда</InputLabel>
@@ -153,26 +133,30 @@ export const GoalDialog: React.FC<GoalDialogProps> = ({
         </FormControl>
 
         <FormControl fullWidth margin="normal">
-          <InputLabel>Тип гола</InputLabel>
+          <InputLabel>Гол</InputLabel>
           <Select
-            value={goalTypeId || ""}
-            onChange={(e) => setGoalTypeId(Number(e.target.value))}
-            label="Тип гола"
+            value={selectedGoalId || ""}
+            onChange={(e) => setSelectedGoalId(Number(e.target.value))}
+            label="Гол"
           >
-            {goalTypes.length > 0 ? (
-              goalTypes.map((goalType) => (
-                <MenuItem key={goalType.id} value={goalType.id}>{goalType.name}</MenuItem>
-              ))
-            ) : (
-              <MenuItem disabled>Нет типов голов</MenuItem>
+            {Array.isArray(goals.winnerTeamGoals) && Array.isArray(goals.loserTeamGoals) && (
+              [...goals.winnerTeamGoals, ...goals.loserTeamGoals].length > 0 ? (
+                [...goals.winnerTeamGoals, ...goals.loserTeamGoals].map((goal) => (
+                  <MenuItem key={goal.goalId} value={goal.goalId}>{`Гол ${goal.goalAuthor.playerName}`}</MenuItem>
+                ))
+              ) : (
+                <MenuItem disabled>Нет голов</MenuItem>
+              )
             )}
           </Select>
         </FormControl>
+
+
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose} color="secondary">Отмена</Button>
-        <Button onClick={handleGoalSubmit} color="primary" disabled={loading}>
-          {selectedGoal ? "Сохранить изменения" : "Добавить"}
+        <Button onClick={handleAssistSubmit} color="primary" disabled={loading}>
+          {selectedAssist ? "Сохранить изменения" : "Добавить"}
         </Button>
       </DialogActions>
     </Dialog>

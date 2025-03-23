@@ -70,7 +70,7 @@ export const TournamentPage: React.FC = () => {
   if (error) return <Typography color="error">{error}</Typography>;
 
   return (
-    <Container className="max-w-[1440px] mb-10">
+    <Container className="max-w-[1440px] font-sans mb-10">
       {tournament ? (
         <div className="flex flex-col items-center justify-center max-md:px-2 max-md:py-2 px-4 py-8">
           <Box className="flex max-md:flex-col max-md:gap-1 max-md:mb-0 w-full gap-5 justify-between items-center mb-4">
