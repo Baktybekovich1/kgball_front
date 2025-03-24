@@ -104,18 +104,19 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
 
   const fetchAssists = useCallback(async (matchId: string) => {
     try {
+      console.log("Загрузка ассистов для матча ID:", matchId);
       const response = await apiClient.get(`/game/assists/${matchId}`);
-      console.log(response.data);
+      console.log("Полученные ассисты:", response.data);
       setAssists(response.data);
-    } catch (error) {
-      console.error("Ошибка при получении ассистов:", error);
+    } catch (error: any) {
+      console.error("Ошибка при получении ассистов:", error?.response?.data || error.message);
       toast.error("Не удалось загрузить ассисты");
     }
   }, []);
+  
 
   useEffect(() => {
     if (selectedMatch?.gameId) {
-      console.log(selectedMatch.gameId);
       fetchGoals(selectedMatch.gameId);
       fetchAssists(selectedMatch.gameId);
     }

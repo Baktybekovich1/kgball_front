@@ -283,9 +283,7 @@ export const DashboardRenderContent: React.FC<DashboardRenderContentProps> = ({
                                           <Typography className="max-md:text-base text-xl font-semibold text-gray-800">
                                             {item.goalAuthor?.playerName || item.assistAuthor?.playerName || "Неизвестен"} ({title.slice(0, -1)})
                                           </Typography>
-                                          {item.assistAuthor && (
-                                            <Typography variant="body2" color="textSecondary">Ассист: {item.assistAuthor.playerName}</Typography>
-                                          )}
+                                          <Typography variant="body2" color="textSecondary">Ассист: {item.assistAuthor?.playerName || "Нет"}</Typography>
                                           <div className="flex max-md:flex-col justify-end gap-2 mt-2">
                                             <Button onClick={() => (title === "Голы" ? handleEditGoal : handleEditAssist)(selectedMatch, item)} sx={{ backgroundColor: "#ff9800", color: "white", padding: 1 }}>Редактировать</Button>
                                             <Button onClick={() => action(item.goalId ?? item.assistId)} sx={{ backgroundColor: "error.main", color: "white", padding: 1 }}>
