@@ -32,6 +32,7 @@ interface DashboardRenderContentProps {
   setOpenMatchDialog: (boolean) => void; 
   setSelectedMatch: (id) => void; 
   handleDeleteMatch: (id) => void; 
+  handleSelectMatch: (id) => void;
   selectedMatch: any;
   goals: any[];
   setOpenGoalDialog: (boolean) => void; 
@@ -51,12 +52,12 @@ export const DashboardRenderContent: React.FC<DashboardRenderContentProps> = ({
   setSelectedTourney, handleDeleteTourney, setActiveTab, setOpenPrizeDialog, 
   setSelectedTourneyId, selectedTourneyId, setOpenMatchDialog, setSelectedMatch, 
   handleDeleteMatch, selectedMatch, goals, setOpenGoalDialog, handleDeleteGoal, setSelectedGoal,
-  assists, setOpenAssistsDialog, setSelectedAssist, handleDeleteAssist,
+  assists, setOpenAssistsDialog, setSelectedAssist, handleDeleteAssist, handleSelectMatch,
 }) => {  
   const playersSectionRef = useRef<HTMLDivElement>(null);
 
   const handleScrollToPlayers = () => playersSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-
+  
   const handleEditPlayer = (playerId: string) => {
     setSelectedPlayerId(playerId);
     setPlayerDetails(teamDetails?.players.find(p => p.id === playerId));
@@ -99,7 +100,7 @@ export const DashboardRenderContent: React.FC<DashboardRenderContentProps> = ({
   };
 
   const toggleMatchDetails = (matchId: string) => {
-    setSelectedMatch(prevMatch => (prevMatch?.gameId === matchId ? null : matches.find(m => m.gameId === matchId)));
+    handleSelectMatch(matchId);
   };
 
   const handleAddGoal = (match: any) => {
@@ -241,6 +242,7 @@ export const DashboardRenderContent: React.FC<DashboardRenderContentProps> = ({
           </Box>
         );
         case "matches":
+          if (loading) return renderLoading;
           if (error) return renderError;
           return (
             <Box>

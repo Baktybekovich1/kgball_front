@@ -120,6 +120,7 @@ export const DashboardPage: React.FC = () => {
       <DashboardContent 
         activeTab={activeTab} 
         loading={loading} 
+        setLoading={setLoading}
         error={error} 
         teams={teams} 
         tournaments={tournaments} 

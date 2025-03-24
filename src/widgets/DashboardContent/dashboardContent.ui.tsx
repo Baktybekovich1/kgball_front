@@ -16,6 +16,7 @@ import "react-toastify/dist/ReactToastify.css";
 interface DashboardContentProps {
   activeTab: string;
   loading: boolean;
+  setLoading: (loading: boolean) => void;
   error: string;
   teams: any[];
   tournaments: any[];
@@ -26,7 +27,7 @@ interface DashboardContentProps {
 }
 
 export const DashboardContent: React.FC<DashboardContentProps> = ({
-  activeTab, loading, error, teams, tournaments, leagues, setTeams, setTournaments, setActiveTab,
+  activeTab, loading, setLoading, error, teams, tournaments, leagues, setTeams, setTournaments, setActiveTab,
 }) => {
   const [selectedTeam, setSelectedTeam] = useState<any>(null);
   const [teamDetails, setTeamDetails] = useState<any>(null);
@@ -84,11 +85,14 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
 
   const fetchMatches = useCallback(async (tourneyId: number) => {
     try {
+      setLoading(true);
       const response = await apiClient.get(`/game/tourney/games/${tourneyId}`);
       setMatches(response.data); 
+      setLoading(false);
     } catch (error) {
       console.error("Ошибка при загрузке матчей:", error);
       toast.error("Не удалось загрузить матчи");
+      setLoading(false);
     }
   }, []);
   
@@ -104,9 +108,7 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
 
   const fetchAssists = useCallback(async (matchId: string) => {
     try {
-      console.log("Загрузка ассистов для матча ID:", matchId);
       const response = await apiClient.get(`/game/assists/${matchId}`);
-      console.log("Полученные ассисты:", response.data);
       setAssists(response.data);
     } catch (error: any) {
       console.error("Ошибка при получении ассистов:", error?.response?.data || error.message);
@@ -114,23 +116,30 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
     }
   }, []);
   
-
   useEffect(() => {
-    if (selectedMatch?.gameId) {
-      fetchGoals(selectedMatch.gameId);
-      fetchAssists(selectedMatch.gameId);
+    const savedMatchId = localStorage.getItem("selectedMatchId");
+    if (savedMatchId) {
+      console.log("savedMatchId:", savedMatchId);
+      fetchGoals(savedMatchId);
+      fetchAssists(savedMatchId);
+      setSelectedMatch(savedMatchId);
     }
-  }, [selectedMatch, fetchGoals, fetchAssists]);
+  }, [fetchGoals, fetchAssists, setSelectedMatch]);
 
   useEffect(() => {
     const savedTourneyId = localStorage.getItem("selectedTourneyId");
     if (savedTourneyId) {
       setSelectedTourneyId(Number(savedTourneyId));
     }
-    if (selectedTourneyId && activeTab == "matches"){
+    if (selectedTourneyId && activeTab == "matches") {
       fetchMatches(selectedTourneyId);
     }
   }, [selectedTourneyId, fetchMatches]);
+  
+  const handleSelectMatch = (matchId: string) => {
+    setSelectedMatch(matchId); 
+    localStorage.setItem("selectedMatchId", matchId);  // Сохраняем выбранный матч
+  };
 
   const fetchTeamDetails = useCallback(async (teamId: string) => {
     setTeamDetails(null); 
@@ -321,6 +330,7 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
         setOpenAssistsDialog={setOpenAssistsDialog}
         setSelectedAssist={setSelectedAssist}
         handleDeleteAssist={handleDeleteAssist}
+        handleSelectMatch={handleSelectMatch}
       />
       <TeamDialog
         open={openDialog}
