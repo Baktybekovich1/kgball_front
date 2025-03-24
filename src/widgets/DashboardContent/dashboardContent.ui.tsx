@@ -119,7 +119,6 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
   useEffect(() => {
     const savedMatchId = localStorage.getItem("selectedMatchId");
     if (savedMatchId) {
-      console.log("savedMatchId:", savedMatchId);
       fetchGoals(savedMatchId);
       fetchAssists(savedMatchId);
       setSelectedMatch(savedMatchId);

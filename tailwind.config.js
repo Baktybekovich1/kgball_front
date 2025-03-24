@@ -3,10 +3,6 @@ export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   important: '#root',
   theme: {
-    fontFamily: {
-      serif: ['Montserrat', 'serif'],
-      sans: ['Montserrat', 'sans-serif'],
-    },
     colors: {
       blue: '#0589c7',
       sun: '#faa918',
