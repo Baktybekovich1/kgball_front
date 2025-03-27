@@ -116,14 +116,26 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
     }
   }, []);
   
-  useEffect(() => {
-    const savedMatchId = localStorage.getItem("selectedMatchId");
-    if (savedMatchId) {
-      fetchGoals(savedMatchId);
-      fetchAssists(savedMatchId);
-      setSelectedMatch(savedMatchId);
-    }
-  }, [fetchGoals, fetchAssists, setSelectedMatch]);
+  const FetchSelectedMatch = () => {
+    const savedMatch = localStorage.getItem("selectedMatch");
+      if (savedMatch) {
+          const parsedMatch = JSON.parse(savedMatch); // Парсим строку в объект
+          fetchGoals(parsedMatch.gameId);
+          fetchAssists(parsedMatch.gameId);
+          setSelectedMatch(parsedMatch); // Передаём объект
+      }
+  };
+
+  const handleSelectMatch = (match: any | null) => {
+      if (!match) {
+          setSelectedMatch(null);
+          localStorage.removeItem("selectedMatch");
+          return;
+      }
+      setSelectedMatch(match);
+      localStorage.setItem("selectedMatch", JSON.stringify(match)); // Сохраняем объект в строку
+      FetchSelectedMatch();
+  };
 
   useEffect(() => {
     const savedTourneyId = localStorage.getItem("selectedTourneyId");
@@ -132,14 +144,10 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
     }
     if (selectedTourneyId && activeTab == "matches") {
       fetchMatches(selectedTourneyId);
+      FetchSelectedMatch();
     }
   }, [selectedTourneyId, fetchMatches]);
   
-  const handleSelectMatch = (matchId: string) => {
-    setSelectedMatch(matchId); 
-    localStorage.setItem("selectedMatchId", matchId);  // Сохраняем выбранный матч
-  };
-
   const fetchTeamDetails = useCallback(async (teamId: string) => {
     setTeamDetails(null); 
     try {

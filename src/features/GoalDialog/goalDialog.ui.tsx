@@ -25,7 +25,7 @@ export const GoalDialog: React.FC<GoalDialogProps> = ({
   const [error, setError] = useState<string>("");
 
   const matchTeams = teams.filter(
-    (team) => team.id === selectedMatch?.winnerTeamId || team.id === selectedMatch?.loserTeamId
+    (team) => [selectedMatch?.winnerTeamId, selectedMatch?.loserTeamId].includes(team.id)
   );
 
   useEffect(() => {

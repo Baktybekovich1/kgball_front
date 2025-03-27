@@ -1,8 +1,9 @@
 import { Box, Card, CardContent, Typography, CircularProgress, Button, Divider } from "@mui/material";
 import defaultTeam from "~shared/assets/img/defaultTeam.webp";
 import DefaultAvatar from "~shared/assets/img/User-avatar.png";
-import { useRef } from "react";
+import { useRef, useEffect, useState } from "react";
 import React from "react";
+import { apiClient } from "~shared/lib/api";
 
 interface DashboardRenderContentProps {
   activeTab: string;
@@ -54,6 +55,22 @@ export const DashboardRenderContent: React.FC<DashboardRenderContentProps> = ({
   handleDeleteMatch, selectedMatch, goals, setOpenGoalDialog, handleDeleteGoal, setSelectedGoal,
   assists, setOpenAssistsDialog, setSelectedAssist, handleDeleteAssist, handleSelectMatch,
 }) => {  
+  const [tournament, setTournament] = useState<any>(null);
+
+  useEffect(() => {
+    if (selectedTourneyId) {
+      apiClient.get(`tourney/review/${selectedTourneyId}`)
+        .then(response => {
+          if (response.data) {
+            setTournament(response.data);
+          } 
+        })
+        .catch(error => {
+          console.error("API Error:", error);
+        });
+    }
+  }, [selectedTourneyId]);
+
   const playersSectionRef = useRef<HTMLDivElement>(null);
 
   const handleScrollToPlayers = () => playersSectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -89,6 +106,10 @@ export const DashboardRenderContent: React.FC<DashboardRenderContentProps> = ({
     handleOpenPrizeDialog(tourneyId);
   };
 
+  const handleEditPrize = (tourneyId: number, prizeId: number) => {
+    handleOpenPrizeDialog(tourneyId);
+  };
+
   const handleAddMatch = () => {
     setSelectedMatch(null); 
     setOpenMatchDialog(true);
@@ -99,8 +120,8 @@ export const DashboardRenderContent: React.FC<DashboardRenderContentProps> = ({
     setOpenMatchDialog(true);
   };
 
-  const toggleMatchDetails = (matchId: string) => {
-    handleSelectMatch(matchId);
+  const toggleMatchDetails = (match: any) => {
+    handleSelectMatch(match);
   };
 
   const handleAddGoal = (match: any) => {
@@ -135,9 +156,15 @@ export const DashboardRenderContent: React.FC<DashboardRenderContentProps> = ({
     const handleEdit = () => (isPlayer ? handleEditPlayer(item.id) : onEdit(item));
     const handleDetailsClick = () => {
       if (!isPlayer && !isMatch) {
-        item.players ? setSelectedTeam(item) : setSelectedTourney(item);
-        item.players ? handleScrollToPlayers() : setSelectedTourneyId(item.id);
-        !item.players && setActiveTab("matches");
+        if (item.players) {
+          setSelectedTeam(item);
+          handleScrollToPlayers();
+        } else {
+          setSelectedTourney(item);
+          setSelectedTourneyId(item.id);
+          setActiveTab("matches");
+          handleSelectMatch(null);
+        }
       }
     };
   
@@ -154,7 +181,7 @@ export const DashboardRenderContent: React.FC<DashboardRenderContentProps> = ({
                 <Typography className="font-semibold">{item.winnerTeamTitle}</Typography>
               </Box>
               <div className="flex flex-col max-md:w-full mt-2 gap-3">
-                <Button onClick={() => toggleMatchDetails(item.gameId)} sx={{ backgroundColor: "blue", color: "white" }}>Подробнее</Button>
+                <Button onClick={() => toggleMatchDetails(item)} sx={{ backgroundColor: "blue", color: "white" }}>Подробнее</Button>
                 <Button onClick={handleDelete} sx={{ backgroundColor: "error.main", color: "white" }}>Удалить</Button>
                 <Button onClick={handleEdit} sx={{ backgroundColor: "#ff9800", color: "white" }}>Редактировать</Button>
               </div>
@@ -250,10 +277,37 @@ export const DashboardRenderContent: React.FC<DashboardRenderContentProps> = ({
                 <Typography variant="h5" fontWeight="bold">Список Матчей</Typography>
                 <div className="flex gap-2 max-md:mt-2">
                   <Button className="bg-tundora text-white text-base max-md:text-sm" onClick={handleAddMatch}>Добавить Матч</Button>
-                  <Button className="bg-blue text-white text-base max-md:text-sm" onClick={() => handleAddPrize(selectedTourneyId)}>Распределить места</Button>
+                  {tournament?.firstPosition ? (
+                    <Button className="bg-blue text-white text-base max-md:text-sm">Редактировать места</Button>
+                  ) : (
+                    <Button className="bg-blue text-white text-base max-md:text-sm" onClick={() => handleAddPrize(selectedTourneyId)}>Распределить места</Button>
+                  )}
                 </div>
               </div>
-              
+              <div className="grid grid-cols-3 max-md:grid-cols-1 gap-4 col-span-2 sm:col-span-3 mb-4">
+                {tournament?.firstPosition && tournament?.secondPosition && tournament?.thirdPosition && (
+                  [
+                    { title: tournament.firstPosition.teamTitle, goals: tournament.firstPosition.goalsCount, assists: tournament.firstPosition.assistsCount },
+                    { title: tournament.secondPosition.teamTitle, goals: tournament.secondPosition.goalsCount, assists: tournament.secondPosition.assistsCount },
+                    { title: tournament.thirdPosition.teamTitle, goals: tournament.thirdPosition.goalsCount, assists: tournament.thirdPosition.assistsCount }
+                  ].map((team, index) => (
+                    <div key={index} className="flex flex-col gap-3">
+                      <div className="flex items-center bg-[#1111] justify-between text-black rounded-xl p-3">
+                        <Typography className="text-lg font-semibold max-md:text-base">
+                          {team.title}
+                        </Typography>
+                        <Typography className="text-2xl max-md:text-lg">
+                          {index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉'}
+                        </Typography>
+                      </div>
+                      <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400 px-2">
+                        <span>Голы: {team.goals}</span>
+                        <span>Ассисты: {team.assists}</span>
+                      </div>
+                    </div>
+                  ))
+                ) }
+              </div>
               <div className="grid grid-cols-2 max-md:grid-cols-1 gap-5">
               {matches.map(match => (
                   <React.Fragment key={match.gameId}>

@@ -1,5 +1,5 @@
-import { Dialog, DialogActions, DialogContent, DialogTitle, Button, MenuItem, Select, FormControl, InputLabel } from "@mui/material";
-import { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
+import { Dialog, DialogActions, DialogContent, DialogTitle, Button, MenuItem, Select, FormControl, InputLabel, Typography } from "@mui/material";
 import { apiClient } from "~shared/lib/api";
 import { toast } from "react-toastify";
 
@@ -8,14 +8,24 @@ interface AddTourneyPrizeProps {
   onClose: () => void;
   tourneyId: number;
   teams: any[];
+  selectedPrize?: any;  // Added selectedPrize for edit mode
 }
 
-export const AddTourneyPrize: React.FC<AddTourneyPrizeProps> = ({ open, onClose, tourneyId, teams }) => {
+export const AddTourneyPrize: React.FC<AddTourneyPrizeProps> = ({ open, onClose, tourneyId, teams, selectedPrize }) => {
   const [firstPositionId, setFirstPositionId] = useState<number | null>(null);
   const [secondPositionId, setSecondPositionId] = useState<number | null>(null);
   const [thirdPositionId, setThirdPositionId] = useState<number | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
-  const handleSubmit = async () => {
+  useEffect(() => {
+    if (selectedPrize) {
+      setFirstPositionId(selectedPrize.firstPositionId);
+      setSecondPositionId(selectedPrize.secondPositionId);
+      setThirdPositionId(selectedPrize.thirdPositionId);
+    }
+  }, [selectedPrize]);
+
+  const handleSubmit = useCallback(async () => {
     if (!firstPositionId || !secondPositionId || !thirdPositionId) {
       toast.error("Заполните все призовые места");
       return;
@@ -25,76 +35,89 @@ export const AddTourneyPrize: React.FC<AddTourneyPrizeProps> = ({ open, onClose,
       return;
     }
 
+    setLoading(true);
+
     try {
-      await apiClient.post("/api/admin/tourney/prizes/add", {
+      const prizeData = {
         tourneyId,
         firstPositionId,
         secondPositionId,
         thirdPositionId,
-      });
-      toast.success("Призы добавлены успешно");
-      onClose();
-    } catch (error: any) {
-      console.error("Ошибка при добавлении призов:", error);
-    
-      if (error.response?.status === 500) {
-        toast.error("Призовые места уже назначены или возникла ошибка на сервере");
+      };
+
+      if (selectedPrize) {
+        await apiClient.patch(`/api/admin/tourney/prizes/edit/${selectedPrize.id}`, prizeData);
+        toast.success("Призы обновлены успешно");
       } else {
-        toast.error("Не удалось добавить призы");
+        await apiClient.post("/api/admin/tourney/prizes/add", prizeData);
+        toast.success("Призы добавлены успешно");
       }
+
+      onClose();
+      window.location.reload();
+    } catch (error) {
+      console.error("Ошибка при добавлении/редактировании призов:", error);
+      toast.error("Не удалось обработать призы");
+    } finally {
+      setLoading(false);
     }
+  }, [firstPositionId, secondPositionId, thirdPositionId, tourneyId, selectedPrize, onClose]);
+
+  const handleClose = () => {
+    setFirstPositionId(null);
+    setSecondPositionId(null);
+    setThirdPositionId(null);
+    onClose();
   };
- 
+
   return (
-    <Dialog open={open} onClose={onClose}>
-      <DialogTitle>Назначить Призы Турнира</DialogTitle>
+    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+      <DialogTitle>{selectedPrize ? "Редактировать Призы" : "Назначить Призы"}</DialogTitle>
       <DialogContent>
-        <FormControl fullWidth>
+        <FormControl fullWidth margin="normal">
           <InputLabel>Первое место</InputLabel>
           <Select
             value={firstPositionId || ""}
-            onChange={(e) => setFirstPositionId(e.target.value as number)}
+            onChange={(e) => setFirstPositionId(Number(e.target.value))}
             label="Первое место"
           >
             {teams.map((team) => (
-              <MenuItem key={team.id} value={team.id}>
-                {team.title}
-              </MenuItem>
+              <MenuItem key={team.id} value={team.id}>{team.title}</MenuItem>
             ))}
           </Select>
         </FormControl>
-        <FormControl fullWidth sx={{ marginTop: 2 }}>
+
+        <FormControl fullWidth margin="normal">
           <InputLabel>Второе место</InputLabel>
           <Select
             value={secondPositionId || ""}
-            onChange={(e) => setSecondPositionId(e.target.value as number)}
+            onChange={(e) => setSecondPositionId(Number(e.target.value))}
             label="Второе место"
           >
             {teams.map((team) => (
-              <MenuItem key={team.id} value={team.id}>
-                {team.title}
-              </MenuItem>
+              <MenuItem key={team.id} value={team.id}>{team.title}</MenuItem>
             ))}
           </Select>
         </FormControl>
-        <FormControl fullWidth sx={{ marginTop: 2 }}>
+
+        <FormControl fullWidth margin="normal">
           <InputLabel>Третье место</InputLabel>
           <Select
             value={thirdPositionId || ""}
-            onChange={(e) => setThirdPositionId(e.target.value as number)}
+            onChange={(e) => setThirdPositionId(Number(e.target.value))}
             label="Третье место"
           >
             {teams.map((team) => (
-              <MenuItem key={team.id} value={team.id}>
-                {team.title}
-              </MenuItem>
+              <MenuItem key={team.id} value={team.id}>{team.title}</MenuItem>
             ))}
           </Select>
         </FormControl>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} color="secondary">Отмена</Button>
-        <Button onClick={handleSubmit} color="primary">Сохранить</Button>
+        <Button onClick={handleClose} color="secondary">Отмена</Button>
+        <Button onClick={handleSubmit} color="primary" disabled={loading}>
+          {selectedPrize ? "Сохранить изменения" : "Добавить"}
+        </Button>
       </DialogActions>
     </Dialog>
   );
