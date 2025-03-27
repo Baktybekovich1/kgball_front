@@ -28,8 +28,7 @@ interface DashboardRenderContentProps {
   handleDeleteTourney: (id) => void; 
   setActiveTab: (tab: string) => void; 
   setOpenPrizeDialog: (boolean) => void; 
-  setSelectedTourneyId: (id) => void; 
-  selectedTourneyId: any;
+  selectedTourney: any;
   setOpenMatchDialog: (boolean) => void; 
   setSelectedMatch: (id) => void; 
   handleDeleteMatch: (id) => void; 
@@ -51,15 +50,21 @@ export const DashboardRenderContent: React.FC<DashboardRenderContentProps> = ({
   handleCreateTeamClick, handleDeleteTeam, handleOpenPlayerDialog, 
   handleDeletePlayer, handleEditTeam, setPlayerDetails, handleOpenTournamentClick, 
   setSelectedTourney, handleDeleteTourney, setActiveTab, setOpenPrizeDialog, 
-  setSelectedTourneyId, selectedTourneyId, setOpenMatchDialog, setSelectedMatch, 
+  selectedTourney, setOpenMatchDialog, setSelectedMatch, 
   handleDeleteMatch, selectedMatch, goals, setOpenGoalDialog, handleDeleteGoal, setSelectedGoal,
   assists, setOpenAssistsDialog, setSelectedAssist, handleDeleteAssist, handleSelectMatch,
 }) => {  
   const [tournament, setTournament] = useState<any>(null);
 
   useEffect(() => {
-    if (selectedTourneyId) {
-      apiClient.get(`tourney/review/${selectedTourneyId}`)
+    if (selectedTourney) {
+      FetchPrizes(selectedTourney);
+    }
+  }, [selectedTourney]);
+
+  const FetchPrizes = (selectedTourney) => {
+    if (selectedTourney) {
+      apiClient.get(`tourney/review/${selectedTourney.id}`)
         .then(response => {
           if (response.data) {
             setTournament(response.data);
@@ -69,7 +74,7 @@ export const DashboardRenderContent: React.FC<DashboardRenderContentProps> = ({
           console.error("API Error:", error);
         });
     }
-  }, [selectedTourneyId]);
+  };
 
   const playersSectionRef = useRef<HTMLDivElement>(null);
 
@@ -97,17 +102,17 @@ export const DashboardRenderContent: React.FC<DashboardRenderContentProps> = ({
     handleOpenTournamentClick();
   };
 
-  const handleOpenPrizeDialog = (tourneyId: number) => {
-    setSelectedTourneyId(tourneyId);
+  const handleOpenPrizeDialog = (tourney: any) => {
+    setSelectedTourney(tourney);
     setOpenPrizeDialog(true);
   };
 
-  const handleAddPrize = (tourneyId: number) => {
-    handleOpenPrizeDialog(tourneyId);
+  const handleAddPrize = (tourney: any) => {
+    handleOpenPrizeDialog(tourney);
   };
 
-  const handleEditPrize = (tourneyId: number, prizeId: number) => {
-    handleOpenPrizeDialog(tourneyId);
+  const handleEditPrize = (tourney: any, prizeId: number) => {
+    handleOpenPrizeDialog(tourney);
   };
 
   const handleAddMatch = () => {
@@ -161,9 +166,10 @@ export const DashboardRenderContent: React.FC<DashboardRenderContentProps> = ({
           handleScrollToPlayers();
         } else {
           setSelectedTourney(item);
-          setSelectedTourneyId(item.id);
           setActiveTab("matches");
+          setTournament(null);
           handleSelectMatch(null);
+          FetchPrizes(item);
         }
       }
     };
@@ -280,7 +286,7 @@ export const DashboardRenderContent: React.FC<DashboardRenderContentProps> = ({
                   {tournament?.firstPosition ? (
                     <Button className="bg-blue text-white text-base max-md:text-sm">Редактировать места</Button>
                   ) : (
-                    <Button className="bg-blue text-white text-base max-md:text-sm" onClick={() => handleAddPrize(selectedTourneyId)}>Распределить места</Button>
+                    <Button className="bg-blue text-white text-base max-md:text-sm" onClick={() => handleAddPrize(selectedTourney)}>Распределить места</Button>
                   )}
                 </div>
               </div>

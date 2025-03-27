@@ -62,7 +62,6 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
 
   const [openPrizeDialog, setOpenPrizeDialog] = useState(false);
   const handleClosePrizeDialog = () => setOpenPrizeDialog(false);
-  const [selectedTourneyId, setSelectedTourneyId] = useState<number | null>(null); 
 
   const [openMatchDialog, setOpenMatchDialog] = useState(false);
   const handleCloseMatchDialog = () => setOpenMatchDialog(false);
@@ -76,13 +75,7 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
   useEffect(() => {
     apiClient.get("/api/teams").then((res) => setTeams(res.data));
   }, []);
-
-  useEffect(() => {
-    if (selectedTourneyId !== null) {
-      localStorage.setItem("selectedTourneyId", selectedTourneyId.toString());
-    }
-  }, [selectedTourneyId]); 
-
+  
   const fetchMatches = useCallback(async (tourneyId: number) => {
     try {
       setLoading(true);
@@ -95,6 +88,26 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
       setLoading(false);
     }
   }, []);
+  
+  useEffect(() => {
+    if (selectedTourney !== null) {
+      localStorage.setItem("selectedTourney", JSON.stringify(selectedTourney));
+    }
+  }, [selectedTourney]); 
+
+  useEffect(() => {
+    const savedTourney = localStorage.getItem("selectedTourney");
+    if (savedTourney) {
+      const parsedTourney = JSON.parse(savedTourney); 
+      setSelectedTourney(parsedTourney);
+    }
+  }, []); 
+  
+  useEffect(() => {
+    if (selectedTourney && activeTab === "matches") {
+      fetchMatches(selectedTourney.id);
+    }
+  }, [selectedTourney, activeTab, fetchMatches]); 
   
   const fetchGoals = useCallback(async (matchId: string) => {
     try {
@@ -136,17 +149,6 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
       localStorage.setItem("selectedMatch", JSON.stringify(match)); // Сохраняем объект в строку
       FetchSelectedMatch();
   };
-
-  useEffect(() => {
-    const savedTourneyId = localStorage.getItem("selectedTourneyId");
-    if (savedTourneyId) {
-      setSelectedTourneyId(Number(savedTourneyId));
-    }
-    if (selectedTourneyId && activeTab == "matches") {
-      fetchMatches(selectedTourneyId);
-      FetchSelectedMatch();
-    }
-  }, [selectedTourneyId, fetchMatches]);
   
   const fetchTeamDetails = useCallback(async (teamId: string) => {
     setTeamDetails(null); 
@@ -169,7 +171,6 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
       fetchTeamDetails(selectedTeam.id);
     }
   }, [selectedTeam]);
-  
 
   const handleDeleteTeam = useCallback((id: string) => {
     if (window.confirm("Вы уверены, что хотите удалить эту команду?")) {
@@ -323,8 +324,7 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
         handleDeleteTourney={handleDeleteTourney}
         setActiveTab={setActiveTab}
         setOpenPrizeDialog={setOpenPrizeDialog}
-        setSelectedTourneyId={setSelectedTourneyId}
-        selectedTourneyId={selectedTourneyId}
+        selectedTourney={selectedTourney}
         setOpenMatchDialog={setOpenMatchDialog}
         setSelectedMatch={setSelectedMatch}
         handleDeleteMatch={handleDeleteMatch}
@@ -362,7 +362,7 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
       <AddTourneyPrize
         open={openPrizeDialog}
         onClose={handleClosePrizeDialog}
-        tourneyId={Number(selectedTourneyId)}
+        tourneyId={selectedTourney?.id}
         teams={teams} 
       />
       <MatchDialog 
@@ -370,7 +370,7 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
         onClose={handleCloseMatchDialog}
         setMatches={setMatches}
         selectedMatch={selectedMatch}
-        tourneyId={Number(selectedTourneyId)}
+        tourneyId={selectedTourney?.id}
         teams={teams}
       />
       <GoalDialog 
