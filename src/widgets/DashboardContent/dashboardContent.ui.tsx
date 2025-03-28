@@ -43,6 +43,7 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
   const [selectedTourney, setSelectedTourney] = useState<any>(null);
   const [selectedMatch, setSelectedMatch] = useState<any>(null);
   const [selectedGoal, setSelectedGoal] = useState<any>(null);
+  const [selectedPrize, setSelectedPrize] = useState<any>(null);
   const [selectedAssist, setSelectedAssist] = useState<any>(null);
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
   const [playerDetails, setPlayerDetails] = useState<string | null>(null);
@@ -338,6 +339,7 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
         setSelectedAssist={setSelectedAssist}
         handleDeleteAssist={handleDeleteAssist}
         handleSelectMatch={handleSelectMatch}
+        setSelectedPrize={setSelectedPrize}
       />
       <TeamDialog
         open={openDialog}
@@ -364,6 +366,7 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
         onClose={handleClosePrizeDialog}
         tourneyId={selectedTourney?.id}
         teams={teams} 
+        selectedPrize={selectedPrize}
       />
       <MatchDialog 
         open={openMatchDialog}

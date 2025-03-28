@@ -8,7 +8,7 @@ interface AddTourneyPrizeProps {
   onClose: () => void;
   tourneyId: number;
   teams: any[];
-  selectedPrize?: any;  // Added selectedPrize for edit mode
+  selectedPrize: any;  
 }
 
 export const AddTourneyPrize: React.FC<AddTourneyPrizeProps> = ({ open, onClose, tourneyId, teams, selectedPrize }) => {
@@ -46,7 +46,7 @@ export const AddTourneyPrize: React.FC<AddTourneyPrizeProps> = ({ open, onClose,
       };
 
       if (selectedPrize) {
-        await apiClient.patch(`/api/admin/tourney/prizes/edit/${selectedPrize.id}`, prizeData);
+        await apiClient.patch(`/api/admin/tourney/prizes/edit/${selectedPrize.prizesId}`, prizeData);
         toast.success("Призы обновлены успешно");
       } else {
         await apiClient.post("/api/admin/tourney/prizes/add", prizeData);

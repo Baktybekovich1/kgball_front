@@ -28,6 +28,7 @@ interface DashboardRenderContentProps {
   handleDeleteTourney: (id) => void; 
   setActiveTab: (tab: string) => void; 
   setOpenPrizeDialog: (boolean) => void; 
+  setSelectedPrize: (prize: any) => void;
   selectedTourney: any;
   setOpenMatchDialog: (boolean) => void; 
   setSelectedMatch: (id) => void; 
@@ -49,12 +50,12 @@ export const DashboardRenderContent: React.FC<DashboardRenderContentProps> = ({
   selectedTeam, setSelectedTeam, setSelectedPlayerId, teamDetails, 
   handleCreateTeamClick, handleDeleteTeam, handleOpenPlayerDialog, 
   handleDeletePlayer, handleEditTeam, setPlayerDetails, handleOpenTournamentClick, 
-  setSelectedTourney, handleDeleteTourney, setActiveTab, setOpenPrizeDialog, 
+  setSelectedTourney, handleDeleteTourney, setActiveTab, setOpenPrizeDialog, setSelectedPrize,
   selectedTourney, setOpenMatchDialog, setSelectedMatch, 
   handleDeleteMatch, selectedMatch, goals, setOpenGoalDialog, handleDeleteGoal, setSelectedGoal,
   assists, setOpenAssistsDialog, setSelectedAssist, handleDeleteAssist, handleSelectMatch,
 }) => {  
-  const [tournament, setTournament] = useState<any>(null);
+  const [prize, setPrize] = useState<any>(null);
 
   useEffect(() => {
     if (selectedTourney) {
@@ -64,10 +65,10 @@ export const DashboardRenderContent: React.FC<DashboardRenderContentProps> = ({
 
   const FetchPrizes = (selectedTourney) => {
     if (selectedTourney) {
-      apiClient.get(`tourney/review/${selectedTourney.id}`)
+      apiClient.get(`tourney/prizes/${selectedTourney.id}`)
         .then(response => {
           if (response.data) {
-            setTournament(response.data);
+            setPrize(response.data);
           } 
         })
         .catch(error => {
@@ -111,7 +112,8 @@ export const DashboardRenderContent: React.FC<DashboardRenderContentProps> = ({
     handleOpenPrizeDialog(tourney);
   };
 
-  const handleEditPrize = (tourney: any, prizeId: number) => {
+  const handleEditPrize = (tourney: any, prize: any) => {
+    setSelectedPrize(prize);
     handleOpenPrizeDialog(tourney);
   };
 
@@ -167,7 +169,7 @@ export const DashboardRenderContent: React.FC<DashboardRenderContentProps> = ({
         } else {
           setSelectedTourney(item);
           setActiveTab("matches");
-          setTournament(null);
+          setPrize(null);
           handleSelectMatch(null);
           FetchPrizes(item);
         }
@@ -283,19 +285,19 @@ export const DashboardRenderContent: React.FC<DashboardRenderContentProps> = ({
                 <Typography variant="h5" fontWeight="bold">Список Матчей</Typography>
                 <div className="flex gap-2 max-md:mt-2">
                   <Button className="bg-tundora text-white text-base max-md:text-sm" onClick={handleAddMatch}>Добавить Матч</Button>
-                  {tournament?.firstPosition ? (
-                    <Button className="bg-blue text-white text-base max-md:text-sm">Редактировать места</Button>
+                  {prize ? (
+                    <Button className="bg-blue text-white text-base max-md:text-sm" onClick={() => handleEditPrize(selectedTourney, prize)}>Редактировать места</Button>
                   ) : (
                     <Button className="bg-blue text-white text-base max-md:text-sm" onClick={() => handleAddPrize(selectedTourney)}>Распределить места</Button>
                   )}
                 </div>
               </div>
               <div className="grid grid-cols-3 max-md:grid-cols-1 gap-4 col-span-2 sm:col-span-3 mb-4">
-                {tournament?.firstPosition && tournament?.secondPosition && tournament?.thirdPosition && (
+                {prize && (
                   [
-                    { title: tournament.firstPosition.teamTitle, goals: tournament.firstPosition.goalsCount, assists: tournament.firstPosition.assistsCount },
-                    { title: tournament.secondPosition.teamTitle, goals: tournament.secondPosition.goalsCount, assists: tournament.secondPosition.assistsCount },
-                    { title: tournament.thirdPosition.teamTitle, goals: tournament.thirdPosition.goalsCount, assists: tournament.thirdPosition.assistsCount }
+                    { title: prize.firstPositionTeamTitle },
+                    { title: prize.secondPositionTeamTitle },
+                    { title: prize.thirdPositionTeamTitle }
                   ].map((team, index) => (
                     <div key={index} className="flex flex-col gap-3">
                       <div className="flex items-center bg-[#1111] justify-between text-black rounded-xl p-3">
@@ -305,10 +307,6 @@ export const DashboardRenderContent: React.FC<DashboardRenderContentProps> = ({
                         <Typography className="text-2xl max-md:text-lg">
                           {index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉'}
                         </Typography>
-                      </div>
-                      <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400 px-2">
-                        <span>Голы: {team.goals}</span>
-                        <span>Ассисты: {team.assists}</span>
                       </div>
                     </div>
                   ))
