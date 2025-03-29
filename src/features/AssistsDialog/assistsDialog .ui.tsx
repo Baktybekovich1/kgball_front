@@ -13,7 +13,6 @@ interface AssistDialogProps {
   selectedMatch: any;
   selectedAssist: any;
 }
-
 export const AssistDialog: React.FC<AssistDialogProps> = ({
   open, onClose, gameId, goals, teams, setMatches, selectedMatch, selectedAssist
 }) => {
@@ -23,7 +22,6 @@ export const AssistDialog: React.FC<AssistDialogProps> = ({
   const [players, setPlayers] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
-  // console.log(goals);
   const matchTeams = teams.filter(
     (team) => team.id === selectedMatch?.winnerTeamId || team.id === selectedMatch?.loserTeamId
   );
@@ -139,18 +137,28 @@ export const AssistDialog: React.FC<AssistDialogProps> = ({
             onChange={(e) => setSelectedGoalId(Number(e.target.value))}
             label="Гол"
           >
-            {Array.isArray(goals.winnerTeamGoals) && Array.isArray(goals.loserTeamGoals) && (
-              [...goals.winnerTeamGoals, ...goals.loserTeamGoals].length > 0 ? (
-                [...goals.winnerTeamGoals, ...goals.loserTeamGoals].map((goal) => (
-                  <MenuItem key={goal.goalId} value={goal.goalId}>{`Гол ${goal.goalAuthor.playerName}`}</MenuItem>
-                ))
-              ) : (
-                <MenuItem disabled>Нет голов</MenuItem>
-              )
+            {selectedTeamId && (
+              (selectedTeamId === selectedMatch?.winnerTeamId ? 
+                [...goals.winnerTeamGoals] : 
+                [...goals.loserTeamGoals])
+                .filter(goal => !goal.assistId) //Фильтр для ассистов
+                .length > 0 ? (
+                  (selectedTeamId === selectedMatch?.winnerTeamId ? 
+                    [...goals.winnerTeamGoals] : 
+                    [...goals.loserTeamGoals])
+                    .filter(goal => !goal.assistId)// фильтр если ли уже ассист у гола
+                    .map((goal) => (
+                      <MenuItem sx={{ display: "flex", justifyContent: 'space-between' }} key={goal.goalId} value={goal.goalId}>
+                        <div>{`Гол ${goal.goalAuthor.playerName}`}</div>
+                        <div>{goal.goalId}</div>
+                      </MenuItem>
+                    ))
+                ) : (
+                  <MenuItem disabled>Нет доступных голов</MenuItem>
+                )
             )}
           </Select>
         </FormControl>
-
 
       </DialogContent>
       <DialogActions>
