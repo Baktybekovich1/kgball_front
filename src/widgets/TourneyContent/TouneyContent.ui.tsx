@@ -1,6 +1,7 @@
 import React from "react";
 import { Typography, Paper, Box, Table, TableContainer, TableHead, TableRow, TableCell, TableBody } from "@mui/material";
 import DefaultAvatar from "~shared/assets/img/User-avatar.png";
+import { PlayerTable } from "~widgets/playerTable";
 
 interface Player {
   playerId: string;
@@ -110,37 +111,11 @@ export const TourneyContent: React.FC<Props> = ({ selectedTab, tournament, playe
     );
   };
 
-  const renderPlayersTable = (filter: (player: Player) => boolean, sortKey: "goals" | "assists") => (
-    <TableContainer className="w-full" component={Paper}>
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell>Фото</TableCell>
-            <TableCell>Имя</TableCell>
-            <TableCell>Голы</TableCell>
-            <TableCell>Голевые передачи</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {playersData
-            .filter(filter)
-            .sort((a, b) => b[sortKey] - a[sortKey]) // Сортировка по убыванию
-            .map(player => (
-              <TableRow key={player.playerId}>
-                <TableCell>
-                  <img className="w-12" src={player.img || DefaultAvatar} alt={player.name} />
-                </TableCell>
-                <TableCell>{player.name}</TableCell>
-                <TableCell>{player.goals}</TableCell>
-                <TableCell>{player.assists}</TableCell>
-              </TableRow>
-            ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
-  );
+  const renderPlayersTable = (filter: (player: Player) => boolean, sortKey: "goals" | "assists") => {
+    const filteredPlayers = playersData.filter(filter).sort((a, b) => b[sortKey] - a[sortKey]);
+    return <PlayerTable players={filteredPlayers} />;
+  };
   
-
   switch (selectedTab) {
     case "обзор":
       return renderOverview();

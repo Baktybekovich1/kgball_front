@@ -77,16 +77,18 @@ export const TournamentPage: React.FC = () => {
             <Link to={pathKeys.matches.root()} className="bg-dove mb-1 p-2 rounded text-white inline-block text-blue hover:underline">
               <ArrowBackIcon className="max-md:text-xs"/> Назад
             </Link>
-            <div>
-              <img 
-                src={winner.teamLogo || defaultTeam} 
-                alt={winner.teamTitle} 
-                className="w-32 h-32 rounded-full border-2 border-gray-300 mx-auto sm:mx-0"
-              />
-              <Typography className="max-md:text-xl text-bold text-[30px]">
-                Победитель: {winner.teamTitle}
-              </Typography>
-            </div>
+            {winner && (
+              <div>
+                <img 
+                  src={winner.teamLogo || defaultTeam} 
+                  alt={winner.teamTitle || "Неизвестная команда"} 
+                  className="w-32 h-32 rounded-full border-2 border-gray-300 mx-auto sm:mx-0"
+                />
+                <Typography className="max-md:text-xl text-bold text-[30px]">
+                  Победитель: {winner.teamTitle}
+                </Typography>
+              </div>
+            )}
             <br></br>
           </Box>
 

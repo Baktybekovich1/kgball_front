@@ -2,6 +2,8 @@ import React from "react";
 import { Box, Typography } from "@mui/material";
 import DefaultAvatar from "~shared/assets/img/User-avatar.png";
 import { useState } from "react";
+import { pathKeys } from "~shared/lib/react-router";
+import { Link } from "react-router-dom";
 
 interface RenderContentProps {
   selectedTab: string;
@@ -10,7 +12,6 @@ interface RenderContentProps {
   squad: any[]; 
   bestPlayers: any[];
 }
-
 export const RenderContent: React.FC<RenderContentProps> = ({
   selectedTab,
   team,
@@ -42,8 +43,6 @@ export const RenderContent: React.FC<RenderContentProps> = ({
     });
   };
   
-  
-
   switch (selectedTab) {
     case "обзор":
       return team ? (
@@ -82,40 +81,33 @@ export const RenderContent: React.FC<RenderContentProps> = ({
             <Typography 
               className="max-md:text-base border border-gray-300 bg-gray-50 p-3 rounded-md text-lg text-gray-700"
             >
-              Штрафные: <span className="font-semibold"></span>
-            </Typography>
-            <Typography 
-              className="max-md:text-base border border-gray-300 bg-gray-50 p-3 rounded-md text-lg text-gray-700"
-            >
               Передачи: <span className="font-semibold">{team.assists.length}</span>
-            </Typography>
-            <Typography 
-              className="max-md:text-base border border-gray-300 bg-gray-50 p-3 rounded-md text-lg text-gray-700"
-            >
-              Автоголы: <span className="font-semibold"></span>
             </Typography>
           </div>
         </Box>
       ) : null;
+      
       case "состав":
         return squad && squad.length > 0 ? (
           <Box className="flex flex-col gap-5 mb-10">
-            <Typography variant="h6" fontWeight="bold">Состав команды</Typography>
-            {squad.map(player => (
-              <Box key={player.id} className="flex items-center gap-4 p-4 border border-gray-300 rounded-md">
-                <img src={player.img || DefaultAvatar} alt={player.name} className="w-12 h-12 rounded-full" />
-                <div className="flex w-full justify-between items-center">
-                  <div>
-                    <Typography variant="h6" className="font-semibold">{player.name}</Typography>
-                    <Typography variant="body2" color="textSecondary">{player.teamTitle}</Typography>
-                  </div>
-                  <Typography variant="body2" className="text-base">
-                    {player.position}
-                  </Typography>
-                </div>
-              </Box>
-            ))}
-          </Box>
+              <Typography variant="h6" fontWeight="bold">Состав команды</Typography>
+              {squad.map(player => (
+                <Link to={pathKeys.players.bySlug(String(player.id))} key={player.id}>
+                  <Box key={player.id} className="flex items-center gap-4 p-4 border border-gray-300 rounded-md">
+                    <img src={player.img || DefaultAvatar} alt={player.name} className="w-12 h-12 rounded-full" />
+                    <div className="flex w-full justify-between items-center">
+                      <div>
+                        <Typography variant="h6" className="font-semibold">{player.name}</Typography>
+                        <Typography variant="body2" color="textSecondary">{player.teamTitle}</Typography>
+                      </div>
+                      <Typography variant="body2" className="text-base">
+                        {player.position}
+                      </Typography>
+                    </div> 
+                  </Box>
+                </Link>
+              ))}
+            </Box>
         ) : (
           <Typography className="text-lg text-gray-700">Нет игроков в составе</Typography>
         );
@@ -123,24 +115,26 @@ export const RenderContent: React.FC<RenderContentProps> = ({
       return matches ? (
         <Box className="grid grid-cols-2 max-md:grid-cols-1 gap-4">
           {matches.map((match, index) => (
-            <div>
-              <span className="max-md:text-md font-semibold text-xl">{match.tourney.title}</span> 
-              <div className="border p-4 rounded-md block">
-                <Box className="flex items-center justify-between">
-                  <div className="flex flex-col items-center">
-                    <span className="text-lg font-semibold">{match.loserTeam.name}</span>
-                  </div>
-                  <span className="text-md">{match.tourney.date}</span>
-                  <div className="flex flex-col items-center">
-                    <span className="text-lg font-semibold">{match.winnerTeam.name}</span>
-                  </div>
-                </Box>
-                <Box className="flex justify-between">
-                  <span className="text-md">Счет: {match.loserTeam.goalTotalInGame}</span>
-                  <span className="text-md">Счет: {match.winnerTeam.goalTotalInGame}</span>
-                </Box>
+            <Link to={pathKeys.matches.bySlug(String(match.id))}>
+              <div>
+                <span className="max-md:text-md font-semibold text-xl">{match.tourney.title}</span> 
+                <div className="border p-4 rounded-md block">
+                  <Box className="flex items-center justify-between">
+                    <div className="flex flex-col items-center">
+                      <span className="text-lg font-semibold">{match.loserTeam.name}</span>
+                    </div>
+                    <span className="text-md">{match.tourney.date}</span>
+                    <div className="flex flex-col items-center">
+                      <span className="text-lg font-semibold">{match.winnerTeam.name}</span>
+                    </div>
+                  </Box>
+                  <Box className="flex justify-between">
+                    <span className="text-md">Счет: {match.loserTeam.goalTotalInGame}</span>
+                    <span className="text-md">Счет: {match.winnerTeam.goalTotalInGame}</span>
+                  </Box>
+                </div>
               </div>
-            </div>
+            </Link>
           ))}
         </Box>
 
@@ -163,18 +157,20 @@ export const RenderContent: React.FC<RenderContentProps> = ({
           </Box>
           <Box className="grid w-full grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
             {getSortedPlayers(selectedCategory).map((player) => (
-              <Box key={player.id} className="flex items-center gap-4 p-4 border border-gray-300 rounded-md">
-                <img src={player.img || DefaultAvatar} alt={player.name} className="w-12 h-12 rounded-full" />
-                <div className="flex  w-full justify-between items-center">
-                  <div>
-                    <Typography variant="h6" className="font-semibold">{player.name}</Typography>
-                    <Typography variant="body2" color="textSecondary">{player.position}</Typography>
+              <Link to={pathKeys.players.bySlug(String(player.playerId))} key={player.playerId}>
+                <Box key={player.id} className="flex items-center gap-4 p-4 border border-gray-300 rounded-md">
+                  <img src={player.img || DefaultAvatar} alt={player.name} className="w-12 h-12 rounded-full" />
+                  <div className="flex  w-full justify-between items-center">
+                    <div>
+                      <Typography variant="h6" className="font-semibold">{player.name}</Typography>
+                      <Typography variant="body2" color="textSecondary">{player.position}</Typography>
+                    </div>
+                    <Typography variant="body2" className="text-base">
+                      {player.goals} + ({player.assists}) = {player.goals + player.assists}
+                    </Typography>
                   </div>
-                  <Typography variant="body2" className="text-base">
-                    {player.goals} + ({player.assists}) = {player.goals + player.assists}
-                  </Typography>
-                </div>
-              </Box>
+                </Box>
+              </Link>
             ))}
           </Box>
         </Box>

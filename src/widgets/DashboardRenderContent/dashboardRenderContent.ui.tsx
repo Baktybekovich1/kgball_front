@@ -110,7 +110,7 @@ export const DashboardRenderContent: React.FC<DashboardRenderContentProps> = ({
 
   const handleAddPrize = (tourney: any) => {
     handleOpenPrizeDialog(tourney);
-  };
+  }; 
 
   const handleEditPrize = (tourney: any, prize: any) => {
     setSelectedPrize(prize);
@@ -341,9 +341,11 @@ export const DashboardRenderContent: React.FC<DashboardRenderContentProps> = ({
                                       <li key={item.id || index} className="mb-2">
                                         <Card sx={{ padding: 2, boxShadow: 3, borderRadius: 2 }}>
                                           <Typography className="max-md:text-base text-xl font-semibold text-gray-800">
-                                            {item.goalAuthor?.playerName || item.assistAuthor?.playerName || "Неизвестен"} ({title.slice(0, -1)})
+                                              {title === "Голы" ? item.goalAuthor?.playerName : item.assistAuthor?.playerName || "Неизвестен"} ({title.slice(0, -1)})
                                           </Typography>
-                                          <Typography variant="body2" color="textSecondary">Ассист: {item.assistAuthor?.playerName || "Нет"}</Typography>
+                                          <Typography variant="body2" color="textSecondary">
+                                            {title === "Голы" ? `Ассист: ${item.assistAuthor?.playerName || "Нет"}` : `Гол: ${item.goalAuthorName || "Нет"}`}
+                                          </Typography>
                                           <div className="flex max-md:flex-col justify-end gap-2 mt-2">
                                             <Button onClick={() => (title === "Голы" ? handleEditGoal : handleEditAssist)(selectedMatch, item)} sx={{ backgroundColor: "#ff9800", color: "white", padding: 1 }}>Редактировать</Button>
                                             <Button onClick={() => action(item.goalId ?? item.assistId)} sx={{ backgroundColor: "error.main", color: "white", padding: 1 }}>

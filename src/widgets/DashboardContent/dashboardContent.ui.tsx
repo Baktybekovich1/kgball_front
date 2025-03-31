@@ -124,6 +124,7 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
     try {
       const response = await apiClient.get(`/game/assists/${matchId}`);
       setAssists(response.data);
+      console.log(response.data);
     } catch (error: any) {
       console.error("Ошибка при получении ассистов:", error?.response?.data || error.message);
       toast.error("Не удалось загрузить ассисты");
