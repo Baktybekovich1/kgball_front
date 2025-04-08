@@ -12,6 +12,7 @@ export const TeamPage: React.FC = () => {
   const [team, setTeam] = useState(null);
   const [matches, setMatches] = useState([]);
   const [bestPlayers, setBestPlayers] = useState([]);
+  const [prizes, setPrizes] = useState([]);
   const [squad, setSquad] = useState([]);
   const [error, setError] = useState("");
   const [selectedTab, setSelectedTab] = useState<string>("обзор");
@@ -60,6 +61,16 @@ export const TeamPage: React.FC = () => {
           }
         })
         .catch(() => setError("Ошибка загрузки состава команды"));
+        apiClient.get(`/team/prizes/${id}`)
+        .then(response => {
+          if (response.data) {
+            setPrizes(response.data);  
+            console.log(response.data);  
+          } else {
+            setError("Некорректный формат данных призов");
+          }
+        })
+        .catch(() => setError("Ошибка загрузки призов"));
     }
   }, [id]);
 
@@ -95,7 +106,8 @@ export const TeamPage: React.FC = () => {
             team={team} 
             matches={matches} 
             bestPlayers={bestPlayers}
-            squad={squad} 
+            squad={squad}
+            prizes={prizes} 
           />
         </>
       ) : (

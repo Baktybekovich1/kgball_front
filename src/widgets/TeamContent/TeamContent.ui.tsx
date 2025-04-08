@@ -4,6 +4,12 @@ import DefaultAvatar from "~shared/assets/img/User-avatar.png";
 import { useState } from "react";
 import { pathKeys } from "~shared/lib/react-router";
 import { Link } from "react-router-dom";
+import {
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+} from "@mui/material";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 interface RenderContentProps {
   selectedTab: string;
@@ -11,13 +17,15 @@ interface RenderContentProps {
   matches: any[];
   squad: any[]; 
   bestPlayers: any[];
+  prizes: any[];
 }
 export const RenderContent: React.FC<RenderContentProps> = ({
   selectedTab,
   team,
   matches,
   squad,
-  bestPlayers
+  bestPlayers,
+  prizes
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
 
@@ -47,21 +55,48 @@ export const RenderContent: React.FC<RenderContentProps> = ({
     case "обзор":
       return team ? (
         <Box className="flex flex-col gap-5 mb-10">
-          <div>
-            <Typography variant="h6" fontWeight="bold">Достижения</Typography>
-          </div>
-          <Box className="flex gap-2">
-            {team.tourneyTeamPrizes.length > 0 ? (
-              team.tourneyTeamPrizes.map((prize, index) => (
-                <Typography
-                  key={index}
-                  className="max-md:text-base border border-gray-300 bg-gray-50 p-3 rounded-md text-lg text-gray-700"
+          <Box className="flex flex-col gap-2">
+            {prizes &&
+            (Object.keys(prizes.firstPositionPrizes || {}).length > 0 ||
+              Object.keys(prizes.secondPositionPrizes || {}).length > 0 ||
+              Object.keys(prizes.thirdPositionPrizes || {}).length > 0) ? (
+              <Accordion className="bg-[#ddd]">
+                <AccordionSummary
+                  expandIcon={<ExpandMoreIcon />}
+                  aria-controls="panel1a-content"
+                  id="panel1a-header"
                 >
-                  {prize.firstPosition ? "Первое мессто - 🥇" : prize.secondPosition ? "Второе место - 🥈" : "Третье место - 🥉"}
-                </Typography>
-              ))
+                  <Typography variant="h6" fontWeight="bold">Достижения</Typography>
+                </AccordionSummary>
+                <AccordionDetails className="flex flex-col gap-2">
+                  {Object.entries(prizes.firstPositionPrizes || {}).map(([id, title]) => (
+                    <Typography
+                      key={`first-${id}`}
+                      className="max-md:text-base border border-gray-300 bg-white p-3 rounded-md text-lg text-gray-700"
+                    >
+                      🥇 Первое место — {title}
+                    </Typography>
+                  ))}
+                  {Object.entries(prizes.secondPositionPrizes || {}).map(([id, title]) => (
+                    <Typography
+                      key={`second-${id}`}
+                      className="max-md:text-base border border-gray-300 bg-white p-3 rounded-md text-lg text-gray-700"
+                    >
+                      🥈 Второе место — {title}
+                    </Typography>
+                  ))}
+                  {Object.entries(prizes.thirdPositionPrizes || {}).map(([id, title]) => (
+                    <Typography
+                      key={`third-${id}`}
+                      className="max-md:text-base border border-gray-300 bg-white p-3 rounded-md text-lg text-gray-700"
+                    >
+                      🥉 Третье место — {title}
+                    </Typography>
+                  ))}
+                </AccordionDetails>
+              </Accordion>
             ) : (
-              <Typography className="text-lg text-gray-700">Нет достижений</Typography>
+              <Typography variant="h6" fontWeight="bold">Нет Достижений</Typography>
             )}
           </Box>
           <div>

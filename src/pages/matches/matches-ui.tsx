@@ -48,7 +48,7 @@ export const MatchesPage: React.FC = () => {
       <div className="grid w-full max-md:grid-cols-1 grid-cols-2 gap-4">
         {matches.map((match, index) => (
           <div className="flex-1 sm:w-[48%] md:w-[30%]" key={index}>
-            <Link to={pathKeys.matches.bySlug(String(match.gameId))} className="border p-4 bg-[#c1c1c1] rounded-md block">
+            <Link to={pathKeys.matches.bySlug(String(match.gameId))} className="border p-4 bg-[#ddd] rounded-md block">
               <Box className="flex items-center justify-between">
                 <div className="flex flex-col items-center">
                   <span className="text-lg font-semibold">{match.loserTeamData.title}</span>

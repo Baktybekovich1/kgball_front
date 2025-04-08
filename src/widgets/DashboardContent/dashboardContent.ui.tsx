@@ -76,6 +76,10 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
   useEffect(() => {
     apiClient.get("/api/teams").then((res) => setTeams(res.data));
   }, []);
+
+  useEffect(() => {
+    FetchSelectedMatch();
+  }, []);
   
   const fetchMatches = useCallback(async (tourneyId: number) => {
     try {
