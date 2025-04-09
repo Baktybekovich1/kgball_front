@@ -33,9 +33,9 @@ export const News: React.FC = () => {
   const latestTournaments = tournaments.slice(0, 3);
 
   return (
-    <Container className="max-w-[1440px] mb-10">
-      <Typography variant="h4" sx={{ fontWeight: "bold", color: "#333", marginBottom: 4 }}>Последние турниры</Typography>
-      <Box className="grid gap-4 grid-cols-2 justify-center max-md:grid-cols-1">
+    <Container className="max-w-[1440px]">
+      <Typography className="text-2xl bold-500 mb-5">Последние турниры</Typography>
+      <Box className="grid gap-4 grid-cols-2 justify-center max-md:gap-0 max-md:grid-cols-1">
         {latestTournaments.map((tournament, index) => (
           <Link className="w-full" to={pathKeys.tournaments.bySlug(String(tournament.id))} key={index}>
             <Paper

@@ -14,79 +14,93 @@ export const MatchContent: React.FC<MatchContentProps> = ({ selectedTab, match, 
   switch (selectedTab) { 
     case "гол":
       return match ? (
-        <Box>
-          <Typography variant="h6">Счет:</Typography>
+        <Box className="space-y-6">
+          <Typography variant="h6" className="text-2xl font-semibold mb-4">Счет</Typography>
+
           {Array.isArray(scores) && scores.length > 0 ? (
             scores.map((score: any, index: number) => (
-              <Box className="flex justify-between" key={index} mb={2}>
-                <Typography className="max-md:text-xl text-[25px]">
-                  {score.loserTeamTitle} - {score.loserTeamScore}
+              <Box
+                key={index}
+                className="flex justify-between items-center p-4 rounded-2xl shadow-md bg-[#ddd]"
+              >
+                <Typography className="max-md:text-xl text-[25px] font-medium">
+                  {score.loserTeamTitle} — {score.loserTeamScore}
                 </Typography>
-                <Typography className="max-md:text-xl text-[25px]">
-                  {score.winnerTeamTitle} - {score.winnerTeamScore}
+                <Typography className="max-md:text-xl text-[25px] font-medium">
+                  {score.winnerTeamTitle} — {score.winnerTeamScore}
                 </Typography>
               </Box>
             ))
           ) : (
-            <Typography variant="body2">No scores available</Typography>
+            <Typography variant="body2">Нет данных о счете</Typography>
           )}
-          <div className="flex justify-between">
-            <div className="flex flex-col">
+
+          <Box className="flex flex-col md:flex-row gap-6">
+            <Box className="flex-1 p-4 rounded-2xl shadow-md bg-[#ddd] dark:bg-neutral-800">
+              <Typography variant="subtitle1" className="text-xl font-semibold mb-3">
+                Голы: {scores?.[0]?.loserTeamTitle}
+              </Typography>
               {goals.loserTeamGoals && goals.loserTeamGoals.length > 0 ? (
-                goals.loserTeamGoals.map((goal: any, index: number) => (
-                  <Box key={goal.goalId} mb={2}>
-                    <Typography className="max-md:text-sm text-xl">
-                      {goal.goalAuthor.playerName} (Гол)
+                goals.loserTeamGoals.map((goal: any) => (
+                  <Box key={goal.goalId} mb={3}>
+                    <Typography className="max-md:text-sm text-lg">
+                      ⚽ {goal.goalAuthor.playerName}
                     </Typography>
-                    <Typography className="max-md:text-sm text-xl">
-                      {goal.assistAuthor ? `${goal.assistAuthor.playerName} (Пас)` : 'Без паса'}
+                    <Typography className="max-md:text-sm text-base text-gray-500">
+                      {goal.assistAuthor ? `🅰️ ${goal.assistAuthor.playerName}` : 'Без паса'}
                     </Typography>
                   </Box>
                 ))
               ) : (
-                <Typography variant="body2">Нет</Typography>
+                <Typography variant="body2">Нет голов</Typography>
               )}
-            </div>
-            <div className="flex flex-col">
+            </Box>
+
+            <Box className="flex-1 p-4 rounded-2xl shadow-md bg-[#ddd] dark:bg-neutral-800">
+              <Typography variant="subtitle1" className="text-xl font-semibold mb-3">
+                Голы: {scores?.[0]?.winnerTeamTitle}
+              </Typography>
               {goals.winnerTeamGoals && goals.winnerTeamGoals.length > 0 ? (
-                goals.winnerTeamGoals.map((goal: any, index: number) => (
-                  <Box key={goal.goalId} mb={2}>
-                    <Typography className="max-md:text-sm text-xl">
-                      {goal.goalAuthor.playerName} (Гол)
+                goals.winnerTeamGoals.map((goal: any) => (
+                  <Box key={goal.goalId} mb={3}>
+                    <Typography className="max-md:text-sm text-lg">
+                      ⚽ {goal.goalAuthor.playerName}
                     </Typography>
-                    <Typography className="max-md:text-sm text-xl">
-                      {goal.assistAuthor ? `${goal.assistAuthor.playerName} (Пас)` : 'Без паса'}
+                    <Typography className="max-md:text-sm text-base text-gray-500">
+                      {goal.assistAuthor ? `🅰️ ${goal.assistAuthor.playerName}` : 'Без паса'}
                     </Typography>
                   </Box>
                 ))
               ) : (
-                <Typography variant="body2">Нет</Typography>
+                <Typography variant="body2">Нет голов</Typography>
               )}
-            </div>
-          </div>
+            </Box>
+          </Box>
         </Box>
       ) : null;
-
     case "состав":
       return match ? (
-        <Box className="flex justify-between">
-          <div className="flex flex-col">
-            <Typography variant="h6" >{match.loserTeamData.title}</Typography>
-            <Box className="flex flex-col gap-2 mt-4">
+        <Box className="flex justify-between max-md:p-0 p-4">
+          <div className="flex flex-col w-1/2 max-md:p-0 p-4">
+            <Typography variant="h6" className="text-center max-md:text-md font-bold text-blue-600 mb-2">
+              {match.loserTeamData.title}
+            </Typography>
+            <Box className="flex flex-col gap-2 mt-2">
               {teams.loser.map((player: any) => (
-                <Box key={player.id} className="flex justify-between items-center">
-                  <Typography>{player.name}</Typography>
+                <Box key={player.id} className="flex justify-between items-center py-2 px-3 bg-gray-50 rounded-lg hover:bg-gray-200 transition-all">
+                  <Typography className="max-md:text-sm text-gray-800">{player.name}</Typography>
                 </Box>
               ))}
             </Box>
           </div>
-
-          <div className="flex flex-col">
-            <Typography variant="h6" >{match.winnerTeamData.title}</Typography>
-            <Box className="flex flex-col gap-2 mt-4" >
+          <div className="flex flex-col w-1/2 max-md:p-0 p-4">
+            <Typography variant="h6" className="text-center max-md:text-md font-bold text-green-600 mb-2">
+              {match.winnerTeamData.title}
+            </Typography>
+            <Box className="flex flex-col gap-2 mt-2">
               {teams.winner.map((player: any) => (
-                <Box key={player.id} className="flex justify-between items-center">
-                  <Typography>{player.name}</Typography>
+                <Box key={player.id} className="flexjustify-between items-center py-2 px-3 bg-gray-50 rounded-lg hover:bg-gray-200 transition-all">
+                  <Typography className="max-md:text-sm text-gray-800 text-right">{player.name}</Typography>
                 </Box>
               ))}
             </Box>

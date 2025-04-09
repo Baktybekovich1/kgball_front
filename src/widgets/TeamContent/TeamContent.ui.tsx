@@ -120,32 +120,31 @@ export const RenderContent: React.FC<RenderContentProps> = ({
             </Typography>
           </div>
         </Box>
-      ) : null;
-      
-      case "состав":
-        return squad && squad.length > 0 ? (
-          <Box className="flex flex-col gap-5 mb-10">
-              <Typography variant="h6" fontWeight="bold">Состав команды</Typography>
-              {squad.map(player => (
-                <Link to={pathKeys.players.bySlug(String(player.id))} key={player.id}>
-                  <Box key={player.id} className="flex items-center gap-4 p-4 border border-gray-300 rounded-md">
-                    <img src={player.img || DefaultAvatar} alt={player.name} className="w-12 h-12 rounded-full" />
-                    <div className="flex w-full justify-between items-center">
-                      <div>
-                        <Typography variant="h6" className="font-semibold">{player.name}</Typography>
-                        <Typography variant="body2" color="textSecondary">{player.teamTitle}</Typography>
-                      </div>
-                      <Typography variant="body2" className="text-base">
-                        {player.position}
-                      </Typography>
-                    </div> 
-                  </Box>
-                </Link>
-              ))}
-            </Box>
-        ) : (
-          <Typography className="text-lg text-gray-700">Нет игроков в составе</Typography>
-        );
+      ) : null;     
+    case "состав":
+      return squad && squad.length > 0 ? (
+        <Box className="flex flex-col gap-5 mb-10">
+            <Typography variant="h6" fontWeight="bold">Состав команды</Typography>
+            {squad.map(player => (
+              <Link to={pathKeys.players.bySlug(String(player.id))} key={player.id}>
+                <Box key={player.id} className="flex items-center gap-4 p-4 border border-gray-300 rounded-md">
+                  <img src={player.img || DefaultAvatar} alt={player.name} className="w-12 h-12 rounded-full" />
+                  <div className="flex w-full justify-between items-center">
+                    <div>
+                      <Typography variant="h6" className="font-semibold">{player.name}</Typography>
+                      <Typography variant="body2" color="textSecondary">{player.teamTitle}</Typography>
+                    </div>
+                    <Typography variant="body2" className="text-base">
+                      {player.position}
+                    </Typography>
+                  </div> 
+                </Box>
+              </Link>
+            ))}
+          </Box>
+      ) : (
+        <Typography className="text-lg text-gray-700">Нет игроков в составе</Typography>
+      );
     case "матчи":
       return matches ? (
         <Box className="grid grid-cols-2 max-md:grid-cols-1 gap-4">
@@ -153,7 +152,7 @@ export const RenderContent: React.FC<RenderContentProps> = ({
             <Link to={pathKeys.matches.bySlug(String(match.id))}>
               <div>
                 <span className="max-md:text-md font-semibold text-xl">{match.tourney.title}</span> 
-                <div className="border p-4 rounded-md block">
+                <div className="border mt-4 p-5 rounded-md block">
                   <Box className="flex items-center justify-between">
                     <div className="flex flex-col items-center">
                       <span className="text-lg font-semibold">{match.loserTeam.name}</span>

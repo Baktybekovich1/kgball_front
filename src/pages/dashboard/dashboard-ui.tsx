@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import MenuIcon from '@mui/icons-material/Menu';
 import { apiClient } from "~shared/lib/api";
 import { DashboardContent } from "~widgets/DashboardContent";
+import { pathKeys } from "~shared/lib/react-router";
 
 export const DashboardPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>(() => {
@@ -70,67 +71,79 @@ export const DashboardPage: React.FC = () => {
   }, [activeTab]);
 
   return (
-    <Container className="max-w-[1440px]">
-      <IconButton className="mb-2" onClick={() => setIsSidebarOpen(true)}>
-        <MenuIcon />
+    <Container className="max-w-[1440px] px-4 py-2">
+      <IconButton 
+        className="mb-4" 
+        onClick={() => setIsSidebarOpen(true)} 
+        sx={{ borderRadius: 2 }}
+      >
+        <MenuIcon fontSize="large" />
       </IconButton>
-
+  
       <Drawer
         anchor="left"
-        BackdropProps={{ invisible: true }} 
+        BackdropProps={{ invisible: true }}
         open={isSidebarOpen}
-        onClick={() => setIsSidebarOpen(false)}
+        onClose={() => setIsSidebarOpen(false)}
       >
-        <Box sx={{ width: 300, p: 2 }}>
-          <Box sx={{ display: "flex", justifyContent: "space-between", width: "100%" }}>
-            <Typography variant="h6">KYRGYZBALL</Typography>
-            <Button  
+        <Box sx={{ width: 300, p: 3, bgcolor: "#f9f9f9", height: "100%" }}>
+          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
+            <Typography variant="h6" fontWeight="bold" color="primary">
+              KYRGYZBALL
+            </Typography>
+            <IconButton 
               onClick={() => setIsSidebarOpen(false)} 
-              sx={{
-                color: 'black', 
-                fontSize: '20px', 
-                fontWeight: 'bold', 
-                padding: '0', 
-                '&:hover': {
-                  cursor: 'pointer',
-                }
-              }}
+              sx={{ color: "#333" }}
             >
-              X
-            </Button>
+              <Typography variant="h6" sx={{ fontWeight: "bold" }}>×</Typography>
+            </IconButton>
           </Box>
-
+  
           <List>
             <ListItem disablePadding>
-              <ListItemButton component={Link} to="/">Home</ListItemButton>
+              <ListItemButton onClick={() => setActiveTab("teams")}>
+                <Typography variant="body1">Команды</Typography>
+              </ListItemButton>
             </ListItem>
             <ListItem disablePadding>
-              <ListItemButton onClick={() => setActiveTab("teams")}>Команды</ListItemButton>
+              <ListItemButton onClick={() => setActiveTab("leagues")}>
+                <Typography variant="body1">Лиги</Typography>
+              </ListItemButton>
             </ListItem>
             <ListItem disablePadding>
-              <ListItemButton onClick={() => setActiveTab("leagues")}>Лиги</ListItemButton> 
+              <ListItemButton onClick={() => setActiveTab("tournaments")}>
+                <Typography variant="body1">Турниры</Typography>
+              </ListItemButton>
             </ListItem>
             <ListItem disablePadding>
-              <ListItemButton onClick={() => setActiveTab("tournaments")}>Турниры</ListItemButton>
+              <ListItemButton component={Link} to={pathKeys.dashboard.playerTransfer()}>
+                <Typography variant="body1">Переместить игрока</Typography>
+              </ListItemButton>
+            </ListItem>
+            <ListItem disablePadding sx={{ mt: 3 }}>
+              <ListItemButton component={Link} to="/">
+                <Typography variant="body1" color="text.secondary">На главную</Typography>
+              </ListItemButton>
             </ListItem>
           </List>
         </Box>
       </Drawer>
-
+  
       <DashboardContent 
-        activeTab={activeTab} 
-        loading={loading} 
+        activeTab={activeTab}
+        loading={loading}
         setLoading={setLoading}
-        error={error} 
-        teams={teams} 
-        tournaments={tournaments} 
+        error={error}
+        teams={teams}
+        tournaments={tournaments}
         setTournaments={setTournaments}
-        leagues={leagues} 
+        leagues={leagues}
         setTeams={setTeams}
         setActiveTab={setActiveTab}
       />
     </Container>
   );
+  
 };
 
 export default DashboardPage;

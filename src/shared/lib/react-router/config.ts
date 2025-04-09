@@ -3,8 +3,13 @@ export const pathKeys = {
   home() {
     return pathKeys.root
   },
-  dashboard() {
-    return pathKeys.root + 'dashboard';
+  dashboard: {
+    root() {
+      return pathKeys.root + 'dashboard';
+    },
+    playerTransfer() {
+      return pathKeys.dashboard.root() + '/transfer';
+    },
   },
   signIn() {
     return pathKeys.root + 'login';

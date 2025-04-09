@@ -71,7 +71,7 @@ export const BestPlayers: React.FC = () => {
         </Select>
       </Box>
 
-      <Typography variant="h6" fontWeight="bold" gutterBottom>
+      <Typography className="text-xl max-md:text-[16px]" fontWeight="bold" gutterBottom>
         {selectedCategory === "bombers" && "Топ 3 бомбардиров"}
         {selectedCategory === "assistants" && "Топ 3 ассистентов"}
         {selectedCategory === "all" && "Топ 3 игроков по общим очкам"}
