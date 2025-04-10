@@ -71,7 +71,7 @@ export const MatchPage: React.FC = () => {
     <Container className="max-w-[1440px] mb-10">
       {match ? (
         <>
-          <Link to={pathKeys.matches.root()} className="bg-dove mb-1 p-2 rounded text-white inline-block text-blue hover:underline">
+          <Link to={pathKeys.matches.root()} className="max-md:p-1 bg-dove mb-1 p-2 rounded text-white inline-block text-blue hover:underline">
             <ArrowBackIcon /> Назад
           </Link>
           <div className="flex justify-between items-center border p-4 rounded-md">

@@ -15,7 +15,7 @@ export const MatchContent: React.FC<MatchContentProps> = ({ selectedTab, match, 
     case "гол":
       return match ? (
         <Box className="space-y-6">
-          <Typography variant="h6" className="text-2xl font-semibold mb-4">Счет</Typography>
+          <Typography variant="h6" className="max-md:text-xl text-2xl font-semibold mb-4">Счет</Typography>
 
           {Array.isArray(scores) && scores.length > 0 ? (
             scores.map((score: any, index: number) => (
@@ -23,10 +23,10 @@ export const MatchContent: React.FC<MatchContentProps> = ({ selectedTab, match, 
                 key={index}
                 className="flex justify-between items-center p-4 rounded-2xl shadow-md bg-[#ddd]"
               >
-                <Typography className="max-md:text-xl text-[25px] font-medium">
+                <Typography className="max-md:text-sm text-xl font-medium">
                   {score.loserTeamTitle} — {score.loserTeamScore}
                 </Typography>
-                <Typography className="max-md:text-xl text-[25px] font-medium">
+                <Typography className="max-md:text-sm text-xl font-medium">
                   {score.winnerTeamTitle} — {score.winnerTeamScore}
                 </Typography>
               </Box>
@@ -37,7 +37,7 @@ export const MatchContent: React.FC<MatchContentProps> = ({ selectedTab, match, 
 
           <Box className="flex flex-col md:flex-row gap-6">
             <Box className="flex-1 p-4 rounded-2xl shadow-md bg-[#ddd] dark:bg-neutral-800">
-              <Typography variant="subtitle1" className="text-xl font-semibold mb-3">
+              <Typography className="max-md:text-sm text-xl font-semibold mb-3">
                 Голы: {scores?.[0]?.loserTeamTitle}
               </Typography>
               {goals.loserTeamGoals && goals.loserTeamGoals.length > 0 ? (
@@ -57,7 +57,7 @@ export const MatchContent: React.FC<MatchContentProps> = ({ selectedTab, match, 
             </Box>
 
             <Box className="flex-1 p-4 rounded-2xl shadow-md bg-[#ddd] dark:bg-neutral-800">
-              <Typography variant="subtitle1" className="text-xl font-semibold mb-3">
+              <Typography className="max-md:text-sm text-xl font-semibold mb-3">
                 Голы: {scores?.[0]?.winnerTeamTitle}
               </Typography>
               {goals.winnerTeamGoals && goals.winnerTeamGoals.length > 0 ? (

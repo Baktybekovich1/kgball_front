@@ -13,7 +13,7 @@ interface GoalDialogProps {
   selectedGoal: any;  
 }
 
-export const GoalDialog: React.FC<GoalDialogProps> = ({
+export const GoalDialog: React.FC<GoalDialogProps> = ({ 
   open, onClose, gameId, teams, setMatches, selectedMatch, selectedGoal
 }) => {
   const [selectedTeamId, setSelectedTeamId] = useState<number | null>(null);

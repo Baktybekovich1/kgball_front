@@ -47,7 +47,7 @@ export const PlayerPage: React.FC = () => {
   return (
     <Container className="max-w-[1200px] mx-auto mb-10 px-4">
       <Box className="flex max-md:flex-col text-center gap-10 mb-6">
-        <Link to={pathKeys.players.root()} className="bg-dove mb-1 p-2 rounded text-white inline-block text-blue hover:underline">
+        <Link to={pathKeys.players.root()} className="max-md:p-1 bg-dove mb-1 p-2 rounded text-white inline-block text-blue hover:underline">
           <ArrowBackIcon /> Назад
         </Link>
         <Typography fontWeight="bold" className="text-3xl max-md:text-xl mb-2">

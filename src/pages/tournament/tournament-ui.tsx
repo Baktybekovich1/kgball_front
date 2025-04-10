@@ -74,7 +74,7 @@ export const TournamentPage: React.FC = () => {
       {tournament ? (
         <div className="flex flex-col items-center justify-center max-md:px-2 max-md:py-2 px-4 py-8">
           <Box className="flex max-md:flex-col max-md:gap-1 max-md:mb-0 w-full gap-5 justify-between items-center mb-4">
-            <Link to={pathKeys.matches.root()} className="bg-dove mb-1 p-2 rounded text-white inline-block text-blue hover:underline">
+            <Link to={pathKeys.matches.root()} className="max-md:p-1 bg-dove mb-1 p-2 rounded text-white inline-block text-blue hover:underline">
               <ArrowBackIcon className="max-md:text-xs"/> Назад
             </Link>
             {winner && (

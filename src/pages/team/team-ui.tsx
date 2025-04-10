@@ -81,7 +81,7 @@ export const TeamPage: React.FC = () => {
     <Container className="max-w-[1440px] mb-10">
       {team ? (
         <>
-          <Link to={pathKeys.teams.root()} className="bg-dove mb-1 p-2 rounded text-white inline-block text-blue hover:underline">
+          <Link to={pathKeys.teams.root()} className="max-md:p-1 bg-dove mb-1 p-2 rounded text-white inline-block text-blue hover:underline">
             <ArrowBackIcon /> Назад
           </Link>
           <Box className="flex flex-col items-center gap-4 mb-6">

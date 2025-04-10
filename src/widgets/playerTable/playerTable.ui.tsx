@@ -20,8 +20,8 @@ export const PlayerTable = ({ players }: { players: any[] }) => {
           {players.map(player => (
             <TableRow key={player.playerId}>
               <TableCell>
-                {player.playerName && player.surname
-                  ? `${player.playerName} ${player.surname}`
+                {player.playerName 
+                  ? `${player.playerName}`
                   : player.name}
               </TableCell>
               {hasTeamColumn && <TableCell>{player.teamTitle || "-"}</TableCell>}
