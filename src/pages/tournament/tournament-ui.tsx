@@ -1,5 +1,5 @@
 // TournamentPage.tsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Container, Box, Button, Typography, CircularProgress } from "@mui/material";
 import { pathKeys } from "~shared/lib/react-router";
 import { Link, useParams } from "react-router-dom";
@@ -10,11 +10,22 @@ import defaultTeam from "~shared/assets/img/defaultTeam.webp";
 
 export const TournamentPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  console.log(id);
   const [tournament, setTournament] = useState<any>(null);
   const [playersData, setPlayersData] = useState<any[]>([]);
   const [selectedTab, setSelectedTab] = useState<string>("обзор");
   const [error, setError] = useState<string>("");
   const [winner, setWinner] = useState<any>(null);
+  const [matches, setMatches] = useState<any[]>([]);
+
+  const fetchMatches = useCallback(async (tourneyId: number) => {
+      try {
+        const response = await apiClient.get(`/game/tourney/games/${tourneyId}`);
+        setMatches(response.data); 
+      } catch (error) {
+        console.error("Ошибка при загрузке матчей:", error);
+      }
+    }, []);
 
   useEffect(() => {
     if (id) {
@@ -121,12 +132,25 @@ export const TournamentPage: React.FC = () => {
             >
               Результативные
             </Button>
+            <Button
+              variant={selectedTab === "матчи" ? "contained" : "outlined"}
+              onClick={() => {
+                if (selectedTab !== "матчи") {
+                  fetchMatches(Number(id));
+                  setSelectedTab("матчи");
+                }
+              }}
+              className="w-full max-w-[200px] mb-2 max-md:max-w-full"
+            >
+              Матчи
+            </Button>
           </Box>
 
           <TourneyContent
             selectedTab={selectedTab}
             tournament={tournament}
             playersData={playersData}
+            matches={matches}
           />
         </div>
       ) : (

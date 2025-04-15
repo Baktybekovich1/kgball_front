@@ -2,6 +2,8 @@ import React from "react";
 import { Typography, Paper, Box, Table, TableContainer, TableHead, TableRow, TableCell, TableBody } from "@mui/material";
 import DefaultAvatar from "~shared/assets/img/User-avatar.png";
 import { PlayerTable } from "~widgets/playerTable";
+import { Link } from "react-router-dom";
+import { pathKeys } from "~shared/lib/react-router";
 
 interface Player {
   playerId: string;
@@ -33,11 +35,12 @@ interface Tournament {
 
 interface Props {
   selectedTab: string;
+  matches: any[];
   tournament: Tournament | null;
   playersData: Player[];
 }
 
-export const TourneyContent: React.FC<Props> = ({ selectedTab, tournament, playersData }) => {
+export const TourneyContent: React.FC<Props> = ({ selectedTab, matches, tournament, playersData }) => {
   const renderOverview = () => {
     if (!tournament) return null;
     return (
@@ -139,6 +142,39 @@ export const TourneyContent: React.FC<Props> = ({ selectedTab, tournament, playe
           <Typography className="mb-2" variant="h5">Результативные</Typography>
           {renderPlayersTable(player => player.assists > 0 || player.goals > 0, "goals")}
           </div>
+      );
+    case "матчи":
+      return (
+        <div className="w-full">
+        <Typography className="mb-4" variant="h5">Матчи</Typography>
+        {matches.map((match, index) => (
+          <div className="mb-4" key={index}>
+            <Link
+              to={pathKeys.matches.bySlug(String(match.gameId))}
+              className="block bg-[#ddd] shadow-md hover:shadow-lg duration-300 rounded-xl p-4 border border-gray-200"
+            >
+              <Box className="flex items-center justify-between">
+                <Typography className="font-medium text-gray-700 text-lg w-1/3">
+                  {match.loserTeamTitle}
+                </Typography>
+
+                <div className="flex flex-col items-center w-1/3">
+                  <div className="text-sm text-gray-500 mb-1">Счёт</div>
+                  <div className="flex items-center gap-2 text-xl font-bold text-gray-800">
+                    <span>{match.loserTeamGoals}</span>
+                    <span className="text-red-500">:</span>
+                    <span>{match.winnerTeamGoals}</span>
+                  </div>
+                </div>
+
+                <Typography className="font-medium text-gray-700 text-lg text-right w-1/3">
+                  {match.winnerTeamTitle}
+                </Typography>
+              </Box>
+            </Link>
+          </div>
+        ))}
+      </div>
       );
     default:
       return null;

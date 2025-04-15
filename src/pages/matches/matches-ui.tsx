@@ -48,21 +48,27 @@ export const MatchesPage: React.FC = () => {
       <div className="grid w-full max-md:grid-cols-1 grid-cols-2 gap-4">
         {matches.map((match, index) => (
           <div className="flex-1 sm:w-[48%] md:w-[30%]" key={index}>
-            <Link to={pathKeys.matches.bySlug(String(match.gameId))} className="border p-4 bg-[#ddd] rounded-md block">
+            <Link
+              to={pathKeys.matches.bySlug(String(match.gameId))}
+              className="block bg-[#ddd] shadow-md hover:shadow-lg duration-300 rounded-xl p-4 border border-gray"
+            >
               <Box className="flex items-center justify-between">
-                <div className="flex flex-col items-center">
-                  <span className="text-lg font-semibold">{match.loserTeamData.title}</span>
+                <Typography className="font-medium text-gray-700 text-lg w-1/3">
+                  {match.loserTeamData.title}
+                </Typography>
+
+                <div className="flex flex-col items-center w-1/3">
+                  <div className="text-sm text-gray-500 mb-1">Счёт</div>
+                  <div className="flex items-center gap-2 text-xl font-bold text-gray-800">
+                    <span>{match.loserTeamScore}</span>
+                    <span className="text-red-500">:</span>
+                    <span>{match.winnerTeamScore}</span>
+                  </div>
                 </div>
-                <div className="flex gap-4 text-md font-semibold">
-                  <span>{match.loserTeamScore}</span> 
-                  <span className="">
-                    VS
-                  </span>
-                  <span>{match.winnerTeamScore}</span>
-                </div>
-                <div className="flex flex-col items-center">
-                  <span className="text-lg font-semibold">{match.winnerTeamData.title}</span>
-                </div>
+
+                <Typography className="font-medium text-gray-700 text-lg text-right w-1/3">
+                  {match.winnerTeamData.title}
+                </Typography>
               </Box>
             </Link>
           </div>
