@@ -4,6 +4,8 @@ import DefaultAvatar from "~shared/assets/img/User-avatar.png";
 import { useRef, useEffect, useState } from "react";
 import React from "react";
 import { apiClient } from "~shared/lib/api";
+import { pathKeys } from "~shared/lib/react-router";
+import { Link } from "react-router-dom"; 
 
 interface DashboardRenderContentProps {
   activeTab: string;
@@ -34,15 +36,6 @@ interface DashboardRenderContentProps {
   setSelectedMatch: (id) => void; 
   handleDeleteMatch: (id) => void; 
   handleSelectMatch: (id) => void;
-  selectedMatch: any;
-  goals: any[];
-  setOpenGoalDialog: (boolean) => void; 
-  handleDeleteGoal: (id) => void; 
-  setSelectedGoal: (goal: any) => void;
-  assists: any[];
-  setOpenAssistsDialog: (boolean) => void; 
-  setSelectedAssist: (assist: any) => void;
-  handleDeleteAssist: (id) => void; 
 }
 
 export const DashboardRenderContent: React.FC<DashboardRenderContentProps> = ({
@@ -52,8 +45,7 @@ export const DashboardRenderContent: React.FC<DashboardRenderContentProps> = ({
   handleDeletePlayer, handleEditTeam, setPlayerDetails, handleOpenTournamentClick, 
   setSelectedTourney, handleDeleteTourney, setActiveTab, setOpenPrizeDialog, setSelectedPrize,
   selectedTourney, setOpenMatchDialog, setSelectedMatch, 
-  handleDeleteMatch, selectedMatch, goals, setOpenGoalDialog, handleDeleteGoal, setSelectedGoal,
-  assists, setOpenAssistsDialog, setSelectedAssist, handleDeleteAssist, handleSelectMatch,
+  handleDeleteMatch, handleSelectMatch,
 }) => {  
   const [prize, setPrize] = useState<any>(null);
 
@@ -127,34 +119,6 @@ export const DashboardRenderContent: React.FC<DashboardRenderContentProps> = ({
     setOpenMatchDialog(true);
   };
 
-  const toggleMatchDetails = (match: any) => {
-    handleSelectMatch(match);
-  };
-
-  const handleAddGoal = (match: any) => {
-    setSelectedGoal(null);
-    setSelectedMatch(match); 
-    setOpenGoalDialog(true);
-  };
-
-  const handleEditGoal = (match: any, goal: any) => {
-    setSelectedGoal(goal);
-    setSelectedMatch(match); 
-    setOpenGoalDialog(true);
-  };
-
-  const handleAddAssist = (match: any) => {
-    setSelectedAssist(null);
-    setSelectedMatch(match); 
-    setOpenAssistsDialog(true);
-  };
-
-  const handleEditAssist = (match: any, assist: any) => {
-    setSelectedAssist(assist);
-    setSelectedMatch(match); 
-    setOpenAssistsDialog(true);
-  };
-
   const renderLoading = <Typography className="flex justify-center items-center h-64"><CircularProgress /></Typography>;
   const renderError = <Typography color="error">{error}</Typography>;
   
@@ -189,7 +153,12 @@ export const DashboardRenderContent: React.FC<DashboardRenderContentProps> = ({
                 <Typography className="font-semibold">{item.winnerTeamTitle}</Typography>
               </Box>
               <div className="flex flex-col max-md:w-full mt-2 gap-3">
-                <Button onClick={() => toggleMatchDetails(item)} sx={{ backgroundColor: "blue", color: "white" }}>Подробнее</Button>
+                <Link 
+                  to={pathKeys.dashboard.dashboardMatch(String(item.gameId))} 
+                  style={{ backgroundColor: "blue", color: "white", textAlign: "center", padding: "8px", borderRadius: "5px" }}
+                >
+                  ПОДРОБНЕЕ
+                </Link>
                 <Button onClick={handleDelete} sx={{ backgroundColor: "error.main", color: "white" }}>Удалить</Button>
                 <Button onClick={handleEdit} sx={{ backgroundColor: "#ff9800", color: "white" }}>Редактировать</Button>
               </div>
@@ -319,52 +288,6 @@ export const DashboardRenderContent: React.FC<DashboardRenderContentProps> = ({
                   </React.Fragment>
                 ))}
               </div>
-              
-              {selectedMatch && (
-                <Box className="mt-10">
-                  <div className="flex gap-2">
-                    <Button className="bg-tundora text-white text-base max-md:text-sm" onClick={() => handleAddGoal(selectedMatch)}>Добавить Голы</Button>
-                    <Button className="bg-tundora text-white text-base max-md:text-sm" onClick={() => handleAddAssist(selectedMatch)}>Добавить Ассисты</Button>
-                  </div>
-                  {[{ title: "Голы", data: goals, key: "TeamGoals", action: handleDeleteGoal }, { title: "Ассисты", data: assists, key: "TeamAssists", action: handleDeleteAssist }]
-                    .map(({ title, data, key, action }) => data && (
-                      <div key={title} className="flex flex-col mt-8 gap-4">
-                        <Typography variant="h6" fontWeight="bold">{title}:</Typography>
-                        <div className="flex max-md:flex-col gap-6">
-                          {["loser", "winner"].map(teamType => {
-                            const teamData = data[`${teamType}${key}`] || [];
-                            return (
-                              <div key={teamType} className="w-full">
-                                {teamData.length ? (
-                                  <ul>
-                                    {teamData.map((item, index) => (
-                                      <li key={item.id || index} className="mb-2">
-                                        <Card sx={{ padding: 2, boxShadow: 3, borderRadius: 2 }}>
-                                          <Typography className="max-md:text-base text-xl font-semibold text-gray-800">
-                                              {title === "Голы" ? item.goalAuthor?.playerName : item.assistAuthor?.playerName || "Неизвестен"} ({title.slice(0, -1)})
-                                          </Typography>
-                                          <Typography variant="body2" color="textSecondary">
-                                            {title === "Голы" ? `Ассист: ${item.assistAuthor?.playerName || "Нет"}` : `Гол: ${item.goalAuthorName || "Нет"}`}
-                                          </Typography>
-                                          <div className="flex max-md:flex-col justify-end gap-2 mt-2">
-                                            <Button onClick={() => (title === "Голы" ? handleEditGoal : handleEditAssist)(selectedMatch, item)} sx={{ backgroundColor: "#ff9800", color: "white", padding: 1 }}>Редактировать</Button>
-                                            <Button onClick={() => action(item.goalId ?? item.assistId)} sx={{ backgroundColor: "error.main", color: "white", padding: 1 }}>
-                                              Удалить
-                                            </Button>
-                                          </div>
-                                        </Card>
-                                      </li>
-                                    ))}
-                                  </ul>
-                                ) : <Typography variant="body2" className="text-gray-500">Нет {title.toLowerCase()}</Typography>}
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    ))}
-                </Box>
-              )}
             </Box>
           );
       default:

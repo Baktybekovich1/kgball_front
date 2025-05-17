@@ -9,7 +9,7 @@ export const PlayersPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [filter, setFilter] = useState("all");
-  const [view, setView] = useState<'cards' | 'table'>('cards');
+  const [view, setView] = useState<'cards' | 'table'>('table');
   const [searchQuery, setSearchQuery] = useState(""); 
 
   useEffect(() => {

@@ -24,8 +24,12 @@ export const GoalDialog: React.FC<GoalDialogProps> = ({
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
 
-  const matchTeams = teams.filter(
-    (team) => [selectedMatch?.winnerTeamId, selectedMatch?.loserTeamId].includes(team.id)
+  const extractIdFromApiUrl = (url: string) => parseInt(url.split("/").pop() || "");
+  const winnerTeamId = extractIdFromApiUrl(selectedMatch?.winnerTeam);
+  const loserTeamId = extractIdFromApiUrl(selectedMatch?.loserTeam);
+
+  const matchTeams = teams.filter((team) =>
+    [winnerTeamId, loserTeamId].includes(team.id)
   );
 
   useEffect(() => {
@@ -80,7 +84,7 @@ export const GoalDialog: React.FC<GoalDialogProps> = ({
       playerId: selectedPlayerId,
       gameId,
       teamId: selectedTeamId,
-      vsTeamId: selectedMatch?.winnerTeamId === selectedTeamId ? selectedMatch?.loserTeamId : selectedMatch?.winnerTeamId,
+      vsTeamId: winnerTeamId === selectedTeamId ? loserTeamId : winnerTeamId,
       typeOfGoalId: goalTypeId,
     };
     try {

@@ -20,6 +20,7 @@ import { tournamentsPageRoute } from '~pages/tournaments'
 import { tournamentPageRoute } from '~pages/tournament'
 import { GenericLayout } from '~app/layout'
 import { playerTransferPagePageRoute } from '~pages/PlayerTransfer'
+import { dashboardMatchPageRoute } from '~pages/dashboardMatch'
 
 function BubbleError() {
   const error = useRouteError()
@@ -58,7 +59,7 @@ const router = createBrowserRouter([
   {
     path: '/dashboard',
     element: <DashboardLayout />,
-    children: [dashboardPageRoute, playerTransferPagePageRoute], 
+    children: [dashboardPageRoute, playerTransferPagePageRoute, dashboardMatchPageRoute], 
   }
 ])
 

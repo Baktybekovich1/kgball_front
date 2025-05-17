@@ -9,7 +9,7 @@ export const TeamsPage: React.FC = () => {
   const [bestTeams, setBestTeams] = useState<any[]>([]); 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [viewMode, setViewMode] = useState<"cards" | "table">("cards");
+  const [viewMode, setViewMode] = useState<"cards" | "table">("table");
 
   useEffect(() => {
     apiClient.get("/api/teams")

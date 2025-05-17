@@ -22,8 +22,13 @@ export const AssistDialog: React.FC<AssistDialogProps> = ({
   const [players, setPlayers] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
-  const matchTeams = teams.filter(
-    (team) => team.id === selectedMatch?.winnerTeamId || team.id === selectedMatch?.loserTeamId
+
+  const extractIdFromApiUrl = (url: string) => parseInt(url.split("/").pop() || "");
+  const winnerTeamId = extractIdFromApiUrl(selectedMatch?.winnerTeam);
+  const loserTeamId = extractIdFromApiUrl(selectedMatch?.loserTeam);
+
+  const matchTeams = teams.filter((team) =>
+    [winnerTeamId, loserTeamId].includes(team.id)
   );
 
   useEffect(() => {
@@ -138,12 +143,12 @@ export const AssistDialog: React.FC<AssistDialogProps> = ({
             label="Гол"
           >
             {selectedTeamId && (
-              (selectedTeamId === selectedMatch?.winnerTeamId ? 
+              (selectedTeamId === winnerTeamId ? 
                 [...goals.winnerTeamGoals] : 
                 [...goals.loserTeamGoals])
                 .filter(goal => !goal.assistId) //Фильтр для ассистов
                 .length > 0 ? (
-                  (selectedTeamId === selectedMatch?.winnerTeamId ? 
+                  (selectedTeamId === winnerTeamId ? 
                     [...goals.winnerTeamGoals] : 
                     [...goals.loserTeamGoals])
                     .filter(goal => !goal.assistId)// фильтр если ли уже ассист у гола

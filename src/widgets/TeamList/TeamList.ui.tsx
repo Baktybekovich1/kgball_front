@@ -42,44 +42,44 @@ export const TeamsList: React.FC<TeamsListProps> = ({ teams, viewMode }) => {
   } else {
     return (
       <table className="w-full table-auto border-collapse">
-        <thead>
-          <tr>
-            <th className="border-b-2 p-2 text-left">Команда</th>
-          </tr>
-        </thead>
-        <tbody>
-          {teams.map((team, index) => (
-            <tr key={team.id} className="border-b">
-              <td className="p-2">
-                <div className="flex items-center gap-6">
-                  <div className="text-xl text-bold">{index + 1}.</div>
-                  <div className="flex justify-between items-center w-full">
-                    <div className="flex max-md:flex-col max-md:items-baseline items-center">
-                      <img
-                        src={team.logo || defaultTeam}
-                        alt={team.title}
-                        className="w-12 h-12 rounded-full"
-                      />
-                      <Typography>{team.title}</Typography>
-                    </div>
-                    <div className="max-md:hidden">
-                      <Typography>Всего голов: {team.goals.length}</Typography>
-                      <Typography>Всего очков: {team.points}</Typography>
-                    </div>
-                    <Link
-                      className="text-blue hover:underline"
-                      to={pathKeys.teams.bySlug(String(team.id))}
-                      key={team.id}
-                    >
-                      Подробнее
-                    </Link>
-                  </div>
-                </div>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+  <thead>
+    <tr>
+      <th className="border-b-2 p-2 text-left">Команда</th>
+    </tr>
+  </thead>
+  <tbody>
+    {teams.map((team, index) => (
+      <tr key={team.id} className="border-b">
+        <td className="p-2">
+          <div className="grid grid-cols-3 items-center gap-4 max-md:flex max-md:justify-between max-md:items-start">
+            <div className="flex items-center gap-3">
+              <div className="text-xl font-bold text-right">{index + 1}.</div>
+              <img
+                src={team.logo || defaultTeam}
+                alt={team.title}
+                className="w-12 h-12 rounded-full"
+              />
+              <Typography>{team.title}</Typography>
+            </div>
+
+            <div className="flex flex-col text-sm max-md:hidden">
+              <Typography>Всего голов: {team.goals.length}</Typography>
+              <Typography>Всего очков: {team.points}</Typography>
+            </div>
+
+            <Link
+              className="text-blue hover:underline text-right"
+              to={pathKeys.teams.bySlug(String(team.id))}
+            >
+              Подробнее
+            </Link>
+          </div>
+        </td>
+      </tr>
+    ))}
+  </tbody>
+</table>
+
     );
   }
 };

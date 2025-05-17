@@ -7,8 +7,6 @@ import { TeamDialog } from "~features/TeamDialog";
 import { TourneyDialog } from "~features/TourneyDialog";
 import { AddTourneyPrize } from "~features/AddTourneyPrize";
 import { MatchDialog } from "~features/MatchDialog";
-import { GoalDialog } from "~features/GoalDialog";
-import { AssistDialog } from "~features/AssistsDialog";
 
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -37,14 +35,10 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
   const [logo, setLogo] = useState<File | null>(null);
   const [previewLogo, setPreviewLogo] = useState<string | null>(null);
   const [matches, setMatches] = useState<any[]>([]);
-  const [goals, setGoals] = useState<any[]>([]);
-  const [assists, setAssists] = useState<any[]>([]);
 
   const [selectedTourney, setSelectedTourney] = useState<any>(null);
   const [selectedMatch, setSelectedMatch] = useState<any>(null);
-  const [selectedGoal, setSelectedGoal] = useState<any>(null);
   const [selectedPrize, setSelectedPrize] = useState<any>(null);
-  const [selectedAssist, setSelectedAssist] = useState<any>(null);
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
   const [playerDetails, setPlayerDetails] = useState<string | null>(null);
 
@@ -67,20 +61,10 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
   const [openMatchDialog, setOpenMatchDialog] = useState(false);
   const handleCloseMatchDialog = () => setOpenMatchDialog(false);
 
-  const [openGoalDialog, setOpenGoalDialog] = useState(false);
-  const handleCloseGoalDialog = () => setOpenGoalDialog(false);
-
-  const [openAssistsDialog, setOpenAssistsDialog] = useState(false);
-  const handleCloseAssistsDialog = () => setOpenAssistsDialog(false);
-
   useEffect(() => {
     apiClient.get("/api/teams").then((res) => setTeams(res.data));
   }, []);
 
-  useEffect(() => {
-    FetchSelectedMatch();
-  }, []);
-  
   const fetchMatches = useCallback(async (tourneyId: number) => {
     try {
       setLoading(true);
@@ -114,37 +98,6 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
     }
   }, [selectedTourney, activeTab, fetchMatches]); 
   
-  const fetchGoals = useCallback(async (matchId: string) => {
-    try {
-      const response = await apiClient.get(`/game/goals/${matchId}`);
-      setGoals(response.data);
-    } catch (error) {
-      console.error("Ошибка при получении голов:", error);
-      toast.error("Не удалось загрузить голы");
-    }
-  }, []);
-
-  const fetchAssists = useCallback(async (matchId: string) => {
-    try {
-      const response = await apiClient.get(`/game/assists/${matchId}`);
-      setAssists(response.data);
-      console.log(response.data);
-    } catch (error: any) {
-      console.error("Ошибка при получении ассистов:", error?.response?.data || error.message);
-      toast.error("Не удалось загрузить ассисты");
-    }
-  }, []);
-  
-  const FetchSelectedMatch = () => {
-    const savedMatch = localStorage.getItem("selectedMatch");
-      if (savedMatch) {
-          const parsedMatch = JSON.parse(savedMatch); // Парсим строку в объект
-          fetchGoals(parsedMatch.gameId);
-          fetchAssists(parsedMatch.gameId);
-          setSelectedMatch(parsedMatch); // Передаём объект
-      }
-  };
-
   const handleSelectMatch = (match: any | null) => {
       if (!match) {
           setSelectedMatch(null);
@@ -153,7 +106,6 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
       }
       setSelectedMatch(match);
       localStorage.setItem("selectedMatch", JSON.stringify(match)); // Сохраняем объект в строку
-      FetchSelectedMatch();
   };
   
   const fetchTeamDetails = useCallback(async (teamId: string) => {
@@ -260,42 +212,6 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
       toast.error("Не удалось удалить матч или его голы");
     }
   }, [setMatches]);
-
-  const handleDeleteGoal = useCallback((goalId: string) => {
-    if (window.confirm("Вы уверены, что хотите удалить этот гол?")) {
-      apiClient.delete(`/api/admin/goal/remove/${goalId}`)
-        .then(() => {
-          // После успешного удаления получаем актуальные данные
-          const gameId = selectedMatch?.gameId;
-          if (gameId) {
-            fetchGoals(gameId); // Перезагружаем голы для матча
-          }
-          toast.success("Гол удален успешно");
-        })
-        .catch((error) => {
-          console.error("Ошибка при удалении гола:", error);
-          toast.error("Не удалось удалить гол");
-        });
-    }
-  }, [selectedMatch, fetchGoals]);
-
-  const handleDeleteAssist = useCallback((assistId: string) => {
-    if (window.confirm("Вы уверены, что хотите удалить этот ассист?")) {
-      apiClient.delete(`/api/admin/assist/remove/${assistId}`)
-        .then(() => {
-          // После успешного удаления получаем актуальные данные
-          const gameId = selectedMatch?.gameId;
-          if (gameId) {
-            fetchAssists(gameId); // Перезагружаем ассисты для матча
-          }
-          toast.success("Ассист удален успешно");
-        })
-        .catch((error) => {
-          console.error("Ошибка при удалении ассиста:", error);
-          toast.error("Не удалось удалить ассист");
-        });
-    }
-  }, [selectedMatch, fetchGoals]);
   
   const handleEditTeam = (team: any) => {
     setSelectedTeam(team);
@@ -334,15 +250,6 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
         setOpenMatchDialog={setOpenMatchDialog}
         setSelectedMatch={setSelectedMatch}
         handleDeleteMatch={handleDeleteMatch}
-        selectedMatch={selectedMatch}
-        goals={goals}
-        setOpenGoalDialog={setOpenGoalDialog}
-        handleDeleteGoal={handleDeleteGoal}
-        setSelectedGoal={setSelectedGoal}
-        assists={assists}
-        setOpenAssistsDialog={setOpenAssistsDialog}
-        setSelectedAssist={setSelectedAssist}
-        handleDeleteAssist={handleDeleteAssist}
         handleSelectMatch={handleSelectMatch}
         setSelectedPrize={setSelectedPrize}
       />
@@ -380,25 +287,6 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
         selectedMatch={selectedMatch}
         tourneyId={selectedTourney?.id}
         teams={teams}
-      />
-      <GoalDialog 
-        open={openGoalDialog}
-        onClose={handleCloseGoalDialog}
-        gameId={selectedMatch?.gameId}
-        teams={teams}
-        setMatches={setMatches} 
-        selectedMatch={selectedMatch} 
-        selectedGoal={selectedGoal}
-      />
-      <AssistDialog 
-        open={openAssistsDialog}
-        onClose={handleCloseAssistsDialog}
-        gameId={selectedMatch?.gameId}
-        setMatches={setMatches} 
-        selectedMatch={selectedMatch} 
-        goals={goals}
-        teams={teams}
-        selectedAssist={selectedAssist}
       />
     </Box>
   );

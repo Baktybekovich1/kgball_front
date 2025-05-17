@@ -10,6 +10,9 @@ export const pathKeys = {
     playerTransfer() {
       return pathKeys.dashboard.root() + '/transfer';
     },
+    dashboardMatch(id: string) {
+      return pathKeys.dashboard.root() + '/match/' + id;
+    },
   },
   signIn() {
     return pathKeys.root + 'login';

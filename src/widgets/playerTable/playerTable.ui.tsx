@@ -17,12 +17,15 @@ export const PlayerTable = ({ players }: { players: any[] }) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {players.map(player => (
+          {players.map((player, index) => (
             <TableRow key={player.playerId}>
               <TableCell>
-                {player.playerName 
-                  ? `${player.playerName}`
-                  : player.name}
+                <div className="flex gap-1">
+                  <p className="font-bold">{index + 1}.</p>
+                  {player.playerName 
+                    ? `${player.playerName}`
+                    : player.name}
+                </div>
               </TableCell>
               {hasTeamColumn && <TableCell>{player.teamTitle || "-"}</TableCell>}
               <TableCell>{player.goals} ({player.assists})</TableCell>
