@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
-import { Container, Card, Box, Typography, Button, CircularProgress } from "@mui/material";
+import { Container, Card, Box, Typography, Button, CircularProgress, Divider } from "@mui/material";
 import { apiClient } from "~shared/lib/api";
 import { toast } from "react-toastify";
 import { GoalDialog } from "~features/GoalDialog";
@@ -20,6 +20,7 @@ export const DashboardMatchPage: React.FC = () => {
   const [selectedGoal, setSelectedGoal] = useState<any>(null);
   const [selectedAssist, setSelectedAssist] = useState<any>(null);
   const [matches, setMatches] = useState<any[]>([]);
+  const [score, setScore] = useState<any[]>([]);
 
   const [openGoalDialog, setOpenGoalDialog] = useState(false);
   const handleCloseGoalDialog = () => setOpenGoalDialog(false);
@@ -32,7 +33,6 @@ export const DashboardMatchPage: React.FC = () => {
         apiClient.get(`/api/games/${id}`)
           .then(response => {
             if (response.data && typeof response.data === 'object') {
-              console.log(response.data);
               setSelectedMatch(response.data);
             } else {
               setError("Неверный формат данных от сервера");
@@ -41,6 +41,18 @@ export const DashboardMatchPage: React.FC = () => {
           .catch(error => {
             console.error("API Error:", error);
             setError("Ошибка загрузки данных матча");
+          });
+        apiClient.get(`/game/scores/${id}`)
+          .then(response => {
+            if (response.data && typeof response.data === 'object') {
+              setScore(response.data);
+            } else {
+              setError("Неверный формат данных от сервера");
+            }
+          })
+          .catch(error => {
+            console.error("API Error:", error);
+            setError("Ошибка загрузки данных cчета");
           });
       }
   }, [id]);
@@ -170,9 +182,9 @@ export const DashboardMatchPage: React.FC = () => {
     <Container className="max-w-[1440px] mb-10">
       {selectedMatch && (
         <Box className="mt-10">
-          <div className="flex justify-between max-md:flex-col">
+          <div className="flex justify-between max-md:flex-col mb-8">
              <Link to={pathKeys.dashboard.root()} 
-              className="max-md:p-1 bg-dove mb-1 p-2 rounded text-white inline-block text-blue hover:underline text-base max-md:text-sm">
+              className="max-md:p-1 bg-dove p-2 max-md:mb-2 rounded text-white inline-block text-blue hover:underline text-base max-md:text-sm">
               <ArrowBackIcon /> Назад
             </Link>
             <div className="flex gap-2">
@@ -180,12 +192,16 @@ export const DashboardMatchPage: React.FC = () => {
               <Button className="bg-tundora text-white text-base max-md:text-xs" onClick={() => handleAddAssist()}>Добавить Ассисты</Button>
             </div>
           </div>
+          <Typography variant="h6" className="text-3xl max-md:text-xl justify-center flex " fontWeight="bold">
+              {score.loserTeamScore} vs {score.winnerTeamScore}
+          </Typography>
            {[
-              { title: "Голы", data: goals, key: "TeamGoals", action: handleDeleteGoal },
-              { title: "Ассисты", data: assistsWithTeamTitles, key: "TeamAssists", action: handleDeleteAssist }
-            ]
-            .map(({ title, data, key, action }) => data && (
-              <div key={title} className="flex flex-col mt-8 gap-4">
+            { title: "Голы", data: goals, key: "TeamGoals", action: handleDeleteGoal },
+            { title: "Ассисты", data: assistsWithTeamTitles, key: "TeamAssists", action: handleDeleteAssist }
+          ]
+          .map(({ title, data, key, action }, index, array) => data && (
+            <React.Fragment key={title}>
+              <div className="flex flex-col mb-8 gap-4">
                 <Typography variant="h6" className="text-xl max-md:text-sm" fontWeight="bold">{title}:</Typography>
                 <div className="flex max-md:flex-col gap-6 justify-between">
                   {["winner", "loser"].map(teamType => {
@@ -193,18 +209,20 @@ export const DashboardMatchPage: React.FC = () => {
                     const teamTitle = data[`${teamType}TeamTitle`];
                     return (
                       <div key={teamType} className="w-full">
-                        <Typography variant="subtitle1" fontWeight="bold" className="mb-2 text-xl max-md:text-sm text-center">{teamTitle}</Typography>
+                        <Typography variant="subtitle1" fontWeight="bold" className="mb-2 text-xl max-md:text-base text-center">{teamTitle}</Typography>
                         {teamData.length ? (
                           <ul>
                             {teamData.map((item, index) => (
                               <li key={item.id || index} className="mb-2">
-                                <Card sx={{ padding: 2, boxShadow: 3, borderRadius: 2 }}>
-                                  <Typography className="max-md:text-base text-md font-semibold text-gray-800">
-                                    {title === "Голы" ? item.goalAuthor?.playerName : item.assistAuthor?.playerName || "Неизвестен"} ({title.slice(0, -1)})
-                                  </Typography>
-                                  <Typography variant="body2" color="textSecondary">
-                                    {title === "Голы" ? `Ассист: ${item.assistAuthor?.playerName || "Нет"}` : `Гол: ${item.goalAuthorName || "Нет"}`}
-                                  </Typography>
+                                <Card sx={{ padding: 2, boxShadow: 2, borderRadius: 2 }} className="flex justify-between max-md:flex-col">
+                                  <div className="max-md:mb-1">
+                                    <Typography className="max-md:text-base text-md font-semibold text-gray-800">
+                                      {title === "Голы" ? item.goalAuthor?.playerName : item.assistAuthor?.playerName || "Неизвестен"} ({title.slice(0, -1)})
+                                    </Typography>
+                                    <Typography variant="body2" color="textSecondary">
+                                      {title === "Голы" ? `Ассист: ${item.assistAuthor?.playerName || "Нет"}` : `Гол: ${item.goalAuthorName || "Нет"}`}
+                                    </Typography>
+                                  </div>
                                   <div className="flex max-md:flex-col justify-end gap-2 mt-1">
                                     <Button className="text-sm" onClick={() => (title === "Голы" ? handleEditGoal : handleEditAssist)(item)} sx={{ backgroundColor: "#ff9800", color: "white", padding: 1 }}>Редактировать</Button>
                                     <Button
@@ -229,8 +247,9 @@ export const DashboardMatchPage: React.FC = () => {
                   })}
                 </div>
               </div>
-            ))}
-
+              {index < array.length - 1 && <Divider className="my-4" />}
+            </React.Fragment>
+          ))}
         </Box>
       )}
       <GoalDialog 
