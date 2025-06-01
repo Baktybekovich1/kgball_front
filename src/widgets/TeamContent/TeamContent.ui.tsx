@@ -149,29 +149,36 @@ export const RenderContent: React.FC<RenderContentProps> = ({
       return matches ? (
         <Box className="grid grid-cols-2 max-md:grid-cols-1 gap-4">
           {matches.map((match, index) => (
-            <Link to={pathKeys.matches.bySlug(String(match.id))}>
-              <div>
-                <span className="max-md:text-md font-semibold text-xl">{match.tourney.title}</span> 
-                <div className="border mt-4 p-5 rounded-md block">
-                  <Box className="flex items-center justify-between">
-                    <div className="flex flex-col items-center">
-                      <span className="text-lg font-semibold">{match.loserTeam.name}</span>
-                    </div>
-                    <span className="text-md">{match.tourney.date}</span>
-                    <div className="flex flex-col items-center">
-                      <span className="text-lg font-semibold">{match.winnerTeam.name}</span>
-                    </div>
-                  </Box>
-                  <Box className="flex justify-between">
-                    <span className="text-md">Счет: {match.loserTeam.goalTotalInGame}</span>
-                    <span className="text-md">Счет: {match.winnerTeam.goalTotalInGame}</span>
-                  </Box>
-                </div>
+            <Link 
+              to={pathKeys.matches.bySlug(String(match.id))} 
+              key={match.id} 
+              className="hover:scale-[1.01] transition-transform duration-200"
+            >
+              <div className="bg-white border border-gray-200 rounded-2xl shadow-md p-4 hover:shadow-lg transition-shadow duration-300">
+                <span className="block text-primary font-bold text-xl max-md:text-lg mb-2 text-center">
+                  {match.tourney.title}
+                </span>
+
+                <Box className="flex justify-between items-center text-center">
+                  <div className="flex flex-col items-center w-1/3">
+                    <span className="font-semibold text-lg text-gray-800">{match.loserTeam.name}</span>
+                    <span className="text-sm text-red-600">Счет: {match.loserTeam.goalTotalInGame}</span>
+                  </div>
+
+                <Box className="flex flex-col items-center justify-between mb-2 text-sm text-gray-500">
+                  <span className="text-2xl font-bold text-gray-600">vs</span>
+                  <span>{match.tourney.date}</span>
+                </Box>
+
+                  <div className="flex flex-col items-center w-1/3">
+                    <span className="font-semibold text-lg text-gray-800">{match.winnerTeam.name}</span>
+                    <span className="text-sm text-green-600">Счет: {match.winnerTeam.goalTotalInGame}</span>
+                  </div>
+                </Box>
               </div>
             </Link>
           ))}
         </Box>
-
       ) : null;
     case "лучшие":
       return team ? (

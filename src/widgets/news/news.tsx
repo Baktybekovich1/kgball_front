@@ -3,18 +3,19 @@ import { useState, useEffect } from "react";
 import { apiClient } from "~shared/lib/api";
 import { pathKeys } from "~shared/lib/react-router";
 import { Link } from "react-router-dom";
+import { Calendar} from 'lucide-react';
 
 export const News: React.FC = () => {
-  const [tournaments, setTournaments] = useState<any[]>([]);
+  const [matches, setMatches] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    apiClient.get("api/tourneys")
+    apiClient.get("game/all_games")
       .then(response => {
         console.log("API Response:", response.data);
         if (response.data && Array.isArray(response.data)) {
-          setTournaments(response.data);
+          setMatches(response.data);
         } else {
           setError("Некорректный формат данных от сервера");
         }
@@ -22,7 +23,7 @@ export const News: React.FC = () => {
       })
       .catch(error => {
         console.error("API Error:", error);
-        setError("Ошибка загрузки списка турниров");
+        setError("Ошибка загрузки списка матчей");
         setLoading(false);
       });
   }, []);
@@ -30,49 +31,42 @@ export const News: React.FC = () => {
   if (loading) return <Typography>Загрузка...</Typography>;
   if (error) return <Typography color="error">{error}</Typography>;
 
-  const latestTournaments = tournaments.slice(0, 3);
+  const lastMatches = matches.slice(0, 3);
 
   return (
-    <Container className="max-w-[1440px]">
-      <Typography className="text-2xl bold-500 mb-5">Последние турниры</Typography>
-      <Box className="grid gap-4 grid-cols-2 justify-center max-md:gap-0 max-md:grid-cols-1">
-        {latestTournaments.map((tournament, index) => (
-          <Link className="w-full" to={pathKeys.tournaments.bySlug(String(tournament.id))} key={index}>
-            <Paper
-              key={index}
-              sx={{
-                mb: 4, 
-                p: 3,
-                borderRadius: 2,
-                boxShadow: 3,
-                backgroundColor: "#f1f1f1",
-                transition: "transform 0.3s ease, box-shadow 0.3s ease",
-                "&:hover": {
-                  transform: "translateY(-10px)",
-                  boxShadow: 6,
-                },
-              }}
-              className="w-full"
+    <Container className="max-w-[1440px] mb-10 max-md:mb-5">
+      <Box className="mb-12 p-6 rounded-xl shadow-lg bg-white">
+        <div className="flex items-center mb-5">
+          <Calendar className="w-6 h-6 text-blue-500 mr-2" />
+          <h2 className="text-2xl font-bold">Последние матчи</h2>
+        </div>
+        <div className="grid gap-4 grid-cols-3 max-md:grid-cols-1 " >
+          {lastMatches.map((match, index) => (
+            <Link
+              to={pathKeys.matches.bySlug(String(match.gameId))}
+              className="block duration-300 rounded-xl p-4 border border-gray"
             >
-              <Box mb={2}>
-                <Typography variant="h6" sx={{ fontWeight: "bold", color: "#2C3E50", mb: 1 }}>
-                  {tournament.title}
+              <Box className="flex items-center justify-between">
+                <Typography className="font-medium text-gray-700 text-lg w-1/3">
+                  {match.loserTeamTitle}
                 </Typography>
-                <Typography variant="body2" color="textSecondary">
-                  <strong>Дата:</strong> {tournament.date}
+
+                <div className="flex flex-col items-center w-1/3">
+                  <div className="text-sm text-gray-500 mb-1">Счёт</div>
+                  <div className="flex items-center gap-2 text-xl font-bold text-gray-800">
+                    <span>{match.loserTeamScore}</span>
+                    <span className="text-red-500">:</span>
+                    <span>{match.winnerTeamScore}</span>
+                  </div>
+                </div>
+
+                <Typography className="font-medium text-gray-700 text-lg text-right w-1/3">
+                  {match.winnerTeamTitle}
                 </Typography>
               </Box>
-              <Box className="flex max-md:flex-col gap-2">
-                <Typography variant="body2" sx={{ color: "#7F8C8D" }}>
-                  <strong>Всего матчей:</strong> {tournament.games.length}
-                </Typography>
-                <Typography variant="body2" sx={{ color: "#7F8C8D" }}>
-                  <strong>Всего команд:</strong> {tournament.teamsSum}
-                </Typography>
-              </Box>
-            </Paper>
-          </Link>
-        ))}
+            </Link>
+          ))}
+        </div>
       </Box>
     </Container>
   );

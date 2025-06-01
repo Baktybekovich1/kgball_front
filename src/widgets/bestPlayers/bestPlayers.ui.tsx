@@ -2,6 +2,7 @@ import { Container, Box, Typography, Select, MenuItem } from "@mui/material";
 import { useState, useEffect } from "react";
 import { apiClient } from "~shared/lib/api";
 import { PlayerCard } from '~widgets/playerCard/playerCard.ui';
+import { Star} from 'lucide-react';
 
 export const BestPlayers: React.FC = () => {
   const [players, setPlayers] = useState<any[]>([]);
@@ -54,10 +55,6 @@ export const BestPlayers: React.FC = () => {
 
   return (
     <Container className="max-w-[1440px] mb-10">
-      <Typography className="max-md:text-base" variant="h4" fontWeight="bold" gutterBottom align="center">
-        Лучшие игроки
-      </Typography>
-
       <Box className="mb-4 flex max-md:justify-center">
         <Select
           value={selectedCategory}
@@ -71,24 +68,37 @@ export const BestPlayers: React.FC = () => {
         </Select>
       </Box>
 
-      <Typography className="text-xl max-md:text-[16px]" fontWeight="bold" gutterBottom>
-        {selectedCategory === "bombers" && "Топ 3 бомбардиров"}
-        {selectedCategory === "assistants" && "Топ 3 ассистентов"}
-        {selectedCategory === "all" && "Топ 3 игроков по общим очкам"}
-      </Typography>
 
-      <Box className="flex max-md:flex-col gap-4 justify-center">
-        {selectedPlayers.map((player, index) => (
-          <Box className="w-full" key={player.playerId}>
-            <Typography className="mt-2" variant="body2" fontWeight="bold">
-              {index + 1} место
-            </Typography>
-            <PlayerCard player={player} />
-            <Typography className="mt-2" variant="body2" color="textSecondary">
-              Голы: {player.goals}, Ассисты: {player.assists}
-            </Typography>
-          </Box>
-        ))}
+      <Box className="">
+        <div
+          className={`mb-12 p-6 rounded-xl shadow-lg`}
+        >
+          <div className="flex items-center mb-6">
+            <Star className="w-6 h-6 text-blue-500 mr-2" />
+            <h2 className="text-2xl font-bold">
+              {selectedCategory === "bombers" && "Топ 3 бомбардиров"}
+              {selectedCategory === "assistants" && "Топ 3 ассистентов"}
+              {selectedCategory === "all" && "Топ 3 игроков по общим очкам"}
+            </h2>
+          </div>
+          <div className="grid grid-cols-3 gap-4 max-md:grid-cols-1">
+            {selectedPlayers.map((player, index) => (
+              <div
+                className={`p-4 rounded-lg`}
+              >
+                <Typography className="mt-2" variant="body2" fontWeight="bold">
+                  {index + 1} место
+                </Typography>
+                <PlayerCard player={player} />
+                <div className="text-sm text-gray-500">{player.team}</div>
+                  <div className="mt-2 flex justify-between">
+                    <span>Голы: {player.goals}</span>
+                    <span>Передачи: {player.assists}</span>
+                  </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </Box>
     </Container>
   );
