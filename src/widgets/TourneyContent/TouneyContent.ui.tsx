@@ -145,36 +145,39 @@ export const TourneyContent: React.FC<Props> = ({ selectedTab, matches, tourname
       );
     case "матчи":
       return (
-        <div className="w-full">
-        <Typography className="mb-4" variant="h5">Матчи</Typography>
-        {matches.map((match, index) => (
-          <div className="mb-4" key={index}>
+        <div className="w-full grid gap-5 grid-cols-1 md:grid-cols-2">
+          {matches.map((match, index) => (
             <Link
+              key={index}
               to={pathKeys.matches.bySlug(String(match.gameId))}
-              className="block bg-[#ddd] shadow-md hover:shadow-lg duration-300 rounded-xl p-4 border border-gray-200"
+              className="block bg-gradient-to-r from-blue-100 to-blue-50 hover:from-blue-200 hover:to-blue-100 duration-200 rounded-2xl p-6 shadow-md border border-blue-200 group"
+              style={{ textDecoration: 'none' }}
             >
-              <Box className="flex items-center justify-between">
-                <Typography className="font-medium text-gray-700 text-lg w-1/3">
-                  {match.loserTeamTitle}
-                </Typography>
-
-                <div className="flex flex-col items-center w-1/3">
-                  <div className="text-sm text-gray-500 mb-1">Счёт</div>
-                  <div className="flex items-center gap-2 text-xl font-bold text-gray-800">
-                    <span>{match.loserTeamGoals}</span>
-                    <span className="text-red-500">:</span>
-                    <span>{match.winnerTeamGoals}</span>
+              <Box className="flex flex-col gap-3 items-center">
+                <Box className="flex w-full items-center justify-between">
+                  <Typography className="font-semibold text-blue-900 text-lg text-left w-2/5 truncate">
+                    {match.loserTeamTitle}
+                  </Typography>
+                  <div className="flex flex-col items-center w-1/5">
+                    <div className="text-xs text-blue-500 mb-1 font-medium uppercase tracking-wider">Счёт</div>
+                    <div className="flex items-center gap-2 text-2xl font-extrabold text-blue-800">
+                      <span>{match.loserTeamGoals}</span>
+                      <span className="text-red-500 text-2xl">:</span>
+                      <span>{match.winnerTeamGoals}</span>
+                    </div>
                   </div>
-                </div>
-
-                <Typography className="font-medium text-gray-700 text-lg text-right w-1/3">
-                  {match.winnerTeamTitle}
-                </Typography>
+                  <Typography className="font-semibold text-blue-900 text-lg text-right w-2/5 truncate">
+                    {match.winnerTeamTitle}
+                  </Typography>
+                </Box>
+                <Box className="flex w-full justify-between text-xs text-blue-700 opacity-80 mt-2">
+                  <span>Дата: {match.date ? new Date(match.date).toLocaleDateString() : '-'}</span>
+                  <span>Игра #{match.gameId}</span>
+                </Box>
               </Box>
             </Link>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
       );
     default:
       return null;

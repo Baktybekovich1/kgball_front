@@ -7,7 +7,7 @@ export const Header: React.FC = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
 
   return (
-    <header className='bg-alto r-sm:mb-0 mb-10'>
+    <header className="bg-gradient-to-r from-blue-600 to-blue-400 shadow-lg rounded-b-2xl mb-10 py-2">
       <Container className="max-w-[1440px]">
         <Navigate />
       </Container>

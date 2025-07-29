@@ -50,31 +50,50 @@ export const Navigate: React.FC = () => {
         <Typography
           component={Link}
           to={pathKeys.home()}
-          sx={{ fontWeight: 'bold', fontSize: '1.5rem', color: 'black', textDecoration: 'none' }}
+          sx={{ fontWeight: 700, fontSize: '1.3rem', color: '#2563eb', textDecoration: 'none', letterSpacing: 1 }}
         >
           KYRGYZBALL
         </Typography>
 
         {isMobile ? (
           <>
-            <IconButton edge="start" color="inherit" onClick={toggleDrawer(true)}>
-              <MenuIcon sx={{ color: 'black' }} />
+            <IconButton edge="start" onClick={toggleDrawer(true)} sx={{ background: '#2563eb', color: '#fff', p: 1.2, borderRadius: 2, boxShadow: '0 2px 8px rgba(37,99,235,0.15)' }}>
+              <MenuIcon sx={{ color: '#fff', fontSize: 32 }} />
             </IconButton>
-            <Drawer anchor="right" open={open} onClose={toggleDrawer(false)}>
-              <List sx={{ width: 250 }}>
+            <Drawer
+              anchor="right"
+              open={open}
+              onClose={toggleDrawer(false)}
+              PaperProps={{
+                sx: {
+                  background: '#2563eb',
+                  color: '#fff',
+                  width: 260,
+                  p: 0,
+                  boxShadow: '0 4px 24px rgba(37,99,235,0.18)'
+                }
+              }}
+            >
+              <List sx={{ width: 260, p: 0 }}>
                 {listLink.map((item, index) => (
-                  <ListItem key={index} onClick={toggleDrawer(false)}>
+                  <ListItem key={index} onClick={toggleDrawer(false)} sx={{ p: 0 }}>
                     <ListItemText>
                       <Link
                         to={item.url}
                         style={{
                           textDecoration: 'none',
-                          color: 'black',
+                          color: '#fff',
                           width: '100%',
                           display: 'block',
-                          padding: '8px 16px',
-                          backgroundColor: location.pathname === item.url ? '#f0f0f0' : 'white',
+                          padding: '14px 24px',
+                          borderRadius: 0,
+                          fontWeight: 500,
+                          fontSize: 17,
+                          background: location.pathname === item.url ? '#1e40af' : 'transparent',
+                          transition: 'all 0.2s',
                         }}
+                        onMouseOver={e => e.currentTarget.style.background = '#3b82f6'}
+                        onMouseOut={e => e.currentTarget.style.background = location.pathname === item.url ? '#1e40af' : 'transparent'}
                       >
                         {item.title}
                       </Link>
@@ -82,11 +101,23 @@ export const Navigate: React.FC = () => {
                   </ListItem>
                 ))}
                 {isAuthenticated && (
-                  <ListItem onClick={toggleDrawer(false)}>
+                  <ListItem onClick={toggleDrawer(false)} sx={{ p: 0 }}>
                     <ListItemText>
                       <Button
                         onClick={handleLogout}
-                        sx={{ padding: '8px 18px', color: 'black' }}
+                        sx={{
+                          width: '100%',
+                          padding: '14px 24px',
+                          background: 'rgba(255,255,255,0.12)',
+                          color: '#fff',
+                          fontWeight: 600,
+                          borderRadius: 0,
+                          fontSize: 16,
+                          boxShadow: 'none',
+                          textAlign: 'left',
+                          transition: 'all 0.2s',
+                          '&:hover': { background: 'rgba(255,255,255,0.22)' }
+                        }}
                       >
                         Выйти
                       </Button>
@@ -97,7 +128,7 @@ export const Navigate: React.FC = () => {
             </Drawer>
           </>
         ) : (
-          <Box sx={{ display: 'flex', gap: 2 }}>
+          <Box sx={{ display: 'flex', gap: 1.5 }}>
             {listLink.map((item, index) => (
               <Typography
                 component={Link}
@@ -105,16 +136,17 @@ export const Navigate: React.FC = () => {
                 key={index}
                 sx={{
                   textDecoration: 'none',
-                  color: 'black',
-                  padding: '8px 16px',
-                  borderRadius: '20px',
-                  border: '1px solid #E4E4E7',
-                  transition: 'all 0.3s ease',
-                  backgroundColor: location.pathname === item.url ? 'primary.main' : 'white',
-                  color: location.pathname === item.url ? 'white' : 'black',
+                  color: '#fff',
+                  padding: '8px 18px',
+                  borderRadius: 8,
+                  fontWeight: 500,
+                  fontSize: 15,
+                  background: location.pathname === item.url ? '#1e40af' : '#2563eb',
+                  boxShadow: location.pathname === item.url ? '0 2px 8px rgba(30,64,175,0.12)' : 'none',
+                  transition: 'all 0.2s',
                   '&:hover': {
-                    backgroundColor: 'primary.main',
-                    color: 'white',
+                    background: '#3b82f6',
+                    color: '#fff',
                   },
                 }}
               >
@@ -124,8 +156,19 @@ export const Navigate: React.FC = () => {
             {isAuthenticated && (
               <Button
                 onClick={handleLogout}
-                className="bg-white p-2 text-black font-semibold rounded-lg transition"
-                sx={{ marginLeft: '20px' }}
+                sx={{
+                  marginLeft: '12px',
+                  padding: '8px 18px',
+                  background: '#f3f4f6',
+                  color: '#222',
+                  fontWeight: 500,
+                  borderRadius: 8,
+                  fontSize: 15,
+                  border: '1px solid #e0e7ef',
+                  boxShadow: 'none',
+                  transition: 'all 0.2s',
+                  '&:hover': { background: '#e0e7ef' }
+                }}
               >
                 Выйти
               </Button>

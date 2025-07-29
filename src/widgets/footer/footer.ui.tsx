@@ -14,24 +14,51 @@ export const Footer: React.FC = () => {
   };
 
   return (
-    <footer className="mt-auto bg-[#5640C9] py-6 border-t border-gray-700 text-white">
+    <footer className="mt-auto bg-[#2563eb] py-6 text-white">
       <Container className="max-w-[1440px]">
-        <Box className="flex justify-between">
+        <Box className="flex justify-between items-center">
           <Typography
             component={Link}
             to="/"
-            sx={{ fontWeight: 'bold', fontSize: '1.5rem', color: 'white', textDecoration: 'none' }}
+            sx={{ fontWeight: 'bold', fontSize: '1.5rem', color: 'white', textDecoration: 'none', letterSpacing: 1 }}
           >
             KYRGYZBALL
           </Typography>
           {isAuthenticated ? (
-            <Button onClick={handleLogout} className="bg-white p-2 text-black font-semibold rounded-lg transition">
+            <Button
+              onClick={handleLogout}
+              sx={{
+                background: 'rgba(255,255,255,0.12)',
+                color: 'white',
+                fontWeight: 600,
+                borderRadius: 2,
+                px: 3,
+                py: 1.5,
+                fontSize: 16,
+                boxShadow: 'none',
+                transition: 'all 0.2s',
+                '&:hover': { background: 'rgba(255,255,255,0.22)' }
+              }}
+            >
               Выйти
             </Button>
           ) : (
-            <Link 
-              to="/login" 
-              className="bg-white p-2 text-black font-semibold rounded-lg transition"
+            <Link
+              to="/login"
+              style={{
+                background: 'rgba(255,255,255,0.12)',
+                color: 'white',
+                fontWeight: 600,
+                borderRadius: 6,
+                padding: '8px 24px',
+                fontSize: 16,
+                textDecoration: 'none',
+                transition: 'all 0.2s',
+                boxShadow: 'none',
+                display: 'inline-block',
+              }}
+              onMouseOver={e => e.currentTarget.style.background = 'rgba(255,255,255,0.22)'}
+              onMouseOut={e => e.currentTarget.style.background = 'rgba(255,255,255,0.12)'}
             >
               Войти
             </Link>

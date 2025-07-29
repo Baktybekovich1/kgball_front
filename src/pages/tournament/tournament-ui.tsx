@@ -81,54 +81,54 @@ export const TournamentPage: React.FC = () => {
   if (error) return <Typography color="error">{error}</Typography>;
 
   return (
-    <Container className="max-w-[1440px] font-sans mb-10">
+    <Container className="max-w-[1100px] font-sans mb-10">
       {tournament ? (
-        <div className="flex flex-col items-center justify-center max-md:px-2 max-md:py-2 px-4 py-8">
-          <Box className="flex max-md:flex-col max-md:gap-1 max-md:mb-0 w-full gap-5 justify-between items-center mb-4">
-            <Link to={pathKeys.matches.root()} className="max-md:p-1 bg-dove mb-1 p-2 rounded text-white inline-block text-blue hover:underline">
-              <ArrowBackIcon className="max-md:text-xs"/> Назад
-            </Link>
+        <div className="flex flex-col items-center justify-center px-2 py-8">
+          <Box className="flex flex-col w-full gap-6 mb-8">
+            <div className="flex items-center gap-4">
+              <Link to={pathKeys.matches.root()} className="bg-blue-100 hover:bg-blue-200 text-blue-700 px-4 py-2 rounded-lg font-medium transition">
+                <ArrowBackIcon fontSize="small"/> Назад
+              </Link>
+            </div>
             {winner && (
-              <div>
+              <div className="flex flex-col items-center bg-white rounded-2xl shadow-lg p-6 border border-blue-100">
                 <img 
                   src={winner.teamLogo || defaultTeam} 
                   alt={winner.teamTitle || "Неизвестная команда"} 
-                  className="w-32 h-32 rounded-full border-2 border-gray-300 mx-auto sm:mx-0"
+                  className="w-28 h-28 rounded-full border-4 border-blue-200 mb-2 shadow"
                 />
-                <Typography className="max-md:text-xl text-bold text-[30px]">
-                  Победитель: {winner.teamTitle}
+                <Typography className="text-xl font-bold text-blue-800 mt-2">
+                  Победитель турнира: {winner.teamTitle}
                 </Typography>
               </div>
             )}
-            <br></br>
           </Box>
-
-          <Box className="w-full max-md:justify-center flex gap-4 mb-6 mt-4 flex-wrap">
+          <Box className="flex flex-wrap gap-3 justify-center mb-8">
             <Button
               variant={selectedTab === "обзор" ? "contained" : "outlined"}
               onClick={() => setSelectedTab("обзор")}
-              className="w-full max-w-[200px] mb-2 max-md:max-w-full"
+              sx={{ minWidth: 140, fontWeight: 600, borderRadius: 8, fontSize: 16, background: selectedTab === "обзор" ? '#2563eb' : '#fff', color: selectedTab === "обзор" ? '#fff' : '#2563eb', borderColor: '#2563eb', '&:hover': { background: '#1e40af', color: '#fff', borderColor: '#1e40af' } }}
             >
               Обзор
             </Button>
             <Button
               variant={selectedTab === "бомбардиры" ? "contained" : "outlined"}
               onClick={() => setSelectedTab("бомбардиры")}
-              className="w-full max-w-[200px] mb-2 max-md:max-w-full"
+              sx={{ minWidth: 140, fontWeight: 600, borderRadius: 8, fontSize: 16, background: selectedTab === "бомбардиры" ? '#2563eb' : '#fff', color: selectedTab === "бомбардиры" ? '#fff' : '#2563eb', borderColor: '#2563eb', '&:hover': { background: '#1e40af', color: '#fff', borderColor: '#1e40af' } }}
             >
               Бомбардиры
             </Button>
             <Button
               variant={selectedTab === "ассистенты" ? "contained" : "outlined"}
               onClick={() => setSelectedTab("ассистенты")}
-              className="w-full max-w-[200px] mb-2 max-md:max-w-full"
+              sx={{ minWidth: 140, fontWeight: 600, borderRadius: 8, fontSize: 16, background: selectedTab === "ассистенты" ? '#2563eb' : '#fff', color: selectedTab === "ассистенты" ? '#fff' : '#2563eb', borderColor: '#2563eb', '&:hover': { background: '#1e40af', color: '#fff', borderColor: '#1e40af' } }}
             >
               Ассистенты
             </Button>
             <Button
               variant={selectedTab === "результативные" ? "contained" : "outlined"}
               onClick={() => setSelectedTab("результативные")}
-              className="w-full max-w-[200px] mb-2 max-md:max-w-full"
+              sx={{ minWidth: 140, fontWeight: 600, borderRadius: 8, fontSize: 16, background: selectedTab === "результативные" ? '#2563eb' : '#fff', color: selectedTab === "результативные" ? '#fff' : '#2563eb', borderColor: '#2563eb', '&:hover': { background: '#1e40af', color: '#fff', borderColor: '#1e40af' } }}
             >
               Результативные
             </Button>
@@ -140,18 +140,19 @@ export const TournamentPage: React.FC = () => {
                   setSelectedTab("матчи");
                 }
               }}
-              className="w-full max-w-[200px] mb-2 max-md:max-w-full"
+              sx={{ minWidth: 140, fontWeight: 600, borderRadius: 8, fontSize: 16, background: selectedTab === "матчи" ? '#2563eb' : '#fff', color: selectedTab === "матчи" ? '#fff' : '#2563eb', borderColor: '#2563eb', '&:hover': { background: '#1e40af', color: '#fff', borderColor: '#1e40af' } }}
             >
               Матчи
             </Button>
           </Box>
-
-          <TourneyContent
-            selectedTab={selectedTab}
-            tournament={tournament}
-            playersData={playersData}
-            matches={matches}
-          />
+          <Box className="w-full bg-white rounded-2xl shadow-lg p-6 border border-blue-100">
+            <TourneyContent
+              selectedTab={selectedTab}
+              tournament={tournament}
+              playersData={playersData}
+              matches={matches}
+            />
+          </Box>
         </div>
       ) : (
         <Typography className="flex justify-center items-center h-64"><CircularProgress /></Typography>

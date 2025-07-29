@@ -68,48 +68,54 @@ export const MatchPage: React.FC = () => {
   if (error) return <Typography color="error">{error}</Typography>;
 
   return (
-    <Container className="max-w-[1440px] mb-10">
+    <Container className="max-w-[900px] mb-10">
       {match ? (
         <>
-          <Link to={pathKeys.matches.root()} className="max-md:p-1 bg-dove mb-1 p-2 rounded text-white inline-block text-blue hover:underline">
-            <ArrowBackIcon /> Назад
+          <Link to={pathKeys.matches.root()} className="inline-block mb-4 text-blue-700 hover:underline text-base font-medium">
+            <ArrowBackIcon fontSize="small" className="mr-1"/> Назад к матчам
           </Link>
-          <div className="flex justify-between items-center border p-4 rounded-md">
-            <div className="items-center">
-              <img src={match.loserTeamData.logo || DefaultAvatar} alt={match.loserTeamData.title} className="w-16 h-16" />
-              <h2 className="text-lg font-semibold">{match.loserTeamData.title}</h2>
-              <p className="text-xl">Счет: {scores.filter(score => score.loserTeamId === match.loserTeamData.id).reduce((sum, score) => sum + score.loserTeamScore, 0)}</p>
-            </div>
-            <div className="flex flex-col items-center">
-              <p className="text-xl font-bold">VS</p>
-            </div>
-            <div className="items-center">
-              <img src={match.winnerTeamData.logo || DefaultAvatar} alt={match.winnerTeamData.title} className="w-16 h-16" />
-              <h2 className="text-lg font-semibold">{match.winnerTeamData.title}</h2>
-              <p className="text-xl">Счет: {scores.filter(score => score.winnerTeamId === match.winnerTeamData.id).reduce((sum, score) => sum + score.winnerTeamScore, 0)}</p>
+          <div className="bg-white rounded-2xl shadow-lg p-6 mb-8 flex flex-col items-center">
+            <div className="flex w-full justify-between items-center gap-4">
+              <div className="flex flex-col items-center w-1/3">
+                <img src={match.loserTeamData.logo || DefaultAvatar} alt={match.loserTeamData.title} className="w-20 h-20 rounded-full border-2 border-blue-200 shadow mb-2" />
+                <h2 className="text-lg font-semibold text-blue-900 text-center truncate w-full">{match.loserTeamData.title}</h2>
+              </div>
+              <div className="flex flex-col items-center w-1/3">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-3xl font-bold text-blue-900">{scores.filter(score => score.loserTeamId === match.loserTeamData.id).reduce((sum, score) => sum + score.loserTeamScore, 0)}</span>
+                  <span className="text-3xl font-bold text-red-500">:</span>
+                  <span className="text-3xl font-bold text-blue-900">{scores.filter(score => score.winnerTeamId === match.winnerTeamData.id).reduce((sum, score) => sum + score.winnerTeamScore, 0)}</span>
+                </div>
+                <span className="text-xs text-blue-700 opacity-80">ID матча: {match.id}</span>
+                <span className="text-xs text-blue-700 opacity-80">Дата: {match.date ? new Date(match.date).toLocaleDateString() : '-'}</span>
+              </div>
+              <div className="flex flex-col items-center w-1/3">
+                <img src={match.winnerTeamData.logo || DefaultAvatar} alt={match.winnerTeamData.title} className="w-20 h-20 rounded-full border-2 border-blue-200 shadow mb-2" />
+                <h2 className="text-lg font-semibold text-blue-900 text-center truncate w-full">{match.winnerTeamData.title}</h2>
+              </div>
             </div>
           </div>
-          <Box className="flex max-md:flex-col gap-4 mb-6 mt-2">
+          <Box className="flex max-md:flex-col gap-2 mb-6 mt-2 w-full">
             <Button
               variant={selectedTab === "гол" ? "contained" : "outlined"}
               onClick={() => setSelectedTab("гол")}
-              fullWidth
+              sx={{ minWidth: 100, fontWeight: 500, borderRadius: 5, fontSize: 15, py: 1, px: 2, background: selectedTab === "гол" ? '#2563eb' : '#fff', color: selectedTab === "гол" ? '#fff' : '#2563eb', borderColor: '#2563eb', '&:hover': { background: '#1e40af', color: '#fff', borderColor: '#1e40af' } }}
             >
-              Гол
+              Голы
             </Button>
             <Button
               variant={selectedTab === "состав" ? "contained" : "outlined"}
               onClick={() => setSelectedTab("состав")}
-              fullWidth
+              sx={{ minWidth: 100, fontWeight: 500, borderRadius: 5, fontSize: 15, py: 1, px: 2, background: selectedTab === "состав" ? '#2563eb' : '#fff', color: selectedTab === "состав" ? '#fff' : '#2563eb', borderColor: '#2563eb', '&:hover': { background: '#1e40af', color: '#fff', borderColor: '#1e40af' } }}
             >
-              Состав
+              Составы
             </Button>
             <Button
               variant={selectedTab === "статистика" ? "contained" : "outlined"}
               onClick={() => setSelectedTab("статистика")}
-              fullWidth
+              sx={{ minWidth: 100, fontWeight: 500, borderRadius: 5, fontSize: 15, py: 1, px: 2, background: selectedTab === "статистика" ? '#2563eb' : '#fff', color: selectedTab === "статистика" ? '#fff' : '#2563eb', borderColor: '#2563eb', '&:hover': { background: '#1e40af', color: '#fff', borderColor: '#1e40af' } }}
             >
-              Статистика встреч
+              Статистика
             </Button>
           </Box>
 
