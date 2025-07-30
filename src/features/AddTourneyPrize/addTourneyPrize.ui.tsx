@@ -46,10 +46,10 @@ export const AddTourneyPrize: React.FC<AddTourneyPrizeProps> = ({ open, onClose,
       };
 
       if (selectedPrize) {
-        await apiClient.patch(`/api/admin/tourney/prizes/edit/${selectedPrize.prizesId}`, prizeData);
+        await apiClient.patch(`/api/admin/tourney/team/prizes/edit/${selectedPrize.prizesId}`, prizeData);
         toast.success("Призы обновлены успешно");
       } else {
-        await apiClient.post("/api/admin/tourney/prizes/add", prizeData);
+        await apiClient.post("/api/admin/tourney/team/prizes/add", prizeData);
         toast.success("Призы добавлены успешно");
       }
 
