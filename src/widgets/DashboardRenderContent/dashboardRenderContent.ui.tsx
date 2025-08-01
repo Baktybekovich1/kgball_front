@@ -1,4 +1,4 @@
-import { Box, Card, CardContent, Typography, CircularProgress, Button, Divider } from "@mui/material";
+import { Box, Card, CardContent, Typography, CircularProgress, Button, Divider, Dialog, DialogTitle, DialogContent, DialogActions, TextField, List, ListItem, ListItemText, Chip } from "@mui/material";
 import defaultTeam from "~shared/assets/img/defaultTeam.webp";
 import DefaultAvatar from "~shared/assets/img/User-avatar.png";
 import { useRef, useEffect, useState } from "react";
@@ -6,6 +6,7 @@ import React from "react";
 import { apiClient } from "~shared/lib/api";
 import { pathKeys } from "~shared/lib/react-router";
 import { Link } from "react-router-dom"; 
+import { toast } from "react-toastify";
 
 interface DashboardRenderContentProps {
   activeTab: string;
@@ -48,12 +49,50 @@ export const DashboardRenderContent: React.FC<DashboardRenderContentProps> = ({
   handleDeleteMatch, handleSelectMatch,
 }) => {  
   const [prize, setPrize] = useState<any>(null);
+  const [openCompleteTourneyDialog, setOpenCompleteTourneyDialog] = useState(false);
+  const [tourneyPlayers, setTourneyPlayers] = useState<any[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedGoalkeeper, setSelectedGoalkeeper] = useState<any>(null);
+  const [selectedDefender, setSelectedDefender] = useState<any>(null);
+  const [loadingPlayers, setLoadingPlayers] = useState(false);
+  const [isTourneyFinished, setIsTourneyFinished] = useState<boolean>(false);
+  const [loadingFinished, setLoadingFinished] = useState(false);
 
   useEffect(() => {
     if (selectedTourney) {
       FetchPrizes(selectedTourney);
     }
   }, [selectedTourney]);
+
+  useEffect(() => {
+    const fetchFinished = async () => {
+      if (!selectedTourney) return;
+      setLoadingFinished(true);
+      try {
+        const res = await apiClient.get(`/api/admin/tourney/finished/${selectedTourney.id}`);
+        setIsTourneyFinished(res.data === true);
+      } catch (e) {
+        setIsTourneyFinished(false);
+      } finally {
+        setLoadingFinished(false);
+      }
+    };
+    fetchFinished();
+  }, [selectedTourney]);
+
+  const handleSetTourneyFinished = async (finished: boolean) => {
+    if (!selectedTourney) return;
+    setLoadingFinished(true);
+    try {
+      await apiClient.patch(`/api/admin/tourney/finished/edit/${selectedTourney.id}`, { finished: finished ? true : false });
+      setIsTourneyFinished(finished);
+      toast.success(finished ? 'Турнир завершён!' : 'Турнир снова открыт для редактирования!');
+    } catch (e) {
+      toast.error('Ошибка при изменении статуса турнира');
+    } finally {
+      setLoadingFinished(false);
+    }
+  };
 
   const FetchPrizes = (selectedTourney) => {
     if (selectedTourney) {
@@ -118,6 +157,89 @@ export const DashboardRenderContent: React.FC<DashboardRenderContentProps> = ({
     setSelectedMatch(match); 
     setOpenMatchDialog(true);
   };
+
+  const handleCompleteTourney = () => {
+    setOpenCompleteTourneyDialog(true);
+    fetchTourneyPlayers();
+  };
+
+  const handleCloseCompleteTourneyDialog = () => {
+    setOpenCompleteTourneyDialog(false);
+    setSearchTerm('');
+    setSelectedGoalkeeper(null);
+    setSelectedDefender(null);
+  };
+
+  const fetchTourneyPlayers = async () => {
+    if (!selectedTourney) return;
+    
+    setLoadingPlayers(true);
+    try {
+      const response = await apiClient.get(`/api/teams`);
+      const allTeams = response.data;
+      
+      const allPlayers: any[] = [];
+      
+      for (const team of allTeams) {
+        try {
+          const squadResponse = await apiClient.get(`/team/squad_list/${team.id}`);
+          const players = squadResponse.data.players || [];
+          allPlayers.push(...players.map((player: any) => ({
+            ...player,
+            teamTitle: team.title
+          })));
+        } catch (error) {
+          console.error(`Ошибка загрузки игроков команды ${team.title}:`, error);
+        }
+      }
+      
+      setTourneyPlayers(allPlayers);
+    } catch (error) {
+      console.error("Ошибка загрузки игроков турнира:", error);
+    } finally {
+      setLoadingPlayers(false);
+    }
+  };
+
+  const handleConfirmCompleteTourney = async () => {
+    if (!selectedGoalkeeper || !selectedDefender || !selectedTourney) {
+      toast.error("Пожалуйста, выберите вратаря и защитника");
+      return;
+    }
+
+    try {
+      const response = await apiClient.post('/api/admin/tourney/player/prizes/add', {
+        tourneyId: selectedTourney.id,
+        goalkeeperId: selectedGoalkeeper.id,
+        defenderId: selectedDefender.id
+      });
+
+      if (response.status === 200) {
+        toast.success("Турнир успешно завершен!");
+        handleCloseCompleteTourneyDialog();
+      }
+    } catch (error) {
+      console.error("Ошибка завершения турнира:", error);
+      toast.error("Ошибка при завершении турнира");
+    }
+  };
+
+  const filteredPlayers = tourneyPlayers.filter(player => 
+    player.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    player.surname?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    player.teamTitle?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    player.position?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const goalkeepers = filteredPlayers.filter(player => 
+    player.position?.toLowerCase().includes('вратарь') || 
+    player.position?.toLowerCase().includes('goalkeeper')
+  );
+
+  const defenders = filteredPlayers.filter(player => 
+    player.position?.toLowerCase().includes('защитник') || 
+    player.position?.toLowerCase().includes('defender')
+  );
 
   const renderLoading = <Typography className="flex justify-center items-center h-64"><CircularProgress /></Typography>;
   const renderError = <Typography color="error">{error}</Typography>;
@@ -253,11 +375,28 @@ export const DashboardRenderContent: React.FC<DashboardRenderContentProps> = ({
               <div className="mb-4 flex justify-between items-center max-md:flex-col">
                 <Typography variant="h5" fontWeight="bold">Список Матчей</Typography>
                 <div className="flex gap-2 max-md:mt-2">
-                  <Button className="bg-tundora text-white text-base max-md:text-sm" onClick={handleAddMatch}>Добавить Матч</Button>
+                  <Button className="bg-tundora text-white text-base max-md:text-sm" onClick={handleAddMatch} disabled={isTourneyFinished}>Добавить Матч</Button>
                   {prize ? (
-                    <Button className="bg-blue text-white text-base max-md:text-sm" onClick={() => handleEditPrize(selectedTourney, prize)}>Редактировать места</Button>
+                    <Button className="bg-blue text-white text-base max-md:text-sm" onClick={() => handleEditPrize(selectedTourney, prize)} disabled={isTourneyFinished}>Редактировать места</Button>
                   ) : (
-                    <Button className="bg-blue text-white text-base max-md:text-sm" onClick={() => handleAddPrize(selectedTourney)}>Распределить места</Button>
+                    <Button className="bg-blue text-white text-base max-md:text-sm" onClick={() => handleAddPrize(selectedTourney)} disabled={isTourneyFinished}>Распределить места</Button>
+                  )}
+                  {!isTourneyFinished ? (
+                    <Button 
+                      className="bg-blue text-white text-base max-md:text-sm" 
+                      onClick={handleCompleteTourney}
+                      disabled={!selectedTourney || isTourneyFinished}
+                    >
+                      Завершить турнир
+                    </Button>
+                  ) : (
+                    <Button 
+                      className="bg-blue text-white text-base max-md:text-sm" 
+                      onClick={() => handleSetTourneyFinished(false)}
+                      disabled={loadingFinished}
+                    >
+                      Продолжить турнир
+                    </Button>
                   )}
                 </div>
               </div>
@@ -294,5 +433,143 @@ export const DashboardRenderContent: React.FC<DashboardRenderContentProps> = ({
         return null;
     }
   };
-  return renderTabContent();
+  
+  return (
+    <>
+      {renderTabContent()}
+      
+      {/* Модалка завершения турнира */}
+      <Dialog 
+        open={openCompleteTourneyDialog} 
+        onClose={handleCloseCompleteTourneyDialog}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle>
+          <Typography variant="h6" fontWeight="bold">
+            Завершить турнир "{selectedTourney?.title}"
+          </Typography>
+        </DialogTitle>
+        
+        <DialogContent>
+          <Typography variant="body1" sx={{ mb: 2 }}>
+            Выберите лучших игроков турнира:
+          </Typography>
+          
+          <TextField
+            fullWidth
+            label="Поиск игроков"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            sx={{ mb: 3 }}
+            placeholder="Поиск по имени, команде или позиции..."
+          />
+          
+          {loadingPlayers ? (
+            <Box display="flex" justifyContent="center" p={3}>
+              <CircularProgress />
+            </Box>
+          ) : (
+            <Box display="flex" gap={3}>
+              {/* Вратари */}
+              <Box flex={1}>
+                <Typography variant="h6" fontWeight="bold" sx={{ mb: 2 }}>
+                  Лучший вратарь
+                </Typography>
+                {selectedGoalkeeper && (
+                  <Box sx={{ mb: 2, p: 2, bgcolor: 'primary.light', borderRadius: 1 }}>
+                    <Typography variant="body1" fontWeight="bold">
+                      {selectedGoalkeeper.name} {selectedGoalkeeper.surname}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {selectedGoalkeeper.teamTitle} • {selectedGoalkeeper.position}
+                    </Typography>
+                  </Box>
+                )}
+                <List sx={{ maxHeight: 200, overflow: 'auto', border: 1, borderColor: 'divider', borderRadius: 1 }}>
+                  {goalkeepers.map((player) => (
+                    <ListItem 
+                      key={player.id}
+                      component="div"
+                      sx={{ 
+                        cursor: 'pointer',
+                        '&:hover': { backgroundColor: 'action.hover' },
+                        backgroundColor: selectedGoalkeeper?.id === player.id ? 'action.selected' : 'transparent'
+                      }}
+                      onClick={() => setSelectedGoalkeeper(player)}
+                    >
+                      <ListItemText
+                        primary={`${player.name} ${player.surname}`}
+                        secondary={`${player.teamTitle} • ${player.position}`}
+                      />
+                    </ListItem>
+                  ))}
+                  {goalkeepers.length === 0 && (
+                    <ListItem>
+                      <ListItemText primary="Вратари не найдены" />
+                    </ListItem>
+                  )}
+                </List>
+              </Box>
+              
+              {/* Защитники */}
+              <Box flex={1}>
+                <Typography variant="h6" fontWeight="bold" sx={{ mb: 2 }}>
+                  Лучший защитник
+                </Typography>
+                {selectedDefender && (
+                  <Box sx={{ mb: 2, p: 2, bgcolor: 'primary.light', borderRadius: 1 }}>
+                    <Typography variant="body1" fontWeight="bold">
+                      {selectedDefender.name} {selectedDefender.surname}
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {selectedDefender.teamTitle} • {selectedDefender.position}
+                    </Typography>
+                  </Box>
+                )}
+                <List sx={{ maxHeight: 200, overflow: 'auto', border: 1, borderColor: 'divider', borderRadius: 1 }}>
+                  {defenders.map((player) => (
+                    <ListItem 
+                      key={player.id}
+                      component="div"
+                      sx={{ 
+                        cursor: 'pointer',
+                        '&:hover': { backgroundColor: 'action.hover' },
+                        backgroundColor: selectedDefender?.id === player.id ? 'action.selected' : 'transparent'
+                      }}
+                      onClick={() => setSelectedDefender(player)}
+                    >
+                      <ListItemText
+                        primary={`${player.name} ${player.surname}`}
+                        secondary={`${player.teamTitle} • ${player.position}`}
+                      />
+                    </ListItem>
+                  ))}
+                  {defenders.length === 0 && (
+                    <ListItem>
+                      <ListItemText primary="Защитники не найдены" />
+                    </ListItem>
+                  )}
+                </List>
+              </Box>
+            </Box>
+          )}
+        </DialogContent>
+        
+        <DialogActions>
+          <Button onClick={handleCloseCompleteTourneyDialog}>
+            Отмена
+          </Button>
+          <Button 
+            onClick={handleConfirmCompleteTourney}
+            variant="contained"
+            color="primary"
+            disabled={!selectedGoalkeeper || !selectedDefender}
+          >
+            Завершить турнир
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
+  );
 };

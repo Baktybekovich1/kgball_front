@@ -150,7 +150,7 @@ export const TourneyContent: React.FC<Props> = ({ selectedTab, matches, tourname
             <Link
               key={index}
               to={pathKeys.matches.bySlug(String(match.gameId))}
-              className="block bg-gradient-to-r from-blue-100 to-blue-50 hover:from-blue-200 hover:to-blue-100 duration-200 rounded-2xl p-6 shadow-md border border-blue-200 group"
+              className="block bg-gradient-to-r from-blue-100 to-blue-50 hover:from-blue-200 hover:to-blue-100 duration-200 rounded-2xl p-6 shadow-md border border-blue-500 group"
               style={{ textDecoration: 'none' }}
             >
               <Box className="flex flex-col gap-3 items-center">
