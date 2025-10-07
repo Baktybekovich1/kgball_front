@@ -16,6 +16,7 @@ interface DashboardRenderContentProps {
   matches: any[];
   tournaments: any[];
   leagues: any[];
+  bestByMonthData: any[];
   selectedTeam: any;
   setSelectedTeam: (team: any) => void;
   setSelectedPlayerId: (player: any) => void;
@@ -40,7 +41,7 @@ interface DashboardRenderContentProps {
 }
 
 export const DashboardRenderContent: React.FC<DashboardRenderContentProps> = ({
-  activeTab, loading, error, teams, matches, tournaments, leagues, 
+  activeTab, loading, error, teams, matches, tournaments, leagues, bestByMonthData,
   selectedTeam, setSelectedTeam, setSelectedPlayerId, teamDetails, 
   handleCreateTeamClick, handleDeleteTeam, handleOpenPlayerDialog, 
   handleDeletePlayer, handleEditTeam, setPlayerDetails, handleOpenTournamentClick, 
@@ -364,6 +365,37 @@ export const DashboardRenderContent: React.FC<DashboardRenderContentProps> = ({
             </div>
             <div className="grid grid-cols-2 max-md:grid-cols-1 gap-5">
               {leagues.map(league => renderCard(league, () => {}, () => {}))}
+            </div>
+          </Box>
+        );
+      case "bestByMonth":
+        if (loading) return renderLoading;
+        if (error) return renderError;
+        return (
+          <Box>
+            <div className="mb-4 flex justify-between items-center">
+              <Typography variant="h5" fontWeight="bold">Лучшие по месяцам</Typography>
+              <Button className="bg-tundora text-white text-base">Добавить месяц</Button>
+            </div>
+            <div className="grid grid-cols-2 max-md:grid-cols-1 gap-5">
+              {bestByMonthData.length > 0 ? (
+                bestByMonthData.map((item, index) => (
+                  <Card key={index} className="p-4">
+                    <CardContent>
+                      <Typography variant="h6" fontWeight="bold" gutterBottom>
+                        {item.month || `Месяц ${index + 1}`}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {item.description || 'Описание месяца'}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+                ))
+              ) : (
+                <Typography variant="body1" color="text.secondary">
+                  Пока нет данных о лучших по месяцам
+                </Typography>
+              )}
             </div>
           </Box>
         );

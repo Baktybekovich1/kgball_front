@@ -41,6 +41,7 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
   const [selectedPrize, setSelectedPrize] = useState<any>(null);
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
   const [playerDetails, setPlayerDetails] = useState<string | null>(null);
+  const [bestByMonthData, setBestByMonthData] = useState<any[]>([]);
 
   const handleOpenPlayerDialog = useCallback(() => setOpenPlayerDialog(true), []);
   const handleClosePlayerDialog = useCallback(() => setOpenPlayerDialog(false), []);
@@ -77,6 +78,23 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
       setLoading(false);
     }
   }, []);
+
+  const fetchBestByMonth = useCallback(async () => {
+    try {
+      setLoading(true);
+      // Здесь можно добавить API endpoint для загрузки лучших по месяцам
+      // const response = await apiClient.get("/api/best-by-month");
+      // setBestByMonthData(response.data);
+      
+      // Пока что используем заглушку
+      setBestByMonthData([]);
+      setLoading(false);
+    } catch (error) {
+      console.error("Ошибка при загрузке лучших по месяцам:", error);
+      toast.error("Не удалось загрузить данные");
+      setLoading(false);
+    }
+  }, []);
   
   useEffect(() => {
     if (selectedTourney !== null) {
@@ -96,7 +114,13 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
     if (selectedTourney && activeTab === "matches") {
       fetchMatches(selectedTourney.id);
     }
-  }, [selectedTourney, activeTab, fetchMatches]); 
+  }, [selectedTourney, activeTab, fetchMatches]);
+
+  useEffect(() => {
+    if (activeTab === "bestByMonth") {
+      fetchBestByMonth();
+    }
+  }, [activeTab, fetchBestByMonth]);
   
   const handleSelectMatch = (match: any | null) => {
       if (!match) {
@@ -231,6 +255,7 @@ export const DashboardContent: React.FC<DashboardContentProps> = ({
         matches={matches}
         tournaments={tournaments}
         leagues={leagues}
+        bestByMonthData={bestByMonthData}
         selectedTeam={selectedTeam}
         setSelectedTeam={setSelectedTeam}
         teamDetails={teamDetails}

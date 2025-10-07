@@ -116,6 +116,11 @@ export const DashboardPage: React.FC = () => {
               </ListItemButton>
             </ListItem>
             <ListItem disablePadding>
+              <ListItemButton onClick={() => setActiveTab("bestByMonth")}>
+                <Typography variant="body1">Лучшие по месяцам</Typography>
+              </ListItemButton>
+            </ListItem>
+            <ListItem disablePadding>
               <ListItemButton component={Link} to={pathKeys.dashboard.playerTransfer()}>
                 <Typography variant="body1">Переместить игрока</Typography>
               </ListItemButton>
