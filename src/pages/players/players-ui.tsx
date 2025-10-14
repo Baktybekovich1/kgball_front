@@ -65,40 +65,44 @@ export const PlayersPage: React.FC = () => {
         Список игроков
       </Typography>
 
-      <Box className="max-md:flex-col mb-4 flex gap-2 justify-center text-center">
-        <Select 
-          value={filter} 
-          onChange={(e) => setFilter(e.target.value)}
-          size="small"
-          sx={{ fontSize: "14px", minWidth: 120 }}
-        >
-          <MenuItem value="all">Весь список</MenuItem>
-          <MenuItem value="bombers">Бомбардиры</MenuItem>
-          <MenuItem value="assistants">Ассистенты</MenuItem>
-        </Select>
-        <TextField
-          label="Поиск по имени"
-          variant="outlined"
-          size="small"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          sx={{ minWidth: 180 }}
-        />
-        <Button 
-          variant={view === 'cards' ? "contained" : "outlined"} 
-          onClick={() => setView('cards')}
-          size="small"
-          sx={{ minWidth: 80, padding: "4px 8px", fontSize: "12px" }}
-        >Карточки</Button>
-        <Button 
-          variant={view === 'table' ? "contained" : "outlined"} 
-          onClick={() => setView('table')}
-          size="small"
-          sx={{ minWidth: 80, padding: "4px 8px", fontSize: "12px" }}
-        > Таблица</Button>
+      <Box className="flex flex-col md:flex-row gap-2 mb-4 justify-center text-center">
+        <Box className="flex flex-col sm:flex-row gap-2 justify-center">
+          <Select 
+            value={filter} 
+            onChange={(e) => setFilter(e.target.value)}
+            size="small"
+            sx={{ fontSize: "14px", minWidth: 120 }}
+          >
+            <MenuItem value="all">Весь список</MenuItem>
+            <MenuItem value="bombers">Бомбардиры</MenuItem>
+            <MenuItem value="assistants">Ассистенты</MenuItem>
+          </Select>
+          <TextField
+            label="Поиск по имени"
+            variant="outlined"
+            size="small"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            sx={{ minWidth: 180 }}
+          />
+        </Box>
+        <Box className="flex gap-2 justify-center">
+          <Button 
+            variant={view === 'cards' ? "contained" : "outlined"} 
+            onClick={() => setView('cards')}
+            size="small"
+            sx={{ minWidth: 80, padding: "4px 8px", fontSize: "12px" }}
+          >Карточки</Button>
+          <Button 
+            variant={view === 'table' ? "contained" : "outlined"} 
+            onClick={() => setView('table')}
+            size="small"
+            sx={{ minWidth: 80, padding: "4px 8px", fontSize: "12px" }}
+          > Таблица</Button>
+        </Box>
       </Box>
       {view === 'cards' ? (
-        <Box className="grid grid-cols-2 max-md:grid-cols-1 gap-6">
+        <Box className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
           {filteredAndSortedPlayers.map(player => (
             <PlayerCard key={player.playerId} player={player} />
           ))}

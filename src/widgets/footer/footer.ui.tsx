@@ -22,7 +22,7 @@ export const Footer: React.FC = () => {
             to="/"
             sx={{ fontWeight: 'bold', fontSize: '1.5rem', color: 'white', textDecoration: 'none', letterSpacing: 1 }}
           >
-            KYRGYZBALL
+            KARA-BULAK LEAGUE
           </Typography>
           {isAuthenticated ? (
             <Button

@@ -145,38 +145,83 @@ export const TourneyContent: React.FC<Props> = ({ selectedTab, matches, tourname
       );
     case "матчи":
       return (
-        <div className="w-full grid gap-5 grid-cols-1 md:grid-cols-2">
-          {matches.map((match, index) => (
-            <Link
-              key={index}
-              to={pathKeys.matches.bySlug(String(match.gameId))}
-              className="block bg-gradient-to-r from-blue-100 to-blue-50 hover:from-blue-200 hover:to-blue-100 duration-200 rounded-2xl p-6 shadow-md border border-blue-500 group"
-              style={{ textDecoration: 'none' }}
-            >
-              <Box className="flex flex-col gap-3 items-center">
-                <Box className="flex w-full items-center justify-between">
-                  <Typography className="font-semibold text-blue-900 text-lg text-left w-2/5 truncate">
-                    {match.loserTeamTitle}
-                  </Typography>
-                  <div className="flex flex-col items-center w-1/5">
-                    <div className="text-xs text-blue-500 mb-1 font-medium uppercase tracking-wider">Счёт</div>
-                    <div className="flex items-center gap-2 text-2xl font-extrabold text-blue-800">
-                      <span>{match.loserTeamGoals}</span>
-                      <span className="text-red-500 text-2xl">:</span>
-                      <span>{match.winnerTeamGoals}</span>
-                    </div>
-                  </div>
-                  <Typography className="font-semibold text-blue-900 text-lg text-right w-2/5 truncate">
-                    {match.winnerTeamTitle}
-                  </Typography>
+        <div className="w-full">
+          <Typography variant="h5" className="mb-6 text-center font-bold text-gray-800">
+            Матчи турнира
+          </Typography>
+          <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
+            {matches.map((match, index) => (
+              <Link
+                key={index}
+                to={pathKeys.matches.bySlug(String(match.gameId))}
+                className="block group"
+                style={{ textDecoration: 'none' }}
+              >
+                <Box 
+                  sx={{
+                    background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
+                    borderRadius: 3,
+                    p: 3,
+                    border: '2px solid #e5e7eb',
+                    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)',
+                    transition: 'all 0.3s ease',
+                    '&:hover': {
+                      transform: 'translateY(-4px)',
+                      boxShadow: '0 12px 24px rgba(0, 0, 0, 0.15)',
+                      borderColor: '#3b82f6',
+                      background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)'
+                    }
+                  }}
+                >
+                  <Box className="flex items-center justify-between mb-3">
+                    <Typography 
+                      className="font-bold text-gray-800 text-sm sm:text-base truncate flex-1 mr-2"
+                      sx={{ color: '#1f2937' }}
+                    >
+                      {match.loserTeamTitle}
+                    </Typography>
+                    
+                    <Box className="flex flex-col items-center px-4 py-2 bg-gradient-to-r from-blue-50 to-blue-100 rounded-xl border border-blue-200">
+                      <Typography className="text-xs text-blue-600 font-semibold uppercase tracking-wider mb-1">
+                        Счёт
+                      </Typography>
+                      <Box className="flex items-center gap-1">
+                        <Typography 
+                          className="text-2xl font-bold"
+                          sx={{ color: '#1e40af' }}
+                        >
+                          {match.loserTeamGoals}
+                        </Typography>
+                        <Typography className="text-gray-400 text-xl font-bold">:</Typography>
+                        <Typography 
+                          className="text-2xl font-bold"
+                          sx={{ color: '#1e40af' }}
+                        >
+                          {match.winnerTeamGoals}
+                        </Typography>
+                      </Box>
+                    </Box>
+                    
+                    <Typography 
+                      className="font-bold text-gray-800 text-sm sm:text-base truncate flex-1 ml-2 text-right"
+                      sx={{ color: '#1f2937' }}
+                    >
+                      {match.winnerTeamTitle}
+                    </Typography>
+                  </Box>
+                  
+                  <Box className="flex justify-between items-center pt-2 border-t border-gray-200">
+                    <Typography className="text-xs text-gray-600">
+                      📅 {match.date ? new Date(match.date).toLocaleDateString('ru-RU') : 'Дата не указана'}
+                    </Typography>
+                    <Typography className="text-xs text-blue-600 font-semibold bg-blue-100 px-2 py-1 rounded-full">
+                      Игра #{match.gameId}
+                    </Typography>
+                  </Box>
                 </Box>
-                <Box className="flex w-full justify-between text-xs text-blue-700 opacity-80 mt-2">
-                  <span>Дата: {match.date ? new Date(match.date).toLocaleDateString() : '-'}</span>
-                  <span>Игра #{match.gameId}</span>
-                </Box>
-              </Box>
-            </Link>
-          ))}
+              </Link>
+            ))}
+          </div>
         </div>
       );
     default:

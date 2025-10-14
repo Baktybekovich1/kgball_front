@@ -70,12 +70,12 @@
   "main": "eslint.config.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Baktybekovich1/kgball_front"
+    "url": "git+https://github.com/Baktybekovich1/kara-bulak-league_front"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Baktybekovich1/kgball_front"
+    "url": "https://github.com/Baktybekovich1/kara-bulak-league_front"
   },
-  "homepage": "https://github.com/Baktybekovich1/kgball_front#readme"
+  "homepage": "https://github.com/Baktybekovich1/kara-bulak-league_front#readme"
 }

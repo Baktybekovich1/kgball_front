@@ -21,11 +21,11 @@ import { removeAuthToken } from '~shared/slices/auth/authSlice';
 import { useDispatch, useSelector } from 'react-redux';
 
 const listLink = [
-  { title: 'Главная', url: '/' },
-  { title: 'Игроки', url: '/player/list' },
-  { title: 'Команды', url: '/teams' },
-  { title: 'Матчи', url: '/matches' },
-  { title: 'Турниры', url: '/tournaments' },
+  { title: 'Главная', url: '/', icon: '🏠' },
+  { title: 'Игроки', url: '/player/list', icon: '👥' },
+  { title: 'Команды', url: '/teams', icon: '🏆' },
+  { title: 'Матчи', url: '/matches', icon: '⚽' },
+  { title: 'Турниры', url: '/tournaments', icon: '🏅' },
 ];
 
 export const Navigate: React.FC = () => {
@@ -52,13 +52,29 @@ export const Navigate: React.FC = () => {
           to={pathKeys.home()}
           sx={{ fontWeight: 700, fontSize: '1.3rem', color: '#2563eb', textDecoration: 'none', letterSpacing: 1 }}
         >
-          KYRGYZBALL
+          KARA-BULAK LEAGUE
         </Typography>
 
         {isMobile ? (
           <>
-            <IconButton edge="start" onClick={toggleDrawer(true)} sx={{ background: '#2563eb', color: '#fff', p: 1.2, borderRadius: 2, boxShadow: '0 2px 8px rgba(37,99,235,0.15)' }}>
-              <MenuIcon sx={{ color: '#fff', fontSize: 32 }} />
+            <IconButton 
+              edge="start" 
+              onClick={toggleDrawer(true)} 
+              sx={{ 
+                background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)', 
+                color: '#fff', 
+                p: 1.5, 
+                borderRadius: 3, 
+                boxShadow: '0 4px 12px rgba(37,99,235,0.3)',
+                transition: 'all 0.2s ease',
+                '&:hover': {
+                  background: 'linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%)',
+                  transform: 'translateY(-2px)',
+                  boxShadow: '0 6px 16px rgba(37,99,235,0.4)'
+                }
+              }}
+            >
+              <MenuIcon sx={{ color: '#fff', fontSize: 28 }} />
             </IconButton>
             <Drawer
               anchor="right"
@@ -66,15 +82,20 @@ export const Navigate: React.FC = () => {
               onClose={toggleDrawer(false)}
               PaperProps={{
                 sx: {
-                  background: '#2563eb',
+                  background: 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)',
                   color: '#fff',
-                  width: 260,
+                  width: 280,
                   p: 0,
-                  boxShadow: '0 4px 24px rgba(37,99,235,0.18)'
+                  boxShadow: '0 8px 32px rgba(37,99,235,0.25)'
                 }
               }}
             >
-              <List sx={{ width: 260, p: 0 }}>
+              <Box sx={{ p: 3, borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                <Typography variant="h6" sx={{ fontWeight: 700, color: '#fff', textAlign: 'center' }}>
+                  Меню
+                </Typography>
+              </Box>
+              <List sx={{ width: 280, p: 0 }}>
                 {listLink.map((item, index) => (
                   <ListItem key={index} onClick={toggleDrawer(false)} sx={{ p: 0 }}>
                     <ListItemText>
@@ -84,41 +105,51 @@ export const Navigate: React.FC = () => {
                           textDecoration: 'none',
                           color: '#fff',
                           width: '100%',
-                          display: 'block',
-                          padding: '14px 24px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          padding: '16px 24px',
                           borderRadius: 0,
-                          fontWeight: 500,
-                          fontSize: 17,
-                          background: location.pathname === item.url ? '#1e40af' : 'transparent',
-                          transition: 'all 0.2s',
+                          fontWeight: 600,
+                          fontSize: 16,
+                          background: location.pathname === item.url 
+                            ? 'rgba(255,255,255,0.2)' 
+                            : 'transparent',
+                          transition: 'all 0.3s ease',
+                          borderLeft: location.pathname === item.url ? '4px solid #fff' : '4px solid transparent'
                         }}
-                        onMouseOver={e => e.currentTarget.style.background = '#3b82f6'}
-                        onMouseOut={e => e.currentTarget.style.background = location.pathname === item.url ? '#1e40af' : 'transparent'}
+                        onMouseOver={e => e.currentTarget.style.background = 'rgba(255,255,255,0.15)'}
+                        onMouseOut={e => e.currentTarget.style.background = location.pathname === item.url ? 'rgba(255,255,255,0.2)' : 'transparent'}
                       >
+                        <span style={{ marginRight: '12px', fontSize: '18px' }}>{item.icon}</span>
                         {item.title}
                       </Link>
                     </ListItemText>
                   </ListItem>
                 ))}
                 {isAuthenticated && (
-                  <ListItem onClick={toggleDrawer(false)} sx={{ p: 0 }}>
+                  <ListItem onClick={toggleDrawer(false)} sx={{ p: 0, mt: 2 }}>
                     <ListItemText>
                       <Button
                         onClick={handleLogout}
                         sx={{
                           width: '100%',
-                          padding: '14px 24px',
-                          background: 'rgba(255,255,255,0.12)',
+                          padding: '16px 24px',
+                          background: 'rgba(255,255,255,0.1)',
                           color: '#fff',
                           fontWeight: 600,
                           borderRadius: 0,
                           fontSize: 16,
                           boxShadow: 'none',
                           textAlign: 'left',
-                          transition: 'all 0.2s',
-                          '&:hover': { background: 'rgba(255,255,255,0.22)' }
+                          transition: 'all 0.3s ease',
+                          borderLeft: '4px solid transparent',
+                          '&:hover': { 
+                            background: 'rgba(255,255,255,0.2)',
+                            borderLeft: '4px solid #fff'
+                          }
                         }}
                       >
+                        <span style={{ marginRight: '12px', fontSize: '18px' }}>🚪</span>
                         Выйти
                       </Button>
                     </ListItemText>
@@ -128,49 +159,72 @@ export const Navigate: React.FC = () => {
             </Drawer>
           </>
         ) : (
-          <Box sx={{ display: 'flex', gap: 1.5 }}>
+          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
             {listLink.map((item, index) => (
-              <Typography
+              <Button
                 component={Link}
                 to={item.url}
                 key={index}
+                variant={location.pathname === item.url ? "contained" : "outlined"}
                 sx={{
-                  textDecoration: 'none',
+                  minWidth: { xs: 100, sm: 120 },
+                  fontWeight: 600,
+                  borderRadius: 3,
+                  fontSize: { xs: 13, sm: 14 },
+                  px: 2.5,
+                  py: 1,
+                  background: location.pathname === item.url 
+                    ? 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)' 
+                    : '#2563eb',
                   color: '#fff',
-                  padding: '8px 18px',
-                  borderRadius: 8,
-                  fontWeight: 500,
-                  fontSize: 15,
-                  background: location.pathname === item.url ? '#1e40af' : '#2563eb',
-                  boxShadow: location.pathname === item.url ? '0 2px 8px rgba(30,64,175,0.12)' : 'none',
-                  transition: 'all 0.2s',
+                  borderColor: location.pathname === item.url ? '#2563eb' : '#2563eb',
+                  borderWidth: 2,
+                  boxShadow: location.pathname === item.url 
+                    ? '0 4px 12px rgba(37, 99, 235, 0.3)' 
+                    : '0 2px 4px rgba(0, 0, 0, 0.1)',
+                  transform: location.pathname === item.url ? 'translateY(-1px)' : 'translateY(0)',
+                  transition: 'all 0.2s ease',
                   '&:hover': {
-                    background: '#3b82f6',
+                    background: location.pathname === item.url 
+                      ? 'linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%)'
+                      : 'linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%)',
                     color: '#fff',
-                  },
+                    borderColor: location.pathname === item.url ? '#1e40af' : '#1e40af',
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 6px 16px rgba(37, 99, 235, 0.2)'
+                  }
                 }}
               >
-                {item.title}
-              </Typography>
+                <span className="mr-1.5">{item.icon}</span>
+                <span className="hidden sm:inline">{item.title}</span>
+                <span className="sm:hidden">{item.title.split(' ')[0]}</span>
+              </Button>
             ))}
             {isAuthenticated && (
               <Button
                 onClick={handleLogout}
+                variant="outlined"
                 sx={{
-                  marginLeft: '12px',
-                  padding: '8px 18px',
-                  background: '#f3f4f6',
-                  color: '#222',
-                  fontWeight: 500,
-                  borderRadius: 8,
-                  fontSize: 15,
-                  border: '1px solid #e0e7ef',
-                  boxShadow: 'none',
-                  transition: 'all 0.2s',
-                  '&:hover': { background: '#e0e7ef' }
+                  marginLeft: '8px',
+                  padding: '8px 16px',
+                  background: 'rgba(255, 255, 255, 0.1)',
+                  color: '#fff',
+                  fontWeight: 600,
+                  borderRadius: 3,
+                  fontSize: 14,
+                  borderColor: 'rgba(255, 255, 255, 0.3)',
+                  borderWidth: 2,
+                  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                  transition: 'all 0.2s ease',
+                  '&:hover': { 
+                    background: 'rgba(255, 255, 255, 0.2)',
+                    borderColor: 'rgba(255, 255, 255, 0.5)',
+                    transform: 'translateY(-1px)',
+                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.15)'
+                  }
                 }}
               >
-                Выйти
+                🚪 Выйти
               </Button>
             )}
           </Box>

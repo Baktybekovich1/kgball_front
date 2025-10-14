@@ -103,49 +103,65 @@ export const TournamentPage: React.FC = () => {
               </div>
             )}
           </Box>
-          <Box className="flex flex-wrap gap-3 justify-center mb-8">
-            <Button
-              variant={selectedTab === "обзор" ? "contained" : "outlined"}
-              onClick={() => setSelectedTab("обзор")}
-              sx={{ minWidth: 140, fontWeight: 600, borderRadius: 8, fontSize: 16, background: selectedTab === "обзор" ? '#2563eb' : '#fff', color: selectedTab === "обзор" ? '#fff' : '#2563eb', borderColor: '#2563eb', '&:hover': { background: '#1e40af', color: '#fff', borderColor: '#1e40af' } }}
-            >
-              Обзор
-            </Button>
-            <Button
-              variant={selectedTab === "бомбардиры" ? "contained" : "outlined"}
-              onClick={() => setSelectedTab("бомбардиры")}
-              sx={{ minWidth: 140, fontWeight: 600, borderRadius: 8, fontSize: 16, background: selectedTab === "бомбардиры" ? '#2563eb' : '#fff', color: selectedTab === "бомбардиры" ? '#fff' : '#2563eb', borderColor: '#2563eb', '&:hover': { background: '#1e40af', color: '#fff', borderColor: '#1e40af' } }}
-            >
-              Бомбардиры
-            </Button>
-            <Button
-              variant={selectedTab === "ассистенты" ? "contained" : "outlined"}
-              onClick={() => setSelectedTab("ассистенты")}
-              sx={{ minWidth: 140, fontWeight: 600, borderRadius: 8, fontSize: 16, background: selectedTab === "ассистенты" ? '#2563eb' : '#fff', color: selectedTab === "ассистенты" ? '#fff' : '#2563eb', borderColor: '#2563eb', '&:hover': { background: '#1e40af', color: '#fff', borderColor: '#1e40af' } }}
-            >
-              Ассистенты
-            </Button>
-            <Button
-              variant={selectedTab === "результативные" ? "contained" : "outlined"}
-              onClick={() => setSelectedTab("результативные")}
-              sx={{ minWidth: 140, fontWeight: 600, borderRadius: 8, fontSize: 16, background: selectedTab === "результативные" ? '#2563eb' : '#fff', color: selectedTab === "результативные" ? '#fff' : '#2563eb', borderColor: '#2563eb', '&:hover': { background: '#1e40af', color: '#fff', borderColor: '#1e40af' } }}
-            >
-              Результативные
-            </Button>
-            <Button
-              variant={selectedTab === "матчи" ? "contained" : "outlined"}
-              onClick={() => {
-                if (selectedTab !== "матчи") {
-                  fetchMatches(Number(id));
-                  setSelectedTab("матчи");
-                }
-              }}
-              sx={{ minWidth: 140, fontWeight: 600, borderRadius: 8, fontSize: 16, background: selectedTab === "матчи" ? '#2563eb' : '#fff', color: selectedTab === "матчи" ? '#fff' : '#2563eb', borderColor: '#2563eb', '&:hover': { background: '#1e40af', color: '#fff', borderColor: '#1e40af' } }}
-            >
-              Матчи
-            </Button>
+          <Box className="flex flex-wrap gap-2 justify-center mb-8 p-4 bg-gray-50 rounded-2xl">
+            {[
+              { key: "обзор", label: "Обзор", icon: "📊" },
+              { key: "бомбардиры", label: "Бомбардиры", icon: "⚽" },
+              { key: "ассистенты", label: "Ассистенты", icon: "🎯" },
+              { key: "результативные", label: "Результативные", icon: "🏆" },
+              { key: "матчи", label: "Матчи", icon: "⚽" }
+            ].map((tab) => (
+              <Button
+                key={tab.key}
+                variant={selectedTab === tab.key ? "contained" : "outlined"}
+                onClick={() => {
+                  if (tab.key === "матчи" && selectedTab !== "матчи") {
+                    fetchMatches(Number(id));
+                  }
+                  setSelectedTab(tab.key);
+                }}
+                sx={{
+                  minWidth: { xs: 120, sm: 140 },
+                  fontWeight: 600,
+                  borderRadius: 3,
+                  fontSize: { xs: 14, sm: 16 },
+                  px: 3,
+                  py: 1.5,
+                  background: selectedTab === tab.key 
+                    ? 'linear-gradient(135deg, #2563eb 0%, #1e40af 100%)' 
+                    : '#fff',
+                  color: selectedTab === tab.key ? '#fff' : '#2563eb',
+                  borderColor: selectedTab === tab.key ? '#2563eb' : '#e5e7eb',
+                  borderWidth: 2,
+                  boxShadow: selectedTab === tab.key 
+                    ? '0 4px 12px rgba(37, 99, 235, 0.3)' 
+                    : '0 2px 4px rgba(0, 0, 0, 0.1)',
+                  transform: selectedTab === tab.key ? 'translateY(-2px)' : 'translateY(0)',
+                  transition: 'all 0.2s ease',
+                  '&:hover': {
+                    background: selectedTab === tab.key 
+                      ? 'linear-gradient(135deg, #1e40af 0%, #1d4ed8 100%)'
+                      : 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+                    color: selectedTab === tab.key ? '#fff' : '#1e40af',
+                    borderColor: selectedTab === tab.key ? '#1e40af' : '#2563eb',
+                    transform: 'translateY(-2px)',
+                    boxShadow: '0 6px 16px rgba(37, 99, 235, 0.2)'
+                  }
+                }}
+              >
+                <span className="mr-2">{tab.icon}</span>
+                <span className="hidden sm:inline">{tab.label}</span>
+                <span className="sm:hidden">{tab.label.split(' ')[0]}</span>
+              </Button>
+            ))}
           </Box>
-          <Box className="w-full bg-white rounded-2xl shadow-lg p-6 border border-blue-100">
+          <Box 
+            className="w-full bg-white rounded-2xl shadow-lg border border-blue-100"
+            sx={{
+              p: { xs: 3, sm: 4, md: 6 },
+              minHeight: '400px'
+            }}
+          >
             <TourneyContent
               selectedTab={selectedTab}
               tournament={tournament}

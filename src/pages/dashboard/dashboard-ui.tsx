@@ -89,7 +89,7 @@ export const DashboardPage: React.FC = () => {
         <Box sx={{ width: 300, p: 3, bgcolor: "#f9f9f9", height: "100%" }}>
           <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center", mb: 2 }}>
             <Typography variant="h6" fontWeight="bold" color="primary">
-              KYRGYZBALL
+              KARA-BULAK LEAGUE
             </Typography>
             <IconButton 
               onClick={() => setIsSidebarOpen(false)} 
