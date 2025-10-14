@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://kara-bulak-league.twc1.net/sitemap.xml
+Sitemap: https://kara-bulak.tw1.su/sitemap.xml
